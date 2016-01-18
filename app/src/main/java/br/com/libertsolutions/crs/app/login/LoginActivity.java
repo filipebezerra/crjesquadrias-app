@@ -1,0 +1,114 @@
+package br.com.libertsolutions.crs.app.login;
+
+import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputLayout;
+import android.text.TextUtils;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import br.com.libertsolutions.crs.app.R;
+import br.com.libertsolutions.crs.app.base.BaseActivity;
+import br.com.libertsolutions.crs.app.form.FormUtil;
+import br.com.libertsolutions.crs.app.keyboard.KeyboardUtil;
+import butterknife.Bind;
+import butterknife.OnFocusChange;
+
+import static android.support.design.widget.Snackbar.LENGTH_SHORT;
+
+public class LoginActivity extends BaseActivity {
+    @Override
+    protected int provideLayoutResource() {
+        return R.layout.activity_login;
+    }
+
+    @Override
+    protected int provideUpIndicatorResource() {
+        return R.drawable.ic_clear_24dp;
+    }
+
+    @Override
+    protected int provideMenuResource() {
+        return R.menu.activity_login;
+    }
+
+    @Bind(R.id.root_view) protected FrameLayout mRootView;
+    @Bind(R.id.cpf) protected EditText mCpfView;
+    @Bind(R.id.cpf_helper) protected TextInputLayout mCpfHelper;
+    @Bind(R.id.password) protected EditText mPasswordView;
+    @Bind(R.id.password_helper) protected TextInputLayout mPasswordHelper;
+
+    private FormUtil mFormUtil = new FormUtil();
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            
+            case R.id.action_done:
+                doLogin();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @OnFocusChange(R.id.cpf)
+    public void onCpfViewFocusChange(boolean focused) {
+        if (focused) {
+            final Object cpf = mCpfView.getTag();
+
+            if (cpf != null) {
+                mCpfView.setText(cpf.toString());
+                mCpfView.selectAll();
+            }
+        } else {
+            if (!TextUtils.isEmpty(mCpfView.getText())
+                    && mCpfView.getText().toString().length() == 11) {
+                final String cpf = mCpfView.getText().toString();
+
+                final StringBuilder cpfFormatted = new StringBuilder(cpf)
+                        .insert(3, ".")
+                        .insert(7, ".")
+                        .insert(11, "-");
+
+                mCpfView.setText(cpfFormatted.toString());
+                mCpfView.setTag(cpf);
+            }
+        }
+    }
+
+    private void doLogin() {
+        if (!mFormUtil.enableOrRemoveErrorInView(mCpfHelper, "CPF deve ser informado",
+                mCpfView)) {
+            mFormUtil.enableOrRemoveErrorInView(mCpfHelper, "CPF deve conter 11 dígitos",
+                    mCpfView.getTag().toString().length() == 11);
+        }
+
+        mFormUtil.enableOrRemoveErrorInView(mPasswordHelper, "Senha deve ser informada",
+                mPasswordView);
+
+        if (!mFormUtil.hasErrors()) {
+
+        } else {
+            final View currentFocus = getCurrentFocus();
+
+            Snackbar.make(mRootView, "Corrija os erros para continuar com login", LENGTH_SHORT)
+                    .setCallback(new Snackbar.Callback() {
+                        @Override
+                        public void onDismissed(Snackbar snackbar, int event) {
+                            KeyboardUtil.showKeyboard(LoginActivity.this, currentFocus);
+                        }
+
+                        @Override
+                        public void onShown(Snackbar snackbar) {
+                            KeyboardUtil.hideKeyboard(LoginActivity.this, currentFocus);
+                        }
+                    })
+                    .show();
+        }
+    }
+}

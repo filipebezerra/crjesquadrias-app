@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">CRS</string>
+    <string name="title_login_activity">Login</string>
+    <string name="action_done">Pronto</string>
+</resources>
