@@ -12,7 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import br.com.libertsolutions.crs.app.R;
-import br.com.libertsolutions.crs.app.drawable.TintHelper;
+import br.com.libertsolutions.crs.app.drawable.DrawableHelper;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -47,11 +47,11 @@ public abstract class BaseActivity extends AppCompatActivity {
                 final Drawable icon = menuItem.getIcon();
 
                 if (icon != null) {
-                    menuItem.setIcon(
-                            TintHelper.withContext(this)
-                                    .withDrawable(icon)
-                                    .withColor(R.color.white)
-                                    .tint());
+                    DrawableHelper.withContext(this)
+                            .withDrawable(icon)
+                            .withColor(R.color.white)
+                            .tint()
+                            .applyTo(menuItem);
                 }
             }
 
@@ -71,10 +71,11 @@ public abstract class BaseActivity extends AppCompatActivity {
                     && provideUpIndicatorResource() != NO_UP_INDICATOR) {
                 actionBar.setDisplayHomeAsUpEnabled(true);
                 actionBar.setHomeAsUpIndicator(
-                        TintHelper.withContext(this)
+                        DrawableHelper.withContext(this)
                                 .withDrawable(provideUpIndicatorResource())
                                 .withColor(R.color.white)
-                                .tint());
+                                .tint()
+                                .get());
             }
         }
     }

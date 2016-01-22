@@ -1,16 +1,21 @@
-package br.com.libertsolutions.crs.app.project;
+package br.com.libertsolutions.crs.app.main;
 
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.application.RequestCodes;
 import br.com.libertsolutions.crs.app.base.BaseActivity;
 import br.com.libertsolutions.crs.app.login.LoginActivity;
 import br.com.libertsolutions.crs.app.login.LoginHelper;
+import br.com.libertsolutions.crs.app.project.ProjectAdapter;
+import br.com.libertsolutions.crs.app.recyclerview.DividerDecoration;
 import br.com.libertsolutions.crs.app.settings.SettingsActivity;
 import br.com.libertsolutions.crs.app.settings.SettingsActivityCompat;
 import br.com.libertsolutions.crs.app.settings.SettingsHelper;
+import butterknife.ButterKnife;
 
 /**
  * Application main screen.
@@ -20,6 +25,8 @@ import br.com.libertsolutions.crs.app.settings.SettingsHelper;
  * @since 0.1.0
  */
 public class MainActivity extends BaseActivity {
+
+    private ProjectAdapter mProjectAdapter;
 
     @Override
     protected int provideLayoutResource() {
@@ -45,6 +52,12 @@ public class MainActivity extends BaseActivity {
                         RequestCodes.LAUNCH_SETTINGS_SCREEN);
         } else
             checkOutIfNeedToLogInUser();
+
+        RecyclerView mProjectsView = ButterKnife.findById(this, R.id.list);
+        mProjectsView.setLayoutManager(new LinearLayoutManager(this));
+        mProjectsView.setHasFixedSize(true);
+        mProjectsView.setAdapter(mProjectAdapter = new ProjectAdapter());
+        mProjectsView.addItemDecoration(new DividerDecoration(this));
     }
 
     @Override

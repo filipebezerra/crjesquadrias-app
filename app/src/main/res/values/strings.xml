@@ -23,4 +23,7 @@
     <string name="auth_key_pref_desc">
         Chave autenticável para obter acesso aos dados disponibilizados pelo Web service.
     </string>
+    <string name="project_id_caption">Código:</string>
+    <string name="customer_name_caption">Cliente:</string>
+    <string name="delivery_or_start_date_caption">Previsão de entrega:</string>
 </resources>
