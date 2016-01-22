@@ -26,6 +26,11 @@ public class SettingsActivity extends BaseActivity {
     }
 
     @Override
+    protected int provideUpIndicatorResource() {
+        return R.drawable.ic_arrow_back_24dp;
+    }
+
+    @Override
     protected void onCreate(Bundle inState) {
         super.onCreate(inState);
 

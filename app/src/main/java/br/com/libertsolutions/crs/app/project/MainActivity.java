@@ -30,6 +30,10 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle inState) {
         super.onCreate(inState);
 
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(R.string.title_activity_main);
+        }
+
         if (!SettingsHelper.isAppliedOnFirstRun(this)) {
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.GINGERBREAD_MR1)
                 startActivityForResult(

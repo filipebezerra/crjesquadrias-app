@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">CRS</string>
     <string name="title_login_activity">Login</string>
+    <string name="title_activity_main">Projetos</string>
+    <string name="title_activity_settings">Configurações</string>
+
     <string name="action_done">Pronto</string>
 
     <string name="server_url_pref_title">Endereço do Web service</string>
@@ -20,5 +23,4 @@
     <string name="auth_key_pref_desc">
         Chave autenticável para obter acesso aos dados disponibilizados pelo Web service.
     </string>
-    <string name="title_activity_main">Projetos</string>
 </resources>
