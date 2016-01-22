@@ -14,7 +14,6 @@ import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.base.BaseActivity;
 import br.com.libertsolutions.crs.app.form.FormUtil;
 import br.com.libertsolutions.crs.app.keyboard.KeyboardUtil;
-import br.com.libertsolutions.crs.app.settings.SettingsActivity;
 import butterknife.Bind;
 import butterknife.OnFocusChange;
 
@@ -96,7 +95,8 @@ public class LoginActivity extends BaseActivity {
                 mPasswordView);
 
         if (!mFormUtil.hasErrors()) {
-
+            LoginHelper.loginUser(this);
+            finish();
         } else {
             final View currentFocus = getCurrentFocus();
 

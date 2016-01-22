@@ -26,4 +26,6 @@
     <string name="project_id_caption">Código:</string>
     <string name="customer_name_caption">Cliente:</string>
     <string name="delivery_or_start_date_caption">Previsão de entrega:</string>
+    <string name="action_logout">Sair</string>
+    <string name="action_settings">Configurações</string>
 </resources>

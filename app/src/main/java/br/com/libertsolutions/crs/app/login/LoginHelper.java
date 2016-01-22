@@ -26,7 +26,10 @@ public class LoginHelper {
         return sharedPreferences.getBoolean(KEY_IS_USER_LOGGED, false);
     }
 
-    public static void setUserAsLogged(@NonNull Context context) {
+    public static void loginUser(@NonNull Context context) {
+        if (isUserLogged(context))
+            return;
+
         final SharedPreferences sharedPreferences
                 = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -35,5 +38,21 @@ public class LoginHelper {
                 .apply(
                         sharedPreferences.edit()
                                 .putBoolean(KEY_IS_USER_LOGGED, true));
+    }
+
+    public static void logoutUser(@NonNull Context context) {
+        if (!isUserLogged(context))
+            return;
+
+        final SharedPreferences sharedPreferences
+                = PreferenceManager.getDefaultSharedPreferences(context);
+
+        SharedPreferencesCompat.EditorCompat
+                .getInstance()
+                .apply(
+                        sharedPreferences.edit()
+                                .putBoolean(KEY_IS_USER_LOGGED, false));
+
+        //TODO: delete stored user data
     }
 }
