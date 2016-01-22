@@ -88,7 +88,7 @@ public class LoginActivity extends BaseActivity {
         if (!mFormUtil.enableOrRemoveErrorInView(mCpfHelper, "CPF deve ser informado",
                 mCpfView)) {
             mFormUtil.enableOrRemoveErrorInView(mCpfHelper, "CPF deve conter 11 dígitos",
-                    mCpfView.getTag() != null);
+                    mCpfView.getTag() != null || mCpfView.getText().length() == 11);
         }
 
         mFormUtil.enableOrRemoveErrorInView(mPasswordHelper, "Senha deve ser informada",
