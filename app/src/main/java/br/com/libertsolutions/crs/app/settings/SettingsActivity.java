@@ -4,8 +4,12 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
+import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.view.MenuItem;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.base.BaseActivity;
@@ -52,10 +56,37 @@ public class SettingsActivity extends BaseActivity {
     }
 
     public static class SettingsFragment extends PreferenceFragment {
+        private static Preference.OnPreferenceChangeListener sOnPreferenceChangeListener
+                = new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                String stringValue = newValue.toString();
+
+                if (preference instanceof EditTextPreference) {
+                    if (!TextUtils.isEmpty(stringValue)) {
+                        preference.setSummary(stringValue);
+                    }
+                }
+
+                return true;
+            }
+        };
+
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.settings);
+            bindPreferenceSummaryToValue(findPreference("server_url"));
+            bindPreferenceSummaryToValue(findPreference("auth_key"));
+        }
+
+        private static void bindPreferenceSummaryToValue(Preference preference) {
+            preference.setOnPreferenceChangeListener(sOnPreferenceChangeListener);
+
+            sOnPreferenceChangeListener.onPreferenceChange(preference,
+                    PreferenceManager
+                            .getDefaultSharedPreferences(preference.getContext())
+                            .getString(preference.getKey(), ""));
         }
     }
 
