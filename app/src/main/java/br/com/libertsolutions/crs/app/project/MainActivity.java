@@ -43,25 +43,29 @@ public class MainActivity extends BaseActivity {
                 startActivityForResult(
                         SettingsActivityCompat.getLauncherIntent(getApplicationContext()),
                         RequestCodes.LAUNCH_SETTINGS_SCREEN);
-        } else if (!LoginHelper.isUserLogged(this)) {
-            startActivityForResult(
-                    LoginActivity.getLauncherIntent(getApplicationContext()),
-                    RequestCodes.LAUNCH_LOGIN_SCREEN);
-        }
+        } else
+            checkOutIfNeedToLogInUser();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK) {
-            switch (requestCode) {
-                case RequestCodes.LAUNCH_SETTINGS_SCREEN:
-                    break;
+        switch (requestCode) {
+            case RequestCodes.LAUNCH_SETTINGS_SCREEN:
+                checkOutIfNeedToLogInUser();
+                break;
 
-                case RequestCodes.LAUNCH_LOGIN_SCREEN:
-                    break;
-            }
+            case RequestCodes.LAUNCH_LOGIN_SCREEN:
+                break;
         }
 
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void checkOutIfNeedToLogInUser() {
+        if (!LoginHelper.isUserLogged(this)) {
+            startActivityForResult(
+                    LoginActivity.getLauncherIntent(getApplicationContext()),
+                    RequestCodes.LAUNCH_LOGIN_SCREEN);
+        }
     }
 }
