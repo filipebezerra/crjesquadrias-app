@@ -1,9 +1,13 @@
 package br.com.libertsolutions.crs.app.main;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.content.IntentCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
@@ -136,5 +140,11 @@ public class MainActivity extends BaseActivity {
                     SettingsActivityCompat.getLauncherIntent(getApplicationContext()),
                     RequestCodes.LAUNCH_SETTINGS_SCREEN);
         }
+    }
+
+    public static Intent getLauncherIntent(@NonNull Context context) {
+        return IntentCompat
+                .makeMainActivity(new ComponentName(context, MainActivity.class))
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     }
 }
