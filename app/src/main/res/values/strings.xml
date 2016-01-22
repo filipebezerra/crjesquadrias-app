@@ -2,4 +2,23 @@
     <string name="app_name">CRS</string>
     <string name="title_login_activity">Login</string>
     <string name="action_done">Pronto</string>
+
+    <string name="server_url_pref_title">Endereço do Web service</string>
+    <string name="server_url_pref_default_value">http://</string>
+    <string name="server_url_pref_dialog_title">Confirme a URL do Web service</string>
+    <string name="server_url_dialog_message">Informe o endereço completo incluindo http://</string>
+    <string name="server_url_pref_desc">
+        Endereço do Web service que o aplicativo comunicará para envio e recebimento de dados.
+    </string>
+
+    <string name="auth_key_pref_title">Chave de autenticação</string>
+    <string name="auth_key_pref_default_value">626c6f63736b696e</string>
+    <string name="auth_key_pref_dialog_title">Confirme a chave de autenticação</string>
+    <string name="auth_key_dialog_message">
+        Informe o texto da chave de autenticação para conceder acesso ao Web service
+    </string>
+    <string name="auth_key_pref_desc">
+        Chave autenticável para obter acesso aos dados disponibilizados pelo Web service.
+    </string>
+    <string name="title_activity_main">Projetos</string>
 </resources>

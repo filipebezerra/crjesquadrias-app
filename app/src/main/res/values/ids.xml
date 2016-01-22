@@ -3,4 +3,5 @@
     <item name="toolbar" type="id" />
     <item name="action_done" type="id" />
     <item name="root_view" type="id" />
+    <item name="content_frame" type="id" />
 </resources>

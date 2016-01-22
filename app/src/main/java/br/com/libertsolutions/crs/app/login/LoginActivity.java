@@ -1,5 +1,8 @@
 package br.com.libertsolutions.crs.app.login;
 
+import android.content.Context;
+import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
@@ -11,6 +14,7 @@ import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.base.BaseActivity;
 import br.com.libertsolutions.crs.app.form.FormUtil;
 import br.com.libertsolutions.crs.app.keyboard.KeyboardUtil;
+import br.com.libertsolutions.crs.app.settings.SettingsActivity;
 import butterknife.Bind;
 import butterknife.OnFocusChange;
 
@@ -110,5 +114,9 @@ public class LoginActivity extends BaseActivity {
                     })
                     .show();
         }
+    }
+
+    public static Intent getLauncherIntent(@NonNull Context context) {
+        return new Intent(context, LoginActivity.class);
     }
 }

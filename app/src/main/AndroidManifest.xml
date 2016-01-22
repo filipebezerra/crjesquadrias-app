@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="br.com.libertsolutions.crs.app"
     >
 
@@ -9,20 +10,39 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Crs"
+        tools:ignore="AllowBackup,UnusedAttribute"
         >
+
         <activity
-            android:name=".login.LoginActivity"
-            android:label="@string/title_login_activity"
+            android:name=".project.MainActivity"
+            android:label="@string/title_activity_main"
             android:theme="@style/Crs.NoActionBar"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
-            android:windowSoftInputMode="stateVisible|adjustResize"
-            android:noHistory="true"
             >
             <intent-filter>
-                <category android:name="android.intent.category.LAUNCHER" />
                 <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".login.LoginActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
+            android:label="@string/title_login_activity"
+            android:noHistory="true"
+            android:theme="@style/Crs.NoActionBar"
+            android:windowSoftInputMode="stateVisible|adjustResize"
+            />
+
+        <activity
+            android:name=".settings.SettingsActivity"
+            android:theme="@style/Crs.NoActionBar"
+            />
+
+        <activity
+            android:name=".settings.SettingsActivityCompat"
+            android:theme="@style/Crs.NoActionBar"
+            />
     </application>
 
 </manifest>

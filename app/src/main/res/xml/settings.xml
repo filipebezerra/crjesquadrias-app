@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--suppress AndroidElementNotAllowed -->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.afollestad.materialdialogs.prefs.MaterialEditTextPreference
+        android:key="server_url"
+        android:title="@string/server_url_pref_title"
+        android:inputType="text|textUri"
+        android:persistent="true"
+        android:defaultValue="@string/server_url_pref_default_value"
+        android:dialogTitle="@string/server_url_pref_dialog_title"
+        android:dialogMessage="@string/server_url_dialog_message"
+        android:summary="@string/server_url_pref_desc"
+        />
+
+    <com.afollestad.materialdialogs.prefs.MaterialEditTextPreference
+        android:key="auth_key"
+        android:title="@string/auth_key_pref_title"
+        android:inputType="text"
+        android:persistent="true"
+        android:defaultValue="@string/auth_key_pref_default_value"
+        android:dialogTitle="@string/auth_key_pref_dialog_title"
+        android:dialogMessage="@string/auth_key_dialog_message"
+        android:summary="@string/auth_key_pref_desc"
+        />
+
+</PreferenceScreen>

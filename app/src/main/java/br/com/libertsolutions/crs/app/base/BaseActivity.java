@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.MenuRes;
+import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -26,7 +27,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected static final int NO_UP_INDICATOR = -1;
     protected static final int NO_MENU = -1;
 
-    @Bind(R.id.toolbar) protected Toolbar mToolbarAsActionBar;
+    @Nullable @Bind(R.id.toolbar) protected Toolbar mToolbarAsActionBar;
 
     @Override
     protected void onCreate(Bundle inState) {
