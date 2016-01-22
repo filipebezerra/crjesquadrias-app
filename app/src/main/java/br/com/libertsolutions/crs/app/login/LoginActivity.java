@@ -95,7 +95,7 @@ public class LoginActivity extends BaseActivity {
                 mPasswordView);
 
         if (!mFormUtil.hasErrors()) {
-            LoginHelper.loginUser(this);
+            LoginHelper.loginUser(this, mCpfView.getTag().toString());
             finish();
         } else {
             final View currentFocus = getCurrentFocus();

@@ -15,6 +15,7 @@ import android.support.v4.content.SharedPreferencesCompat;
  */
 public class LoginHelper {
     private static final String KEY_IS_USER_LOGGED = "isUserLogged";
+    private static final String KEY_USER_CPF = "cpf";
 
     private LoginHelper() {
         // no constructor
@@ -26,7 +27,7 @@ public class LoginHelper {
         return sharedPreferences.getBoolean(KEY_IS_USER_LOGGED, false);
     }
 
-    public static void loginUser(@NonNull Context context) {
+    public static void loginUser(@NonNull Context context, @NonNull String cpf) {
         if (isUserLogged(context))
             return;
 
@@ -37,7 +38,13 @@ public class LoginHelper {
                 .getInstance()
                 .apply(
                         sharedPreferences.edit()
-                                .putBoolean(KEY_IS_USER_LOGGED, true));
+                                .putBoolean(KEY_IS_USER_LOGGED, true)
+                                .putString(KEY_USER_CPF, cpf));
+    }
+
+    public static String getUserLogged(@NonNull Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(KEY_USER_CPF, null);
     }
 
     public static void logoutUser(@NonNull Context context) {
@@ -51,8 +58,7 @@ public class LoginHelper {
                 .getInstance()
                 .apply(
                         sharedPreferences.edit()
-                                .putBoolean(KEY_IS_USER_LOGGED, false));
-
-        //TODO: delete stored user data
+                                .putBoolean(KEY_IS_USER_LOGGED, false)
+                                .remove(KEY_USER_CPF));
     }
 }

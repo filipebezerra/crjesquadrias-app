@@ -48,10 +48,13 @@ public class MainActivity extends BaseActivity {
             getSupportActionBar().setTitle(R.string.title_activity_main);
         }
 
-        if (!SettingsHelper.isAppliedOnFirstRun(this)) {
+        if (!SettingsHelper.isSettingsApplied(this)) {
             showSettingsScreen();
-        } else
-            showLoginScreenIfNeed();
+        } else if (!LoginHelper.isUserLogged(this)) {
+            showLoginScreen();
+        } else {
+            showUserLoggedInfo();
+        }
 
         RecyclerView mProjectsView = ButterKnife.findById(this, R.id.list);
         mProjectsView.setLayoutManager(new LinearLayoutManager(this));
@@ -64,14 +67,22 @@ public class MainActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case RequestCodes.LAUNCH_SETTINGS_SCREEN:
-                showLoginScreenIfNeed();
+                if (!SettingsHelper.isSettingsApplied(this)) {
+                    finish();
+                }
+
+                if (!LoginHelper.isUserLogged(this)) {
+                    showLoginScreen();
+                } else {
+                    showUserLoggedInfo();
+                }
                 break;
 
             case RequestCodes.LAUNCH_LOGIN_SCREEN:
                 if (!LoginHelper.isUserLogged(this)) {
                     finish();
                 } else {
-                    FeedbackHelper.snackbar(mRootView, "Usuário logado com sucesso!", false);
+                    showUserLoggedInfo();
                 }
                 break;
         }
@@ -79,12 +90,17 @@ public class MainActivity extends BaseActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void showLoginScreenIfNeed() {
-        if (!LoginHelper.isUserLogged(this)) {
-            startActivityForResult(
-                    LoginActivity.getLauncherIntent(getApplicationContext()),
-                    RequestCodes.LAUNCH_LOGIN_SCREEN);
-        }
+    private void showUserLoggedInfo() {
+        final String userCpf = LoginHelper.getUserLogged(this);
+        FeedbackHelper
+                .snackbar(mRootView, String.format("Logado com cpf %s.", userCpf),
+                        false);
+    }
+
+    private void showLoginScreen() {
+        startActivityForResult(
+                LoginActivity.getLauncherIntent(getApplicationContext()),
+                RequestCodes.LAUNCH_LOGIN_SCREEN);
     }
 
     @Override
@@ -111,13 +127,14 @@ public class MainActivity extends BaseActivity {
     }
 
     private void showSettingsScreen() {
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.GINGERBREAD_MR1)
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.GINGERBREAD_MR1) {
             startActivityForResult(
                     SettingsActivity.getLauncherIntent(getApplicationContext()),
                     RequestCodes.LAUNCH_SETTINGS_SCREEN);
-        else
+        } else {
             startActivityForResult(
                     SettingsActivityCompat.getLauncherIntent(getApplicationContext()),
                     RequestCodes.LAUNCH_SETTINGS_SCREEN);
+        }
     }
 }
