@@ -12,6 +12,10 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="Crs.LaunchScreen" parent="Crs.NoActionBar">
+        <item name="colorPrimaryDark">@color/launch_background</item>
+    </style>
+
     <style name="Crs.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Crs.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />

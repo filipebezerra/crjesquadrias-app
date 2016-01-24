@@ -3,37 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorAccent"
+    android:padding="16dp"
+    android:background="@drawable/launch_screen_bg"
     tools:context="com.suleiman.material.activities.LaunchScreenActivity"
     >
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="125dp"
+        android:background="@drawable/launch_screen_logo"
         android:layout_gravity="center"
-        android:orientation="vertical"
-        >
-
-        <TextView
-            style="@style/TextAppearance.AppCompat.Display1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="CRS"
-            android:textColor="@android:color/primary_text_dark"
-            android:textStyle="bold"
-            />
-
-        <TextView
-            style="@style/TextAppearance.AppCompat.Title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:gravity="center"
-            android:text="Esquadrias em alumínio"
-            android:textColor="@android:color/secondary_text_dark"
-            />
-    </LinearLayout>
-
-
+        />
 </FrameLayout>
