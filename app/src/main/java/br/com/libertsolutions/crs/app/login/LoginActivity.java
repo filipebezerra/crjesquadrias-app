@@ -12,12 +12,11 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.base.BaseActivity;
+import br.com.libertsolutions.crs.app.feedback.FeedbackHelper;
 import br.com.libertsolutions.crs.app.form.FormUtil;
 import br.com.libertsolutions.crs.app.keyboard.KeyboardUtil;
 import butterknife.Bind;
 import butterknife.OnFocusChange;
-
-import static android.support.design.widget.Snackbar.LENGTH_SHORT;
 
 public class LoginActivity extends BaseActivity {
     @Override
@@ -100,8 +99,8 @@ public class LoginActivity extends BaseActivity {
         } else {
             final View currentFocus = getCurrentFocus();
 
-            Snackbar.make(mRootView, "Corrija os erros para continuar com login", LENGTH_SHORT)
-                    .setCallback(new Snackbar.Callback() {
+            FeedbackHelper.snackbar(mRootView, "Corrija os erros para continuar com login",
+                    true, new Snackbar.Callback() {
                         @Override
                         public void onDismissed(Snackbar snackbar, int event) {
                             KeyboardUtil.showKeyboard(LoginActivity.this, currentFocus);
@@ -111,8 +110,7 @@ public class LoginActivity extends BaseActivity {
                         public void onShown(Snackbar snackbar) {
                             KeyboardUtil.hideKeyboard(LoginActivity.this, currentFocus);
                         }
-                    })
-                    .show();
+                    });
         }
     }
 
