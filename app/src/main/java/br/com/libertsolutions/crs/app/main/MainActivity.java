@@ -12,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.application.RequestCodes;
 import br.com.libertsolutions.crs.app.base.BaseActivity;
@@ -20,9 +21,12 @@ import br.com.libertsolutions.crs.app.login.LoginActivity;
 import br.com.libertsolutions.crs.app.login.LoginHelper;
 import br.com.libertsolutions.crs.app.project.ProjectAdapter;
 import br.com.libertsolutions.crs.app.recyclerview.DividerDecoration;
+import br.com.libertsolutions.crs.app.recyclerview.OnClickListener;
+import br.com.libertsolutions.crs.app.recyclerview.OnTouchListener;
 import br.com.libertsolutions.crs.app.settings.SettingsActivity;
 import br.com.libertsolutions.crs.app.settings.SettingsActivityCompat;
 import br.com.libertsolutions.crs.app.settings.SettingsHelper;
+import br.com.libertsolutions.crs.app.stage.StageActivity;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -33,7 +37,7 @@ import butterknife.ButterKnife;
  * @version 0.1.0, 22/01/2016
  * @since 0.1.0
  */
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements OnClickListener {
 
     private ProjectAdapter mProjectAdapter;
 
@@ -63,8 +67,12 @@ public class MainActivity extends BaseActivity {
         RecyclerView mProjectsView = ButterKnife.findById(this, R.id.list);
         mProjectsView.setLayoutManager(new LinearLayoutManager(this));
         mProjectsView.setHasFixedSize(true);
-        mProjectsView.setAdapter(mProjectAdapter = new ProjectAdapter());
-        mProjectsView.addItemDecoration(new DividerDecoration(this));
+        mProjectsView.setAdapter(
+                mProjectAdapter = new ProjectAdapter());
+        mProjectsView.addItemDecoration(
+                new DividerDecoration(this));
+        mProjectsView.addOnItemTouchListener(
+                new OnTouchListener(this, mProjectsView, this));
     }
 
     @Override
@@ -144,5 +152,15 @@ public class MainActivity extends BaseActivity {
         return IntentCompat
                 .makeMainActivity(new ComponentName(context, MainActivity.class))
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    }
+
+    @Override
+    public void onSingleTapUp(View view, int position) {
+        startActivity(StageActivity.getLauncherIntent(this));
+    }
+
+    @Override
+    public void onLongPress(View view, int position) {
+
     }
 }

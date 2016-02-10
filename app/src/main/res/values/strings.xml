@@ -28,4 +28,5 @@
     <string name="delivery_or_start_date_caption">Previsão de entrega:</string>
     <string name="action_logout">Sair</string>
     <string name="action_settings">Configurações</string>
+    <string name="title_activity_stage">Etapas</string>
 </resources>

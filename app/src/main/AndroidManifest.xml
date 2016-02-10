@@ -12,51 +12,56 @@
         android:theme="@style/Crs"
         tools:ignore="AllowBackup,UnusedAttribute"
         >
-
         <activity
             android:name=".launchscreen.LaunchScreenActivity"
             android:label="@string/app_name"
-            android:theme="@style/Crs.LaunchScreen"
-            android:screenOrientation="portrait"
             android:noHistory="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/Crs.LaunchScreen"
             >
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".main.MainActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             android:label="@string/app_name"
             android:theme="@style/Crs.NoActionBar"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             />
-
         <activity
             android:name=".login.LoginActivity"
-            android:label="@string/title_login_activity"
-            android:theme="@style/Crs.NoActionBar"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
+            android:label="@string/title_login_activity"
             android:noHistory="true"
+            android:theme="@style/Crs.NoActionBar"
             android:windowSoftInputMode="stateVisible|adjustResize"
             />
-
         <activity
             android:name=".settings.SettingsActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             android:label="@string/title_activity_settings"
             android:theme="@style/Crs.NoActionBar"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             />
-
         <activity
             android:name=".settings.SettingsActivityCompat"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             android:label="@string/title_activity_settings"
             android:theme="@style/Crs.NoActionBar"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             />
+        <activity
+            android:name=".stage.StageActivity"
+            android:label="@string/title_activity_stage"
+            android:parentActivityName=".main.MainActivity"
+            android:theme="@style/Crs.NoActionBar"
+            >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="br.com.libertsolutions.crs.app.main.MainActivity"
+                />
+        </activity>
     </application>
 
 </manifest>
