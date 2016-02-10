@@ -8,4 +8,5 @@
     <item name="customer_name" type="id" />
     <item name="delivery_or_start_date" type="id" />
     <item name="list" type="id" />
+    <item name="stage_name" type="id" />
 </resources>
