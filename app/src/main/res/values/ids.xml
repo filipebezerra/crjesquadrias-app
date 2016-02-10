@@ -4,9 +4,9 @@
     <item name="action_done" type="id" />
     <item name="root_view" type="id" />
     <item name="content_frame" type="id" />
-    <item name="project_id" type="id" />
-    <item name="customer_name" type="id" />
-    <item name="delivery_or_start_date" type="id" />
+    <item name="workId" type="id" />
+    <item name="customerName" type="id" />
+    <item name="deliveryDate" type="id" />
     <item name="list" type="id" />
     <item name="stage_name" type="id" />
 </resources>

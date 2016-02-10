@@ -11,7 +11,7 @@
     >
 
     <TextView
-        android:id="@+id/project_id_caption"
+        android:id="@+id/workIdCaption"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="@style/TextAppearance.AppCompat.Caption"
@@ -19,13 +19,13 @@
         />
 
     <TextView
-        android:id="@id/project_id"
+        android:id="@id/workId"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/project_id_caption"
-        android:layout_toEndOf="@+id/project_id_caption"
-        android:layout_alignBaseline="@+id/project_id_caption"
+        android:layout_toRightOf="@+id/workIdCaption"
+        android:layout_toEndOf="@+id/workIdCaption"
+        android:layout_alignBaseline="@+id/workIdCaption"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
@@ -33,22 +33,22 @@
         />
 
     <TextView
-        android:id="@+id/customer_name_caption"
+        android:id="@+id/customerNameCaption"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/project_id_caption"
+        android:layout_below="@+id/workIdCaption"
         android:layout_marginTop="8dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Caption"
         android:text="@string/customer_name_caption"
         />
 
     <TextView
-        android:id="@id/customer_name"
+        android:id="@id/customerName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/customer_name_caption"
-        android:layout_toEndOf="@+id/customer_name_caption"
-        android:layout_alignBaseline="@+id/customer_name_caption"
+        android:layout_toRightOf="@+id/customerNameCaption"
+        android:layout_toEndOf="@+id/customerNameCaption"
+        android:layout_alignBaseline="@+id/customerNameCaption"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
@@ -56,22 +56,22 @@
         />
 
     <TextView
-        android:id="@+id/delivery_or_start_date_caption"
+        android:id="@+id/deliveryDateCaption"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/customer_name_caption"
+        android:layout_below="@+id/customerNameCaption"
         android:layout_marginTop="8dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Caption"
         android:text="@string/delivery_or_start_date_caption"
         />
 
     <TextView
-        android:id="@id/delivery_or_start_date"
+        android:id="@id/deliveryDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/delivery_or_start_date_caption"
-        android:layout_toEndOf="@+id/delivery_or_start_date_caption"
-        android:layout_alignBaseline="@+id/delivery_or_start_date_caption"
+        android:layout_toRightOf="@+id/deliveryDateCaption"
+        android:layout_toEndOf="@+id/deliveryDateCaption"
+        android:layout_alignBaseline="@+id/deliveryDateCaption"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"

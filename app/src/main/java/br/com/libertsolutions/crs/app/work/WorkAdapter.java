@@ -33,7 +33,7 @@ public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder> {
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_project, parent, false);
+                .inflate(R.layout.item_work, parent, false);
         return new ViewHolder(itemView);
     }
 
@@ -56,9 +56,9 @@ public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder> {
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        @Bind(R.id.project_id) TextView projectId;
-        @Bind(R.id.customer_name) TextView customerName;
-        @Bind(R.id.delivery_or_start_date) TextView deliveryOrStartDate;
+        @Bind(R.id.workId) TextView projectId;
+        @Bind(R.id.customerName) TextView customerName;
+        @Bind(R.id.deliveryDate) TextView deliveryOrStartDate;
 
         public ViewHolder(View itemView) {
             super(itemView);
