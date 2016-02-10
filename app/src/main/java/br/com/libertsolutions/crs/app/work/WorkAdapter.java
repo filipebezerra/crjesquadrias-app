@@ -1,4 +1,4 @@
-package br.com.libertsolutions.crs.app.project;
+package br.com.libertsolutions.crs.app.work;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -21,13 +21,13 @@ import java.util.List;
  * @version 0.1.0, 22/01/2016
  * @since 0.1.0
  */
-public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ViewHolder> {
-    @NonNull private List<Project> mProjects;
+public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder> {
+    @NonNull private List<Work> mProjects;
 
     private static DateFormat sDateInstance = SimpleDateFormat.getDateInstance(DateFormat.MEDIUM);
 
-    public ProjectAdapter() {
-        mProjects = Projects.getDataSet();
+    public WorkAdapter() {
+        mProjects = Works.getDataSet();
     }
 
     @Override
@@ -39,13 +39,13 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final Project project = mProjects.get(position);
+        final Work project = mProjects.get(position);
 
-        holder.projectId.setText(project.getProjectId());
+        holder.projectId.setText(project.getWorkId());
         holder.customerName.setText(project.getCustomerName());
 
         final Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(project.getDeliveryForecast());
+        calendar.setTimeInMillis(project.getDeliveryDate());
 
         holder.deliveryOrStartDate.setText(sDateInstance.format(calendar.getTime()));
     }

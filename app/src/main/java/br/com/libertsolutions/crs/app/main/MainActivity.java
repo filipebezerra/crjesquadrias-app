@@ -16,7 +16,7 @@ import br.com.libertsolutions.crs.app.feedback.FeedbackHelper;
 import br.com.libertsolutions.crs.app.launchscreen.LaunchScreenActivity;
 import br.com.libertsolutions.crs.app.login.LoginActivity;
 import br.com.libertsolutions.crs.app.login.LoginHelper;
-import br.com.libertsolutions.crs.app.project.ProjectAdapter;
+import br.com.libertsolutions.crs.app.work.WorkAdapter;
 import br.com.libertsolutions.crs.app.recyclerview.DividerDecoration;
 import br.com.libertsolutions.crs.app.recyclerview.OnClickListener;
 import br.com.libertsolutions.crs.app.recyclerview.OnTouchListener;
@@ -36,7 +36,7 @@ import butterknife.ButterKnife;
  */
 public class MainActivity extends BaseActivity implements OnClickListener {
 
-    private ProjectAdapter mProjectAdapter;
+    private WorkAdapter mWorkAdapter;
 
     @Bind(R.id.root_view) protected CoordinatorLayout mRootView;
 
@@ -59,7 +59,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         mProjectsView.setLayoutManager(new LinearLayoutManager(this));
         mProjectsView.setHasFixedSize(true);
         mProjectsView.setAdapter(
-                mProjectAdapter = new ProjectAdapter());
+                mWorkAdapter = new WorkAdapter());
         mProjectsView.addItemDecoration(
                 new DividerDecoration(this));
         mProjectsView.addOnItemTouchListener(
