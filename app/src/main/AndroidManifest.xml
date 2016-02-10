@@ -53,6 +53,7 @@
             />
         <activity
             android:name=".stage.StageActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             android:label="@string/title_activity_stage"
             android:parentActivityName=".main.MainActivity"
             android:theme="@style/Crs.NoActionBar"
