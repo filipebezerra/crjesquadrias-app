@@ -11,7 +11,6 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
@@ -28,67 +27,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.ViewHold
     private static DateFormat sDateInstance = SimpleDateFormat.getDateInstance(DateFormat.MEDIUM);
 
     public ProjectAdapter() {
-        mProjects = Arrays.asList(
-                new Project()
-                        .setProjectId("JUL.379.15-REV05")
-                        .setCustomerName("Gabriella e Cristiano")
-                        .setDeliveryForecast(System.currentTimeMillis()),
-
-                new Project()
-                        .setProjectId("JUL.379.15-REV05")
-                        .setCustomerName("Gabriella e Cristiano")
-                        .setDeliveryForecast(System.currentTimeMillis()),
-
-                new Project()
-                        .setProjectId("JUL.379.15-REV05")
-                        .setCustomerName("Gabriella e Cristiano")
-                        .setDeliveryForecast(System.currentTimeMillis()),
-
-                new Project()
-                        .setProjectId("JUL.379.15-REV05")
-                        .setCustomerName("Gabriella e Cristiano")
-                        .setDeliveryForecast(System.currentTimeMillis()),
-
-                new Project()
-                        .setProjectId("JUL.379.15-REV05")
-                        .setCustomerName("Gabriella e Cristiano")
-                        .setDeliveryForecast(System.currentTimeMillis()),
-
-                new Project()
-                        .setProjectId("JUL.379.15-REV05")
-                        .setCustomerName("Gabriella e Cristiano")
-                        .setDeliveryForecast(System.currentTimeMillis()),
-
-                new Project()
-                        .setProjectId("JUL.379.15-REV05")
-                        .setCustomerName("Gabriella e Cristiano")
-                        .setDeliveryForecast(System.currentTimeMillis()),
-
-                new Project()
-                        .setProjectId("JUL.379.15-REV05")
-                        .setCustomerName("Gabriella e Cristiano")
-                        .setDeliveryForecast(System.currentTimeMillis()),
-
-                new Project()
-                        .setProjectId("JUL.379.15-REV05")
-                        .setCustomerName("Gabriella e Cristiano")
-                        .setDeliveryForecast(System.currentTimeMillis()),
-
-                new Project()
-                        .setProjectId("JUL.379.15-REV05")
-                        .setCustomerName("Gabriella e Cristiano")
-                        .setDeliveryForecast(System.currentTimeMillis()),
-
-                new Project()
-                        .setProjectId("JUL.379.15-REV05")
-                        .setCustomerName("Gabriella e Cristiano")
-                        .setDeliveryForecast(System.currentTimeMillis()),
-
-                new Project()
-                        .setProjectId("JUL.379.15-REV05")
-                        .setCustomerName("Gabriella e Cristiano")
-                        .setDeliveryForecast(System.currentTimeMillis())
-        );
+        mProjects = Projects.getDataSet();
     }
 
     @Override
