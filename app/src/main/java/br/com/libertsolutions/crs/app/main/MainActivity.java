@@ -77,8 +77,6 @@ public class MainActivity extends BaseActivity {
 
                 if (!LoginHelper.isUserLogged(this)) {
                     showLoginScreen();
-                } else {
-                    showUserLoggedInfo();
                 }
                 break;
 
