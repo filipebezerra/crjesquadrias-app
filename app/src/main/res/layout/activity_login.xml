@@ -63,7 +63,9 @@
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
                 android:selectAllOnFocus="true"
-                android:imeOptions="actionDone"
+                android:imeActionId="@integer/entrar"
+                android:imeActionLabel="@string/action_login"
+                android:imeOptions="actionUnspecified"
                 android:hint="Senha"
                 />
 

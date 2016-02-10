@@ -4,7 +4,7 @@
     <string name="title_activity_main">Projetos</string>
     <string name="title_activity_settings">Configurações</string>
 
-    <string name="action_done">Pronto</string>
+    <string name="action_login">Entrar</string>
 
     <string name="server_url_pref_title">Endereço do Web service</string>
     <string name="server_url_pref_default_value">http://</string>

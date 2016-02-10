@@ -16,6 +16,7 @@ import br.com.libertsolutions.crs.app.feedback.FeedbackHelper;
 import br.com.libertsolutions.crs.app.form.FormUtil;
 import br.com.libertsolutions.crs.app.keyboard.KeyboardUtil;
 import butterknife.Bind;
+import butterknife.OnEditorAction;
 import butterknife.OnFocusChange;
 
 public class LoginActivity extends BaseActivity {
@@ -81,6 +82,15 @@ public class LoginActivity extends BaseActivity {
                 mCpfView.setTag(cpf);
             }
         }
+    }
+
+    @OnEditorAction(R.id.password)
+    public boolean onPasswordEditorAction(int actionId) {
+        if (actionId == getResources().getInteger(R.integer.entrar)) {
+            doLogin();
+            return true;
+        }
+        return false;
     }
 
     private void doLogin() {
