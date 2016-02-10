@@ -1,5 +1,6 @@
 package br.com.libertsolutions.crs.app.application;
 
+import br.com.libertsolutions.crs.app.launchscreen.LaunchScreenActivity;
 import br.com.libertsolutions.crs.app.login.LoginActivity;
 import br.com.libertsolutions.crs.app.settings.SettingsActivity;
 import br.com.libertsolutions.crs.app.settings.SettingsActivityCompat;
@@ -22,4 +23,9 @@ public interface RequestCodes {
      * Internal request code used to request launching {@link LoginActivity} asynchronously.
      */
     int LAUNCH_LOGIN_SCREEN = 2;
+
+    /**
+     * Internal request code used to request launching {@link LaunchScreenActivity} asynchronously.
+     */
+    int LAUNCH_BRAND_SCREEN = 3;
 }

@@ -17,6 +17,7 @@ import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.application.RequestCodes;
 import br.com.libertsolutions.crs.app.base.BaseActivity;
 import br.com.libertsolutions.crs.app.feedback.FeedbackHelper;
+import br.com.libertsolutions.crs.app.launchscreen.LaunchScreenActivity;
 import br.com.libertsolutions.crs.app.login.LoginActivity;
 import br.com.libertsolutions.crs.app.login.LoginHelper;
 import br.com.libertsolutions.crs.app.project.ProjectAdapter;
@@ -52,16 +53,10 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     protected void onCreate(Bundle inState) {
         super.onCreate(inState);
 
+        showLaunchScreen();
+
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(R.string.title_activity_main);
-        }
-
-        if (!SettingsHelper.isSettingsApplied(this)) {
-            showSettingsScreen();
-        } else if (!LoginHelper.isUserLogged(this)) {
-            showLoginScreen();
-        } else {
-            showUserLoggedInfo();
         }
 
         RecyclerView mProjectsView = ButterKnife.findById(this, R.id.list);
@@ -75,9 +70,25 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                 new OnTouchListener(this, mProjectsView, this));
     }
 
+    private void showLaunchScreen() {
+        startActivityForResult(
+                LaunchScreenActivity.getLauncherIntent(this),
+                RequestCodes.LAUNCH_BRAND_SCREEN);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
+            case RequestCodes.LAUNCH_BRAND_SCREEN:
+                if (!SettingsHelper.isSettingsApplied(this)) {
+                    showSettingsScreen();
+                } else if (!LoginHelper.isUserLogged(this)) {
+                    showLoginScreen();
+                } else {
+                    showUserLoggedInfo();
+                }
+                break;
+
             case RequestCodes.LAUNCH_SETTINGS_SCREEN:
                 if (!SettingsHelper.isSettingsApplied(this)) {
                     finish();

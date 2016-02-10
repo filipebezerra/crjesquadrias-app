@@ -1,10 +1,12 @@
 package br.com.libertsolutions.crs.app.launchscreen;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.base.BaseActivity;
-import br.com.libertsolutions.crs.app.main.MainActivity;
 
 /**
  * .
@@ -21,6 +23,10 @@ public class LaunchScreenActivity extends BaseActivity {
         return R.layout.activity_launch_screen;
     }
 
+    public static Intent getLauncherIntent(@NonNull Context context) {
+        return new Intent(context, LaunchScreenActivity.class);
+    }
+
     @Override
     protected void onCreate(Bundle inState) {
         super.onCreate(inState);
@@ -30,9 +36,7 @@ public class LaunchScreenActivity extends BaseActivity {
                         new Runnable() {
                             @Override
                             public void run() {
-                                startActivity(
-                                        MainActivity
-                                                .getLauncherIntent(LaunchScreenActivity.this));
+                                finish();
                             }
                         },
                         SPLASH_TIME
