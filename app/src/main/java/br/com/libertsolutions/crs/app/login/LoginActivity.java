@@ -43,13 +43,17 @@ public class LoginActivity extends BaseActivity {
 
     private FormUtil mFormUtil = new FormUtil();
 
+    public static Intent getLauncherIntent(@NonNull Context context) {
+        return new Intent(context, LoginActivity.class);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
                 return true;
-            
+
             case R.id.action_done:
                 doLogin();
                 return true;
@@ -122,9 +126,5 @@ public class LoginActivity extends BaseActivity {
                         }
                     });
         }
-    }
-
-    public static Intent getLauncherIntent(@NonNull Context context) {
-        return new Intent(context, LoginActivity.class);
     }
 }
