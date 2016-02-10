@@ -59,7 +59,7 @@
             />
 
         <activity
-            android:name=".stage.StageActivity"
+            android:name=".step.WorkStepActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             android:label="@string/title_activity_stage"
             android:parentActivityName=".main.MainActivity"

@@ -1,4 +1,4 @@
-package br.com.libertsolutions.crs.app.stage;
+package br.com.libertsolutions.crs.app.step;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,13 +14,13 @@ import br.com.libertsolutions.crs.app.recyclerview.OnClickListener;
 import br.com.libertsolutions.crs.app.recyclerview.OnTouchListener;
 import butterknife.ButterKnife;
 
-public class StageActivity extends BaseActivity implements OnClickListener {
+public class WorkStepActivity extends BaseActivity implements OnClickListener {
 
-    private StageAdapter mStageAdapter;
+    private WorkStepAdapter mStageAdapter;
 
     @Override
     protected int provideLayoutResource() {
-        return R.layout.activity_stage;
+        return R.layout.activity_work_step;
     }
 
     @Override
@@ -29,7 +29,7 @@ public class StageActivity extends BaseActivity implements OnClickListener {
     }
 
     public static Intent getLauncherIntent(@NonNull Context context) {
-        return new Intent(context, StageActivity.class);
+        return new Intent(context, WorkStepActivity.class);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class StageActivity extends BaseActivity implements OnClickListener {
         stagesView.setLayoutManager(new LinearLayoutManager(this));
         stagesView.setHasFixedSize(true);
         stagesView.setAdapter(
-                mStageAdapter = new StageAdapter());
+                mStageAdapter = new WorkStepAdapter());
         stagesView.addItemDecoration(
                 new DividerDecoration(this));
         stagesView.addOnItemTouchListener(

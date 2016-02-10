@@ -1,4 +1,4 @@
-package br.com.libertsolutions.crs.app.stage;
+package br.com.libertsolutions.crs.app.step;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -18,11 +18,11 @@ import java.util.List;
  * @version #, 10/02/2016
  * @since #
  */
-public class StageAdapter extends RecyclerView.Adapter<StageAdapter.ViewHolder> {
-    @NonNull  private final List<Stage> mStages;
+public class WorkStepAdapter extends RecyclerView.Adapter<WorkStepAdapter.ViewHolder> {
+    @NonNull  private final List<WorkStep> mStages;
 
-    public StageAdapter() {
-        mStages = Stages.getDataSet();
+    public WorkStepAdapter() {
+        mStages = WorkSteps.getDataSet();
     }
 
     @Override
@@ -34,7 +34,7 @@ public class StageAdapter extends RecyclerView.Adapter<StageAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final Stage item = mStages.get(position);
+        final WorkStep item = mStages.get(position);
         holder.stageName.setText(item.getName());
     }
 

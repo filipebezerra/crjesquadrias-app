@@ -23,7 +23,7 @@ import br.com.libertsolutions.crs.app.recyclerview.OnTouchListener;
 import br.com.libertsolutions.crs.app.settings.SettingsActivity;
 import br.com.libertsolutions.crs.app.settings.SettingsActivityCompat;
 import br.com.libertsolutions.crs.app.settings.SettingsHelper;
-import br.com.libertsolutions.crs.app.stage.StageActivity;
+import br.com.libertsolutions.crs.app.step.WorkStepActivity;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -157,7 +157,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
     @Override
     public void onSingleTapUp(View view, int position) {
-        startActivity(StageActivity.getLauncherIntent(this));
+        startActivity(WorkStepActivity.getLauncherIntent(this));
     }
 
     @Override

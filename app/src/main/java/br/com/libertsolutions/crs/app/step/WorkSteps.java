@@ -1,4 +1,4 @@
-package br.com.libertsolutions.crs.app.stage;
+package br.com.libertsolutions.crs.app.step;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,40 +11,40 @@ import java.util.List;
  * @version #, 10/02/2016
  * @since #
  */
-public final class Stages {
-    private static final List<Stage> DATA_SET;
+public final class WorkSteps {
+    private static final List<WorkStep> DATA_SET;
 
     static {
-        List<Stage> list = Arrays.asList(
-                new Stage()
+        List<WorkStep> list = Arrays.asList(
+                new WorkStep()
                         .setName("Liberação Fabricação"),
 
-                new Stage()
+                new WorkStep()
                         .setName("Liberação Compra Vidro"),
 
-                new Stage()
+                new WorkStep()
                         .setName("Entrega dos Vidros"),
 
-                new Stage()
+                new WorkStep()
                         .setName("Expedição/Checagem"),
 
-                new Stage()
+                new WorkStep()
                         .setName("Embalagem"),
 
-                new Stage()
+                new WorkStep()
                         .setName("Liberou Obra"),
 
-                new Stage()
+                new WorkStep()
                         .setName("Entrega"),
 
-                new Stage()
+                new WorkStep()
                         .setName("Instalação")
         );
 
         DATA_SET = Collections.unmodifiableList(list);
     }
 
-    public static List<Stage> getDataSet() {
+    public static List<WorkStep> getDataSet() {
         return DATA_SET;
     }
 }
