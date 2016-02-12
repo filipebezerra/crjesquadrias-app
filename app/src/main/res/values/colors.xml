@@ -6,4 +6,5 @@
     <color name="white">#FFFFFF</color>
     <color name="launch_background">@color/colorPrimaryDark</color>
     <color name="accentTranslucent">#803f825e</color>
+    <color name="blackTranslucent">#20000000</color>
 </resources>

@@ -1,6 +1,7 @@
 package br.com.libertsolutions.crs.app.step;
 
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,10 +20,10 @@ import java.util.List;
  * @since #
  */
 public class WorkStepAdapter extends RecyclerView.Adapter<WorkStepAdapter.ViewHolder> {
-    @NonNull  private final List<WorkStep> mStages;
+    @NonNull  private final List<WorkStep> mWorkSteps;
 
     public WorkStepAdapter() {
-        mStages = WorkSteps.getDataSet();
+        mWorkSteps = WorkSteps.getDataSet();
     }
 
     @Override
@@ -34,13 +35,18 @@ public class WorkStepAdapter extends RecyclerView.Adapter<WorkStepAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final WorkStep item = mStages.get(position);
+        final WorkStep item = mWorkSteps.get(position);
         holder.stageName.setText(item.getName());
+
+        if (item.getGoForward() == 0 && position != 0) {
+            holder.stageName.setTextColor(
+                    ContextCompat.getColor(holder.itemView.getContext(), R.color.blackTranslucent));
+        }
     }
 
     @Override
     public int getItemCount() {
-        return mStages.size();
+        return mWorkSteps.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
