@@ -17,34 +17,47 @@ public final class WorkSteps {
     static {
         List<WorkStep> list = Arrays.asList(
                 new WorkStep()
-                        .setName("Liberação Fabricação"),
+                        .setOrder(1)
+                        .setName("Fabricação")
+                        .setKind(0)
+                        .setGoForward(0),
 
                 new WorkStep()
-                        .setName("Liberação Compra Vidro"),
+                        .setOrder(2)
+                        .setName("Pedido Vidro")
+                        .setKind(1)
+                        .setGoForward(0),
 
                 new WorkStep()
-                        .setName("Entrega dos Vidros"),
+                        .setOrder(3)
+                        .setName("Embalagem")
+                        .setKind(0)
+                        .setGoForward(0),
 
                 new WorkStep()
-                        .setName("Expedição/Checagem"),
+                        .setOrder(4)
+                        .setName("Entrega")
+                        .setKind(0)
+                        .setGoForward(0),
 
                 new WorkStep()
-                        .setName("Embalagem"),
+                        .setOrder(5)
+                        .setName("Liberação Obra")
+                        .setKind(0)
+                        .setGoForward(0),
 
                 new WorkStep()
-                        .setName("Liberou Obra"),
-
-                new WorkStep()
-                        .setName("Entrega"),
-
-                new WorkStep()
+                        .setOrder(6)
                         .setName("Instalação")
+                        .setKind(0)
+                        .setGoForward(0)
         );
 
-        DATA_SET = Collections.unmodifiableList(list);
+        DATA_SET = list;
     }
 
     public static List<WorkStep> getDataSet() {
+        Collections.sort(DATA_SET);
         return DATA_SET;
     }
 }
