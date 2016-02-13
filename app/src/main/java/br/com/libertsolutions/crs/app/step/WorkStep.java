@@ -10,6 +10,8 @@ import android.support.annotation.NonNull;
  * @since 0.1.0
  */
 public class WorkStep implements Comparable<WorkStep> {
+    long mWorkStepId;
+
     int mOrder;
 
     String mName;
@@ -17,6 +19,15 @@ public class WorkStep implements Comparable<WorkStep> {
     int mKind;
 
     int mGoForward;
+
+    public long getWorkStepId() {
+        return mWorkStepId;
+    }
+
+    public WorkStep setWorkStepId(long workStepId) {
+        mWorkStepId = workStepId;
+        return this;
+    }
 
     public int getOrder() {
         return mOrder;
