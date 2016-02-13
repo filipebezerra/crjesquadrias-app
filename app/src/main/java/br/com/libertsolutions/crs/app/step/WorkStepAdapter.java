@@ -49,6 +49,14 @@ public class WorkStepAdapter extends RecyclerView.Adapter<WorkStepAdapter.ViewHo
         return mWorkSteps.size();
     }
 
+    public WorkStep getItem(int position) {
+        if (position < 0 || position >= mWorkSteps.size()) {
+            return null;
+        }
+
+        return mWorkSteps.get(position);
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.stage_name) TextView stageName;
 

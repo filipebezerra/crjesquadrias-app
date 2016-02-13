@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.base.BaseActivity;
+import br.com.libertsolutions.crs.app.checkin.CheckinActivity;
 import br.com.libertsolutions.crs.app.recyclerview.DividerDecoration;
 import br.com.libertsolutions.crs.app.recyclerview.OnClickListener;
 import br.com.libertsolutions.crs.app.recyclerview.OnTouchListener;
@@ -49,7 +50,11 @@ public class WorkStepActivity extends BaseActivity implements OnClickListener {
 
     @Override
     public void onSingleTapUp(View view, int position) {
+        final WorkStep item = mStageAdapter.getItem(position);
 
+        if (item != null) {
+            startActivity(CheckinActivity.getLauncherIntent(this, item));
+        }
     }
 
     @Override

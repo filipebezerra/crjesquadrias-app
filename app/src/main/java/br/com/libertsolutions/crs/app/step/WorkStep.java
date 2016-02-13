@@ -1,6 +1,9 @@
 package br.com.libertsolutions.crs.app.step;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import com.hannesdorfmann.parcelableplease.annotation.ParcelablePlease;
 
 /**
  * .
@@ -9,7 +12,8 @@ import android.support.annotation.NonNull;
  * @version 0.1.0, 10/02/2016
  * @since 0.1.0
  */
-public class WorkStep implements Comparable<WorkStep> {
+@ParcelablePlease
+public class WorkStep implements Comparable<WorkStep>,Parcelable {
     long mWorkStepId;
 
     int mOrder;
@@ -73,4 +77,26 @@ public class WorkStep implements Comparable<WorkStep> {
 
         return getOrder() < another.getOrder() ? -1 : 1;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        WorkStepParcelablePlease.writeToParcel(this, dest, flags);
+    }
+
+    public static final Creator<WorkStep> CREATOR = new Creator<WorkStep>() {
+        public WorkStep createFromParcel(Parcel source) {
+            WorkStep target = new WorkStep();
+            WorkStepParcelablePlease.readFromParcel(target, source);
+            return target;
+        }
+
+        public WorkStep[] newArray(int size) {
+            return new WorkStep[size];
+        }
+    };
 }

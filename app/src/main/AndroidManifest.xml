@@ -12,30 +12,26 @@
         android:theme="@style/Crs"
         tools:ignore="AllowBackup,UnusedAttribute"
         >
-
         <activity
             android:name=".main.MainActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             android:label="@string/app_name"
-            android:theme="@style/Crs.NoActionBar"
             android:launchMode="singleTop"
+            android:theme="@style/Crs.NoActionBar"
             >
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".launchscreen.LaunchScreenActivity"
             android:label="@string/app_name"
+            android:noHistory="true"
             android:screenOrientation="portrait"
             android:theme="@style/Crs.LaunchScreen"
-            android:noHistory="true"
             />
-
         <activity
             android:name=".login.LoginActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
@@ -43,21 +39,18 @@
             android:theme="@style/Crs.NoActionBar"
             android:windowSoftInputMode="stateVisible|adjustResize"
             />
-
         <activity
             android:name=".settings.SettingsActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             android:label="@string/title_activity_settings"
             android:theme="@style/Crs.NoActionBar"
             />
-
         <activity
             android:name=".settings.SettingsActivityCompat"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             android:label="@string/title_activity_settings"
             android:theme="@style/Crs.NoActionBar"
             />
-
         <activity
             android:name=".step.WorkStepActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
@@ -68,6 +61,17 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="br.com.libertsolutions.crs.app.main.MainActivity"
+                />
+        </activity>
+        <activity
+            android:name=".checkin.CheckinActivity"
+            android:label="@string/title_activity_checkin"
+            android:parentActivityName=".step.WorkStepActivity"
+            android:theme="@style/Crs.NoActionBar"
+            >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="br.com.libertsolutions.crs.app.step.WorkStepActivity"
                 />
         </activity>
     </application>
