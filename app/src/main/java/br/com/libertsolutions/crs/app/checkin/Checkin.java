@@ -8,19 +8,47 @@ package br.com.libertsolutions.crs.app.checkin;
  * @since #
  */
 public class Checkin {
-    String mCheckinId;
-
-    String mDescription;
+    long mCheckinId;
 
     int mStatus;
 
-    long mWorkStepId;
+    Item mItem;
 
-    int mQuantity;
+    OrderGlass mOrderGlass;
 
-    float mHeight;
+    public long getCheckinId() {
+        return mCheckinId;
+    }
 
-    float mWidth;
+    public Checkin setCheckinId(long checkinId) {
+        mCheckinId = checkinId;
+        return this;
+    }
 
-    String mColor;
+    public int getStatus() {
+        return mStatus;
+    }
+
+    public Checkin setStatus(int status) {
+        mStatus = status;
+        return this;
+    }
+
+    public Item getItem() {
+        return mItem;
+    }
+
+    public Checkin setItem(Item item) {
+        mItem = item;
+        return this;
+    }
+
+    public OrderGlass getOrderGlass() {
+        return mOrderGlass;
+    }
+
+    public Checkin setOrderGlass(OrderGlass orderGlass) {
+        mOrderGlass = orderGlass;
+        return this;
+    }
 }
