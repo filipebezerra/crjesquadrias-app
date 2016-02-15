@@ -22,6 +22,8 @@ public class OrderGlass {
 
     float mWeight;
 
+    Product mProduct;
+
     public long getOrderGlassId() {
         return mOrderGlassId;
     }
@@ -82,6 +84,15 @@ public class OrderGlass {
 
     public OrderGlass setWeight(float weight) {
         mWeight = weight;
+        return this;
+    }
+
+    public Product getProduct() {
+        return mProduct;
+    }
+
+    public OrderGlass setProduct(Product product) {
+        mProduct = product;
         return this;
     }
 }
