@@ -20,7 +20,7 @@ public class WorkStep implements Comparable<WorkStep>,Parcelable {
 
     String mName;
 
-    int mKind;
+    int mType;
 
     int mGoForward;
 
@@ -51,12 +51,12 @@ public class WorkStep implements Comparable<WorkStep>,Parcelable {
         return this;
     }
 
-    public int getKind() {
-        return mKind;
+    public int getType() {
+        return mType;
     }
 
-    public WorkStep setKind(int kind) {
-        mKind = kind;
+    public WorkStep setType(int type) {
+        mType = type;
         return this;
     }
 
