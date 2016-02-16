@@ -22,16 +22,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/Crs.PopupOverlay"
-            app:layout_scrollFlags="scroll|enterAlways"
-            >
-
-            <Spinner
-                android:id="@id/spinner"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:popupTheme="@style/Crs.PopupOverlay"
-                />
-        </android.support.v7.widget.Toolbar>
+            />
 
     </android.support.design.widget.AppBarLayout>
 
