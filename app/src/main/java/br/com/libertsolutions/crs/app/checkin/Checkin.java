@@ -16,6 +16,16 @@ public class Checkin {
 
     OrderGlass mOrderGlass;
 
+    public Checkin() {
+    }
+
+    public Checkin(Checkin checkin) {
+        this.mCheckinId = checkin.getCheckinId();
+        this.mStatus = checkin.getStatus();
+        this.mItem = checkin.getItem();
+        this.mOrderGlass = checkin.getOrderGlass();
+    }
+
     public long getCheckinId() {
         return mCheckinId;
     }
