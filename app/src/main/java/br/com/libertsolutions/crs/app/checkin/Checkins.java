@@ -1,5 +1,7 @@
 package br.com.libertsolutions.crs.app.checkin;
 
+import android.support.annotation.IntRange;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -8,8 +10,8 @@ import java.util.List;
  * .
  *
  * @author Filipe Bezerra
- * @version #, 13/02/2016
- * @since #
+ * @version 0.1.0, 13/02/2016
+ * @since 0.1.0
  */
 public final class Checkins {
     private static final List<Checkin> DATA_SET;
@@ -167,7 +169,22 @@ public final class Checkins {
         DATA_SET = Collections.unmodifiableList(list);
     }
 
-    public static List<Checkin> getDataSet() {
-        return DATA_SET;
+    public static List<Checkin> getDataSet(@IntRange(from = 0, to = 1) int type) {
+        List<Checkin> list = new ArrayList<>();
+        for(Checkin checkin : DATA_SET) {
+            switch (type) {
+                case 0:
+                    if (checkin.getItem() != null) {
+                        list.add(checkin);
+                    }
+                    continue;
+
+                case 1:
+                    if (checkin.getOrderGlass() != null) {
+                        list.add(checkin);
+                    }
+            }
+        }
+        return list;
     }
 }

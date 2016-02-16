@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -11,15 +13,27 @@ import android.widget.Spinner;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.android.spinner.SpinnerAdapter;
 import br.com.libertsolutions.crs.app.base.BaseActivity;
+import br.com.libertsolutions.crs.app.recyclerview.DividerDecoration;
+import br.com.libertsolutions.crs.app.recyclerview.OnClickListener;
+import br.com.libertsolutions.crs.app.recyclerview.OnTouchListener;
 import br.com.libertsolutions.crs.app.step.WorkStep;
 import br.com.libertsolutions.crs.app.step.WorkSteps;
+import butterknife.ButterKnife;
 import java.util.List;
 
-public class CheckinActivity extends BaseActivity {
+/**
+ * .
+ *
+ * @author Filipe Bezerra
+ * @version 0.1.0, 13/02/2016
+ * @since 0.1.0
+ */
+public class CheckinActivity extends BaseActivity implements OnClickListener {
 
     private static final String EXTRA_DATA = "data";
 
     private WorkStep mWorkStep;
+    private CheckinAdapter mCheckinAdapter;
 
     @Override
     protected int provideLayoutResource() {
@@ -45,6 +59,18 @@ public class CheckinActivity extends BaseActivity {
         mWorkStep = getIntent().getParcelableExtra(EXTRA_DATA);
 
         setupSpinner();
+
+        final List<Checkin> checkins = Checkins.getDataSet(mWorkStep.getType());
+
+        RecyclerView checkingsView = ButterKnife.findById(this, android.R.id.list);
+        checkingsView.setLayoutManager(new LinearLayoutManager(this));
+        checkingsView.setHasFixedSize(true);
+        checkingsView.setAdapter(
+                mCheckinAdapter = new CheckinAdapter(checkins));
+        checkingsView.addItemDecoration(
+                new DividerDecoration(this));
+        checkingsView.addOnItemTouchListener(
+                new OnTouchListener(this, checkingsView, this));
     }
 
     private void setupSpinner() {
@@ -81,5 +107,15 @@ public class CheckinActivity extends BaseActivity {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
+    }
+
+    @Override
+    public void onSingleTapUp(View view, int position) {
+
+    }
+
+    @Override
+    public void onLongPress(View view, int position) {
+
     }
 }

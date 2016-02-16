@@ -4,8 +4,8 @@ package br.com.libertsolutions.crs.app.checkin;
  * .
  *
  * @author Filipe Bezerra
- * @version #, 13/02/2016
- * @since #
+ * @version 0.1.0, 13/02/2016
+ * @since 0.1.0
  */
 public class Checkin {
     long mCheckinId;

@@ -15,6 +15,13 @@ import br.com.libertsolutions.crs.app.recyclerview.OnClickListener;
 import br.com.libertsolutions.crs.app.recyclerview.OnTouchListener;
 import butterknife.ButterKnife;
 
+/**
+ * .
+ *
+ * @author Filipe Bezerra
+ * @version 0.1.0, 16/02/2016
+ * @since 0.1.0
+ */
 public class WorkStepActivity extends BaseActivity implements OnClickListener {
 
     private WorkStepAdapter mStageAdapter;
