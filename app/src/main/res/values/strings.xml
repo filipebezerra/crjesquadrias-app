@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">CRS</string>
     <string name="title_login_activity">Login</string>
-    <string name="title_activity_main">Projetos</string>
+    <string name="title_activity_main">Obras</string>
     <string name="title_activity_settings">Configurações</string>
 
     <string name="action_login">Entrar</string>
