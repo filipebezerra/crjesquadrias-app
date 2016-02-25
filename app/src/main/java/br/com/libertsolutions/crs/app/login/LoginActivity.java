@@ -32,7 +32,7 @@ public class LoginActivity extends BaseActivity {
 
     @Override
     protected int provideMenuResource() {
-        return R.menu.activity_login;
+        return R.menu.menu_login;
     }
 
     @Bind(R.id.root_view) protected FrameLayout mRootView;
