@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.MenuItem;
 import android.view.View;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
@@ -38,6 +39,11 @@ public class CheckinActivity extends BaseActivity implements OnClickListener {
     @Override
     protected int provideUpIndicatorResource() {
         return R.drawable.ic_arrow_back_24dp;
+    }
+
+    @Override
+    protected int provideMenuResource() {
+        return R.menu.menu_checkin;
     }
 
     public static Intent getLauncherIntent(@NonNull Context context,
@@ -73,5 +79,15 @@ public class CheckinActivity extends BaseActivity implements OnClickListener {
     @Override
     public void onLongPress(View view, int position) {
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_check_all) {
+            mCheckinAdapter.checkAllDone();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
     }
 }

@@ -30,4 +30,5 @@
     <string name="action_settings">Configurações</string>
     <string name="title_activity_stage">Etapas</string>
     <string name="title_activity_checkin">Check-ins</string>
+    <string name="action_check_all">Marcar todos</string>
 </resources>

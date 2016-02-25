@@ -8,6 +8,9 @@ package br.com.libertsolutions.crs.app.checkin;
  * @since 0.1.0
  */
 public class Checkin {
+    public static final int STATUS_PENDING = 0;
+    public static final int STATUS_FINISHED = 2;
+
     long mCheckinId;
 
     int mStatus;

@@ -71,11 +71,26 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
         holder.itemLocation.setText("-");
         holder.productLine.setText("-");
         holder.itemTreatment.setText(product.getTreatment());
+        holder.itemDone.setChecked(checkin.getStatus() == Checkin.STATUS_FINISHED);
     }
 
     @Override
     public int getItemCount() {
         return mCheckins.size();
+    }
+
+    public void checkAllDone() {
+        boolean updated = false;
+        for (Checkin checkin : mCheckins) {
+            if (checkin.getStatus() != Checkin.STATUS_FINISHED) {
+                checkin.setStatus(Checkin.STATUS_FINISHED);
+                updated = true;
+            }
+        }
+
+        if (updated) {
+            notifyDataSetChanged();
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
