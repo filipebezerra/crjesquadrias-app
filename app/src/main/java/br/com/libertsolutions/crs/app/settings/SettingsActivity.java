@@ -12,7 +12,7 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import br.com.libertsolutions.crs.app.R;
-import br.com.libertsolutions.crs.app.base.BaseActivity;
+import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
 
 /**
  * Application settings screen.

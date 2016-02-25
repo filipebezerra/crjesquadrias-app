@@ -8,11 +8,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import br.com.libertsolutions.crs.app.R;
-import br.com.libertsolutions.crs.app.base.BaseActivity;
+import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
 import br.com.libertsolutions.crs.app.checkin.CheckinActivity;
-import br.com.libertsolutions.crs.app.recyclerview.DividerDecoration;
-import br.com.libertsolutions.crs.app.recyclerview.OnClickListener;
-import br.com.libertsolutions.crs.app.recyclerview.OnTouchListener;
+import br.com.libertsolutions.crs.app.android.recyclerview.DividerDecoration;
+import br.com.libertsolutions.crs.app.android.recyclerview.OnClickListener;
+import br.com.libertsolutions.crs.app.android.recyclerview.OnTouchListener;
 import butterknife.ButterKnife;
 
 /**

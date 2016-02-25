@@ -11,7 +11,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import br.com.libertsolutions.crs.app.R;
-import br.com.libertsolutions.crs.app.base.BaseActivity;
+import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
 import br.com.libertsolutions.crs.app.feedback.FeedbackHelper;
 import br.com.libertsolutions.crs.app.form.FormUtil;
 import br.com.libertsolutions.crs.app.keyboard.KeyboardUtil;

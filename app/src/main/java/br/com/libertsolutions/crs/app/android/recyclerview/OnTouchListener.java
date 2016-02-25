@@ -1,4 +1,4 @@
-package br.com.libertsolutions.crs.app.recyclerview;
+package br.com.libertsolutions.crs.app.android.recyclerview;
 
 import android.content.Context;
 import android.support.annotation.NonNull;

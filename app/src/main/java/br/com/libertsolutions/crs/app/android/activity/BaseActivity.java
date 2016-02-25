@@ -1,4 +1,4 @@
-package br.com.libertsolutions.crs.app.base;
+package br.com.libertsolutions.crs.app.android.activity;
 
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
