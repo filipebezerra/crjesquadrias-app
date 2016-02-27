@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 import br.com.libertsolutions.crs.app.R;
 import butterknife.Bind;
@@ -55,7 +54,7 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         final Checkin checkin = mCheckins.get(position);
 
         Product product;
@@ -77,24 +76,27 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
         holder.productLine.setText("-");
         holder.itemTreatment.setText(product.getTreatment());
         holder.itemDone.setChecked(checkin.getStatus() == Checkin.STATUS_FINISHED);
-        holder.itemDone.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        holder.itemDone.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                final Checkin checkin = mCheckins.get(position);
-                checkin.setStatus(isChecked ? Checkin.STATUS_FINISHED : Checkin.STATUS_PENDING);
-                notifyItemChanged(position);
+            public void onClick(View v) {
+                final CheckBox checkBox = (CheckBox) v;
+                final Checkin checkin = mCheckins.get(holder.getAdapterPosition());
+                checkin.setStatus(checkBox.isChecked() ?
+                        Checkin.STATUS_FINISHED : Checkin.STATUS_PENDING);
+                notifyItemChanged(holder.getAdapterPosition());
             }
         });
 
         switch (checkin.getStatus()) {
             case Checkin.STATUS_PENDING:
                 holder.checkinStatus.setBackgroundColor(
-                        ContextCompat.getColor(mContext, R.color.status_pending));
+                        ContextCompat.getColor(mContext, R.color.status_finished));
+
                 break;
 
             case Checkin.STATUS_FINISHED:
                 holder.checkinStatus.setBackgroundColor(
-                        ContextCompat.getColor(mContext, R.color.status_finished));
+                        ContextCompat.getColor(mContext, R.color.status_pending));
                 break;
         }
     }
