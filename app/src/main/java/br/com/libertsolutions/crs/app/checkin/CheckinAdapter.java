@@ -90,13 +90,12 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
         switch (checkin.getStatus()) {
             case Checkin.STATUS_PENDING:
                 holder.checkinStatus.setBackgroundColor(
-                        ContextCompat.getColor(mContext, R.color.status_finished));
-
+                        ContextCompat.getColor(mContext, R.color.status_pending));
                 break;
 
             case Checkin.STATUS_FINISHED:
                 holder.checkinStatus.setBackgroundColor(
-                        ContextCompat.getColor(mContext, R.color.status_pending));
+                        ContextCompat.getColor(mContext, R.color.status_finished));
                 break;
         }
     }

@@ -9,7 +9,7 @@
     <color name="blackTranslucent">#20000000</color>
     <color name="item_background_color">#def1e5</color>
 
-    <color name="status_pending">#739e73</color>
+    <color name="status_pending">#a90329</color>
     <color name="status_started">#3276b1</color>
-    <color name="status_finished">#a90329</color>
+    <color name="status_finished">#739e73</color>
 </resources>
