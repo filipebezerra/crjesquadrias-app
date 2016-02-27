@@ -7,4 +7,5 @@
     <color name="launch_background">@color/colorPrimaryDark</color>
     <color name="accentTranslucent">#803f825e</color>
     <color name="blackTranslucent">#20000000</color>
+    <color name="item_background_color">#def1e5</color>
 </resources>
