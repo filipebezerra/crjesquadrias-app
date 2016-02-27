@@ -39,15 +39,15 @@ public class WorkStepAdapter extends RecyclerView.Adapter<WorkStepAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final WorkStep item = mWorkSteps.get(position);
-        holder.stageName.setText(item.getName());
+        final WorkStep workStep = mWorkSteps.get(position);
+        holder.stageName.setText(workStep.getName());
 
-        if (item.getGoForward() == 0 && position != 0) {
+        if (workStep.getGoForward() == 0 && position != 0) {
             holder.stageName.setTextColor(
                     ContextCompat.getColor(holder.itemView.getContext(), R.color.blackTranslucent));
         }
 
-        switch (item.getStatus()) {
+        switch (workStep.getStatus()) {
             case WorkStep.STATUS_PENDING:
                 holder.stepStatus.setBackgroundColor(
                         ContextCompat.getColor(mContext, R.color.status_pending));
@@ -56,6 +56,11 @@ public class WorkStepAdapter extends RecyclerView.Adapter<WorkStepAdapter.ViewHo
             case WorkStep.STATUS_STARTED:
                 holder.stepStatus.setBackgroundColor(
                         ContextCompat.getColor(mContext, R.color.status_started));
+                break;
+
+            case WorkStep.STATUS_FINISHED:
+                holder.stepStatus.setBackgroundColor(
+                        ContextCompat.getColor(mContext, R.color.status_finished));
                 break;
         }
     }
