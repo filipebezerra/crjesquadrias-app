@@ -8,7 +8,7 @@ import java.util.List;
  * .
  *
  * @author Filipe Bezerra
- * @version #, 10/02/2016
+ * @version #, 27/02/2016
  * @since #
  */
 public final class Works {

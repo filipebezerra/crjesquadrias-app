@@ -4,7 +4,7 @@ package br.com.libertsolutions.crs.app.work;
  * Entity project abstraction.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 10/02/2016
+ * @version 0.1.0, 27/02/2016
  * @since 0.1.0
  */
 public class Work {
