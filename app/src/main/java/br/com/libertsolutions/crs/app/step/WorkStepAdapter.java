@@ -30,7 +30,7 @@ public class WorkStepAdapter extends RecyclerView.Adapter<WorkStepAdapter.ViewHo
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_stage, parent, false);
+                .inflate(R.layout.item_work_step, parent, false);
         return new ViewHolder(itemView);
     }
 
