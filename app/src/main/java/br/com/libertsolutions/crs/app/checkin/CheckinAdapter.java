@@ -1,16 +1,18 @@
 package br.com.libertsolutions.crs.app.checkin;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import br.com.libertsolutions.crs.app.R;
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnCheckedChanged;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,11 +27,13 @@ import java.util.List;
 public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHolder> {
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getNumberInstance();
 
-    @NonNull List<Checkin> mOriginalCheckins;
-    @NonNull List<Checkin> mCheckins;
+    @NonNull private List<Checkin> mOriginalCheckins;
+    @NonNull private List<Checkin> mCheckins;
+    @NonNull private Context mContext;
 
-    public CheckinAdapter(@NonNull List<Checkin> checkins) {
+    public CheckinAdapter(@NonNull List<Checkin> checkins, @NonNull Context context) {
         mOriginalCheckins = checkins;
+        mContext = context;
 
         mCheckins = new ArrayList<>();
         for(Checkin checkin : mOriginalCheckins) {
@@ -45,13 +49,13 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final View itemView = LayoutInflater.from(parent.getContext())
+        final View itemView = LayoutInflater.from(mContext)
                 .inflate(R.layout.item_checkin, parent, false);
         return new CheckinAdapter.ViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         final Checkin checkin = mCheckins.get(position);
 
         Product product;
@@ -73,6 +77,26 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
         holder.productLine.setText("-");
         holder.itemTreatment.setText(product.getTreatment());
         holder.itemDone.setChecked(checkin.getStatus() == Checkin.STATUS_FINISHED);
+        holder.itemDone.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                final Checkin checkin = mCheckins.get(position);
+                checkin.setStatus(isChecked ? Checkin.STATUS_FINISHED : Checkin.STATUS_PENDING);
+                notifyItemChanged(position);
+            }
+        });
+
+        switch (checkin.getStatus()) {
+            case Checkin.STATUS_PENDING:
+                holder.checkinStatus.setBackgroundColor(
+                        ContextCompat.getColor(mContext, R.color.status_pending));
+                break;
+
+            case Checkin.STATUS_FINISHED:
+                holder.checkinStatus.setBackgroundColor(
+                        ContextCompat.getColor(mContext, R.color.status_finished));
+                break;
+        }
     }
 
     @Override
@@ -95,6 +119,7 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+        @Bind(R.id.checkinStatus) View checkinStatus;
         @Bind(R.id.productType) TextView productType;
         @Bind(R.id.productWidth) TextView productWidth;
         @Bind(R.id.productHeight) TextView productHeight;
@@ -106,12 +131,6 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-        }
-
-        @OnCheckedChanged(R.id.itemDone)
-        public void onCheckedChanged(boolean checked) {
-            final Checkin checkin = mCheckins.get(getLayoutPosition());
-            checkin.setStatus(checked ? Checkin.STATUS_FINISHED : Checkin.STATUS_PENDING);
         }
     }
 }

@@ -64,7 +64,7 @@ public class CheckinActivity extends BaseActivity implements OnClickListener {
         checkingsView.setLayoutManager(new LinearLayoutManager(this));
         checkingsView.setHasFixedSize(true);
         checkingsView.setAdapter(
-                mCheckinAdapter = new CheckinAdapter(checkins));
+                mCheckinAdapter = new CheckinAdapter(checkins, this));
         checkingsView.addItemDecoration(
                 new DividerDecoration(this));
         checkingsView.addOnItemTouchListener(
