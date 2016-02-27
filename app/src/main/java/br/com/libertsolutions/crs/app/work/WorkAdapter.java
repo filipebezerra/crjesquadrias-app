@@ -24,14 +24,14 @@ import java.util.List;
  * @since 0.1.0
  */
 public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder> {
-    @NonNull private List<Work> mProjects;
+    @NonNull private List<Work> mWorks;
     @NonNull private Context mContext;
 
     private static DateFormat sDateInstance = SimpleDateFormat.getDateInstance(DateFormat.MEDIUM);
 
     public WorkAdapter(@NonNull Context context) {
         mContext = context;
-        mProjects = Works.getDataSet();
+        mWorks = Works.getDataSet();
     }
 
     @Override
@@ -43,7 +43,7 @@ public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final Work work = mProjects.get(position);
+        final Work work = mWorks.get(position);
 
         holder.projectId.setText(work.getWorkId());
         holder.customerName.setText(work.getCustomerName());
@@ -68,7 +68,17 @@ public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder> {
 
     @Override
     public int getItemCount() {
-        return mProjects.size();
+        return mWorks.size();
+    }
+
+    public int getWorksInRunning() {
+        int count = 0;
+        for (Work work : mWorks) {
+            if (work.getStatus() == Work.STATUS_STARTED) {
+                count++;
+            }
+        }
+        return count;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

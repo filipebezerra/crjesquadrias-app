@@ -29,7 +29,6 @@ import br.com.libertsolutions.crs.app.settings.SettingsHelper;
 import br.com.libertsolutions.crs.app.step.WorkStepActivity;
 import br.com.libertsolutions.crs.app.work.WorkAdapter;
 import butterknife.Bind;
-import java.util.Locale;
 
 /**
  * Application main screen.
@@ -68,8 +67,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         mWorksView.addOnItemTouchListener(
                 new OnTouchListener(this, mWorksView, this));
 
-        getSupportActionBar().setSubtitle(String.format(Locale.getDefault(),
-                "%d obras em execução", mWorkAdapter.getItemCount()));
+        getSupportActionBar().setSubtitle(getString(R.string.works_in_running,
+                mWorkAdapter.getWorksInRunning()));
 
         if (mToolbarAsActionBar != null) {
             final Drawable navigationIcon = DrawableHelper.withContext(this)
