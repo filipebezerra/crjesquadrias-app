@@ -2,6 +2,7 @@ package br.com.libertsolutions.crs.app.main;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -17,6 +18,7 @@ import br.com.libertsolutions.crs.app.android.recyclerview.GridDividerDecoration
 import br.com.libertsolutions.crs.app.android.recyclerview.OnClickListener;
 import br.com.libertsolutions.crs.app.android.recyclerview.OnTouchListener;
 import br.com.libertsolutions.crs.app.application.RequestCodes;
+import br.com.libertsolutions.crs.app.drawable.DrawableHelper;
 import br.com.libertsolutions.crs.app.feedback.FeedbackHelper;
 import br.com.libertsolutions.crs.app.launchscreen.LaunchScreenActivity;
 import br.com.libertsolutions.crs.app.login.LoginActivity;
@@ -27,12 +29,13 @@ import br.com.libertsolutions.crs.app.settings.SettingsHelper;
 import br.com.libertsolutions.crs.app.step.WorkStepActivity;
 import br.com.libertsolutions.crs.app.work.WorkAdapter;
 import butterknife.Bind;
+import java.util.Locale;
 
 /**
  * Application main screen.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 22/01/2016
+ * @version 0.1.0, 27/02/2016
  * @since 0.1.0
  */
 public class MainActivity extends BaseActivity implements OnClickListener {
@@ -40,7 +43,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     private WorkAdapter mWorkAdapter;
 
     @Bind(R.id.root_view) CoordinatorLayout mRootView;
-    @Bind(R.id.list) RecyclerView mProjectsView;
+    @Bind(R.id.list) RecyclerView mWorksView;
 
     @Override
     protected int provideLayoutResource() {
@@ -58,12 +61,25 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         }
 
         changeListLayout(getResources().getConfiguration());
-        mProjectsView.addItemDecoration(new GridDividerDecoration(this));
-        mProjectsView.setHasFixedSize(true);
-        mProjectsView.setAdapter(
+        mWorksView.addItemDecoration(new GridDividerDecoration(this));
+        mWorksView.setHasFixedSize(true);
+        mWorksView.setAdapter(
                 mWorkAdapter = new WorkAdapter());
-        mProjectsView.addOnItemTouchListener(
-                new OnTouchListener(this, mProjectsView, this));
+        mWorksView.addOnItemTouchListener(
+                new OnTouchListener(this, mWorksView, this));
+
+        getSupportActionBar().setSubtitle(String.format(Locale.getDefault(),
+                "%d obras em execução", mWorkAdapter.getItemCount()));
+
+        if (mToolbarAsActionBar != null) {
+            final Drawable navigationIcon = DrawableHelper.withContext(this)
+                    .withColor(R.color.white)
+                    .withDrawable(R.drawable.ic_worker)
+                    .tint()
+                    .get();
+
+            mToolbarAsActionBar.setNavigationIcon(navigationIcon);
+        }
     }
 
     private void showLaunchScreen() {
@@ -173,9 +189,9 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
     private void changeListLayout(Configuration configuration) {
         if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mProjectsView.setLayoutManager(new GridLayoutManager(this, 2));
+            mWorksView.setLayoutManager(new GridLayoutManager(this, 2));
         } else {
-            mProjectsView.setLayoutManager(new LinearLayoutManager(this));
+            mWorksView.setLayoutManager(new LinearLayoutManager(this));
         }
     }
 }
