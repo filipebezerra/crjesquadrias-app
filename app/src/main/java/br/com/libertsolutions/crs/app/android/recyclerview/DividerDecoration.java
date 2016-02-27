@@ -27,7 +27,7 @@ public class DividerDecoration extends RecyclerView.ItemDecoration {
         mDivider = a.getDrawable(0);
         a.recycle();
 
-        mInsets = context.getResources().getDimensionPixelSize(R.dimen.card_insets);
+        mInsets = context.getResources().getDimensionPixelSize(R.dimen.item_offset);
     }
 
     @Override
@@ -55,6 +55,6 @@ public class DividerDecoration extends RecyclerView.ItemDecoration {
     @Override
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
         //We can supply forced insets for each item view here in the Rect
-        outRect.set(mInsets, mInsets, mInsets, mInsets);
+        outRect.set(0, mInsets, 0, mInsets);
     }
 }
