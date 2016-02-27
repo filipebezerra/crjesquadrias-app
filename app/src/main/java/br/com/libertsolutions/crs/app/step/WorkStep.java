@@ -9,11 +9,15 @@ import com.hannesdorfmann.parcelableplease.annotation.ParcelablePlease;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 10/02/2016
+ * @version 0.1.0, 27/02/2016
  * @since 0.1.0
  */
 @ParcelablePlease
-public class WorkStep implements Comparable<WorkStep>,Parcelable {
+public class WorkStep implements Comparable<WorkStep>, Parcelable {
+    public static final int STATUS_PENDING = 0;
+    public static final int STATUS_STARTED = 1;
+    public static final int STATUS_FINISHED = 2;
+
     long mWorkStepId;
 
     int mOrder;
@@ -23,6 +27,8 @@ public class WorkStep implements Comparable<WorkStep>,Parcelable {
     int mType;
 
     int mGoForward;
+
+    int mStatus;
 
     public long getWorkStepId() {
         return mWorkStepId;
@@ -66,6 +72,15 @@ public class WorkStep implements Comparable<WorkStep>,Parcelable {
 
     public WorkStep setGoForward(int goForward) {
         mGoForward = goForward;
+        return this;
+    }
+
+    public int getStatus() {
+        return mStatus;
+    }
+
+    public WorkStep setStatus(int status) {
+        mStatus = status;
         return this;
     }
 
