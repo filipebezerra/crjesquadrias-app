@@ -64,7 +64,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         mWorksView.addItemDecoration(new GridDividerDecoration(this));
         mWorksView.setHasFixedSize(true);
         mWorksView.setAdapter(
-                mWorkAdapter = new WorkAdapter());
+                mWorkAdapter = new WorkAdapter(this));
         mWorksView.addOnItemTouchListener(
                 new OnTouchListener(this, mWorksView, this));
 

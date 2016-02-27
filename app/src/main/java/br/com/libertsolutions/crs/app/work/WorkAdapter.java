@@ -1,6 +1,8 @@
 package br.com.libertsolutions.crs.app.work;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,31 +25,45 @@ import java.util.List;
  */
 public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder> {
     @NonNull private List<Work> mProjects;
+    @NonNull private Context mContext;
 
     private static DateFormat sDateInstance = SimpleDateFormat.getDateInstance(DateFormat.MEDIUM);
 
-    public WorkAdapter() {
+    public WorkAdapter(@NonNull Context context) {
+        mContext = context;
         mProjects = Works.getDataSet();
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final View itemView = LayoutInflater.from(parent.getContext())
+        final View itemView = LayoutInflater.from(mContext)
                 .inflate(R.layout.item_work, parent, false);
         return new ViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final Work project = mProjects.get(position);
+        final Work work = mProjects.get(position);
 
-        holder.projectId.setText(project.getWorkId());
-        holder.customerName.setText(project.getCustomerName());
+        holder.projectId.setText(work.getWorkId());
+        holder.customerName.setText(work.getCustomerName());
 
         final Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(project.getDeliveryDate());
+        calendar.setTimeInMillis(work.getDeliveryDate());
 
         holder.deliveryOrStartDate.setText(sDateInstance.format(calendar.getTime()));
+
+        switch (work.getStatus()) {
+            case Work.STATUS_PENDING:
+                holder.workStatus.setBackgroundColor(
+                        ContextCompat.getColor(mContext, R.color.status_pending));
+                break;
+
+            case Work.STATUS_STARTED:
+                holder.workStatus.setBackgroundColor(
+                        ContextCompat.getColor(mContext, R.color.status_started));
+                break;
+        }
     }
 
     @Override
@@ -56,6 +72,7 @@ public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder> {
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
+        @Bind(R.id.workStatus) View workStatus;
         @Bind(R.id.workId) TextView projectId;
         @Bind(R.id.customerName) TextView customerName;
         @Bind(R.id.deliveryDate) TextView deliveryOrStartDate;

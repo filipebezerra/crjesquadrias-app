@@ -19,62 +19,74 @@ public final class Works {
                 new Work()
                         .setWorkId("JUL.379.15-REV05")
                         .setCustomerName("Gabriella e Cristiano")
-                        .setDeliveryDate(System.currentTimeMillis()),
-
-                new Work()
-                        .setWorkId("JUL.379.15-REV05")
-                        .setCustomerName("Gabriella e Cristiano")
-                        .setDeliveryDate(System.currentTimeMillis()),
-
-                new Work()
-                        .setWorkId("JUL.379.15-REV05")
-                        .setCustomerName("Gabriella e Cristiano")
-                        .setDeliveryDate(System.currentTimeMillis()),
-
-                new Work()
-                        .setWorkId("JUL.379.15-REV05")
-                        .setCustomerName("Gabriella e Cristiano")
-                        .setDeliveryDate(System.currentTimeMillis()),
-
-                new Work()
-                        .setWorkId("JUL.379.15-REV05")
-                        .setCustomerName("Gabriella e Cristiano")
-                        .setDeliveryDate(System.currentTimeMillis()),
-
-                new Work()
-                        .setWorkId("JUL.379.15-REV05")
-                        .setCustomerName("Gabriella e Cristiano")
-                        .setDeliveryDate(System.currentTimeMillis()),
-
-                new Work()
-                        .setWorkId("JUL.379.15-REV05")
-                        .setCustomerName("Gabriella e Cristiano")
-                        .setDeliveryDate(System.currentTimeMillis()),
-
-                new Work()
-                        .setWorkId("JUL.379.15-REV05")
-                        .setCustomerName("Gabriella e Cristiano")
-                        .setDeliveryDate(System.currentTimeMillis()),
-
-                new Work()
-                        .setWorkId("JUL.379.15-REV05")
-                        .setCustomerName("Gabriella e Cristiano")
-                        .setDeliveryDate(System.currentTimeMillis()),
-
-                new Work()
-                        .setWorkId("JUL.379.15-REV05")
-                        .setCustomerName("Gabriella e Cristiano")
-                        .setDeliveryDate(System.currentTimeMillis()),
-
-                new Work()
-                        .setWorkId("JUL.379.15-REV05")
-                        .setCustomerName("Gabriella e Cristiano")
-                        .setDeliveryDate(System.currentTimeMillis()),
+                        .setDeliveryDate(System.currentTimeMillis())
+                        .setStatus(Work.STATUS_STARTED),
 
                 new Work()
                         .setWorkId("JUL.379.15-REV05")
                         .setCustomerName("Gabriella e Cristiano")
                         .setDeliveryDate(System.currentTimeMillis())
+                        .setStatus(Work.STATUS_STARTED),
+
+                new Work()
+                        .setWorkId("JUL.379.15-REV05")
+                        .setCustomerName("Gabriella e Cristiano")
+                        .setDeliveryDate(System.currentTimeMillis())
+                        .setStatus(Work.STATUS_STARTED),
+
+                new Work()
+                        .setWorkId("JUL.379.15-REV05")
+                        .setCustomerName("Gabriella e Cristiano")
+                        .setDeliveryDate(System.currentTimeMillis())
+                        .setStatus(Work.STATUS_STARTED),
+
+                new Work()
+                        .setWorkId("JUL.379.15-REV05")
+                        .setCustomerName("Gabriella e Cristiano")
+                        .setDeliveryDate(System.currentTimeMillis())
+                        .setStatus(Work.STATUS_PENDING),
+
+                new Work()
+                        .setWorkId("JUL.379.15-REV05")
+                        .setCustomerName("Gabriella e Cristiano")
+                        .setDeliveryDate(System.currentTimeMillis())
+                        .setStatus(Work.STATUS_PENDING),
+
+                new Work()
+                        .setWorkId("JUL.379.15-REV05")
+                        .setCustomerName("Gabriella e Cristiano")
+                        .setDeliveryDate(System.currentTimeMillis())
+                        .setStatus(Work.STATUS_PENDING),
+
+                new Work()
+                        .setWorkId("JUL.379.15-REV05")
+                        .setCustomerName("Gabriella e Cristiano")
+                        .setDeliveryDate(System.currentTimeMillis())
+                        .setStatus(Work.STATUS_PENDING),
+
+                new Work()
+                        .setWorkId("JUL.379.15-REV05")
+                        .setCustomerName("Gabriella e Cristiano")
+                        .setDeliveryDate(System.currentTimeMillis())
+                        .setStatus(Work.STATUS_PENDING),
+
+                new Work()
+                        .setWorkId("JUL.379.15-REV05")
+                        .setCustomerName("Gabriella e Cristiano")
+                        .setDeliveryDate(System.currentTimeMillis())
+                        .setStatus(Work.STATUS_PENDING),
+
+                new Work()
+                        .setWorkId("JUL.379.15-REV05")
+                        .setCustomerName("Gabriella e Cristiano")
+                        .setDeliveryDate(System.currentTimeMillis())
+                        .setStatus(Work.STATUS_PENDING),
+
+                new Work()
+                        .setWorkId("JUL.379.15-REV05")
+                        .setCustomerName("Gabriella e Cristiano")
+                        .setDeliveryDate(System.currentTimeMillis())
+                        .setStatus(Work.STATUS_PENDING)
         );
 
         DATA_SET = Collections.unmodifiableList(list);

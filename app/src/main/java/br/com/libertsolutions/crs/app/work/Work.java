@@ -8,11 +8,16 @@ package br.com.libertsolutions.crs.app.work;
  * @since 0.1.0
  */
 public class Work {
+    public static final int STATUS_PENDING = 0;
+    public static final int STATUS_STARTED = 1;
+
     String mWorkId;
 
     String customerName;
 
     long mDeliveryDate;
+
+    int mStatus;
 
     public String getWorkId() {
         return mWorkId;
@@ -38,6 +43,15 @@ public class Work {
 
     public Work setDeliveryDate(long deliveryDate) {
         this.mDeliveryDate = deliveryDate;
+        return this;
+    }
+
+    public int getStatus() {
+        return mStatus;
+    }
+
+    public Work setStatus(int status) {
+        mStatus = status;
         return this;
     }
 }
