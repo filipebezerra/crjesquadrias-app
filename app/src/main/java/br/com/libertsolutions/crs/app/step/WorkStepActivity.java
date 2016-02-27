@@ -48,7 +48,7 @@ public class WorkStepActivity extends BaseActivity implements OnClickListener {
         stagesView.setLayoutManager(new LinearLayoutManager(this));
         stagesView.setHasFixedSize(true);
         stagesView.setAdapter(
-                mWorkStepAdapter = new WorkStepAdapter());
+                mWorkStepAdapter = new WorkStepAdapter(this));
         stagesView.addItemDecoration(
                 new DividerDecoration(this));
         stagesView.addOnItemTouchListener(

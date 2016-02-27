@@ -1,5 +1,6 @@
 package br.com.libertsolutions.crs.app.step;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -22,14 +23,16 @@ import java.util.List;
  */
 public class WorkStepAdapter extends RecyclerView.Adapter<WorkStepAdapter.ViewHolder> {
     @NonNull  private final List<WorkStep> mWorkSteps;
+    @NonNull private Context mContext;
 
-    public WorkStepAdapter() {
+    public WorkStepAdapter(@NonNull Context context) {
+        mContext = context;
         mWorkSteps = WorkSteps.getDataSet();
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final View itemView = LayoutInflater.from(parent.getContext())
+        final View itemView = LayoutInflater.from(mContext)
                 .inflate(R.layout.item_work_step, parent, false);
         return new ViewHolder(itemView);
     }
@@ -42,6 +45,18 @@ public class WorkStepAdapter extends RecyclerView.Adapter<WorkStepAdapter.ViewHo
         if (item.getGoForward() == 0 && position != 0) {
             holder.stageName.setTextColor(
                     ContextCompat.getColor(holder.itemView.getContext(), R.color.blackTranslucent));
+        }
+
+        switch (item.getStatus()) {
+            case WorkStep.STATUS_PENDING:
+                holder.stepStatus.setBackgroundColor(
+                        ContextCompat.getColor(mContext, R.color.status_pending));
+                break;
+
+            case WorkStep.STATUS_STARTED:
+                holder.stepStatus.setBackgroundColor(
+                        ContextCompat.getColor(mContext, R.color.status_started));
+                break;
         }
     }
 
@@ -69,6 +84,7 @@ public class WorkStepAdapter extends RecyclerView.Adapter<WorkStepAdapter.ViewHo
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+        @Bind(R.id.stepStatus) View stepStatus;
         @Bind(R.id.stage_name) TextView stageName;
 
         public ViewHolder(View itemView) {

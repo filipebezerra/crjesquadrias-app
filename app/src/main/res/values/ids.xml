@@ -20,4 +20,5 @@
     <item name="productHeight" type="id" />
     <item name="productLine" type="id" />
     <item name="itemTreatment" type="id" />
+    <item name="stepStatus" type="id" />
 </resources>
