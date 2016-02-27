@@ -20,7 +20,7 @@ public final class Checkins {
         List<Checkin> list = Arrays.asList(
                 new Checkin()
                         .setCheckinId(164)
-                        .setStatus(0)
+                        .setStatus(Checkin.STATUS_PENDING)
                         .setItem(
                                 new Item()
                                         .setItemId(22)
@@ -45,7 +45,7 @@ public final class Checkins {
 
                 new Checkin()
                         .setCheckinId(165)
-                        .setStatus(0)
+                        .setStatus(Checkin.STATUS_PENDING)
                         .setItem(
                                 new Item()
                                         .setItemId(23)
@@ -70,7 +70,7 @@ public final class Checkins {
 
                 new Checkin()
                         .setCheckinId(166)
-                        .setStatus(0)
+                        .setStatus(Checkin.STATUS_PENDING)
                         .setItem(
                                 new Item()
                                         .setItemId(24)
@@ -95,7 +95,7 @@ public final class Checkins {
 
                 new Checkin()
                         .setCheckinId(192)
-                        .setStatus(0)
+                        .setStatus(Checkin.STATUS_PENDING)
                         .setItem(null)
                         .setOrderGlass(
                                 new OrderGlass()
@@ -119,7 +119,7 @@ public final class Checkins {
 
                 new Checkin()
                         .setCheckinId(206)
-                        .setStatus(0)
+                        .setStatus(Checkin.STATUS_PENDING)
                         .setItem(null)
                         .setOrderGlass(
                                 new OrderGlass()
@@ -143,7 +143,7 @@ public final class Checkins {
 
                 new Checkin()
                         .setCheckinId(209   )
-                        .setStatus(0)
+                        .setStatus(Checkin.STATUS_PENDING)
                         .setItem(null)
                         .setOrderGlass(
                                 new OrderGlass()
