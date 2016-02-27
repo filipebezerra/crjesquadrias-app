@@ -15,14 +15,14 @@ import br.com.libertsolutions.crs.app.R;
  * that are expected from a vertical list implementation, such as
  * ListView.
  */
-public class DividerDecoration extends RecyclerView.ItemDecoration {
+public class GridDividerDecoration extends RecyclerView.ItemDecoration {
 
     private static final int[] ATTRS = { android.R.attr.listDivider };
 
     private Drawable mDivider;
     private int mInsets;
 
-    public DividerDecoration(Context context) {
+    public GridDividerDecoration(Context context) {
         TypedArray a = context.obtainStyledAttributes(ATTRS);
         mDivider = a.getDrawable(0);
         a.recycle();
@@ -33,20 +33,42 @@ public class DividerDecoration extends RecyclerView.ItemDecoration {
     @Override
     public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
         drawVertical(c, parent);
+        drawHorizontal(c, parent);
     }
 
-    /** Draw dividers underneath each child view */
+    /** Draw dividers at each expected grid interval */
     public void drawVertical(Canvas c, RecyclerView parent) {
-        final int left = parent.getPaddingLeft();
-        final int right = parent.getWidth() - parent.getPaddingRight();
+        if (parent.getChildCount() == 0) return;
 
         final int childCount = parent.getChildCount();
+
         for (int i = 0; i < childCount; i++) {
             final View child = parent.getChildAt(i);
-            final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child
-                    .getLayoutParams();
+            final RecyclerView.LayoutParams params =
+                    (RecyclerView.LayoutParams) child.getLayoutParams();
+
+            final int left = child.getLeft() - params.leftMargin - mInsets;
+            final int right = child.getRight() + params.rightMargin + mInsets;
             final int top = child.getBottom() + params.bottomMargin + mInsets;
             final int bottom = top + mDivider.getIntrinsicHeight();
+            mDivider.setBounds(left, top, right, bottom);
+            mDivider.draw(c);
+        }
+    }
+
+    /** Draw dividers to the right of each child view */
+    public void drawHorizontal(Canvas c, RecyclerView parent) {
+        final int childCount = parent.getChildCount();
+
+        for (int i = 0; i < childCount; i++) {
+            final View child = parent.getChildAt(i);
+            final RecyclerView.LayoutParams params =
+                    (RecyclerView.LayoutParams) child.getLayoutParams();
+
+            final int left = child.getRight() + params.rightMargin + mInsets;
+            final int right = left + mDivider.getIntrinsicWidth();
+            final int top = child.getTop() - params.topMargin - mInsets;
+            final int bottom = child.getBottom() + params.bottomMargin + mInsets;
             mDivider.setBounds(left, top, right, bottom);
             mDivider.draw(c);
         }
