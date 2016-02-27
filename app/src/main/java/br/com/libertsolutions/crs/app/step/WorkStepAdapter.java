@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import br.com.libertsolutions.crs.app.R;
+import br.com.libertsolutions.crs.app.work.Work;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.List;
  * .
  *
  * @author Filipe Bezerra
- * @version #, 10/02/2016
+ * @version #, 27/02/2016
  * @since #
  */
 public class WorkStepAdapter extends RecyclerView.Adapter<WorkStepAdapter.ViewHolder> {
@@ -55,6 +56,16 @@ public class WorkStepAdapter extends RecyclerView.Adapter<WorkStepAdapter.ViewHo
         }
 
         return mWorkSteps.get(position);
+    }
+
+    public int getWorkStepsInRunning() {
+        int count = 0;
+        for (WorkStep workStep : mWorkSteps) {
+            if (workStep.getStatus() == Work.STATUS_STARTED) {
+                count++;
+            }
+        }
+        return count;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

@@ -8,7 +8,7 @@ import java.util.List;
  * .
  *
  * @author Filipe Bezerra
- * @version #, 10/02/2016
+ * @version #, 27/02/2016
  * @since #
  */
 public final class WorkSteps {
@@ -21,35 +21,40 @@ public final class WorkSteps {
                         .setOrder(1)
                         .setName("Fabricação")
                         .setType(0)
-                        .setGoForward(0),
+                        .setGoForward(0)
+                        .setStatus(WorkStep.STATUS_STARTED),
 
                 new WorkStep()
                         .setWorkStepId(2)
                         .setOrder(2)
                         .setName("Pedido Vidro")
                         .setType(1)
-                        .setGoForward(0),
+                        .setGoForward(0)
+                        .setStatus(WorkStep.STATUS_PENDING),
 
                 new WorkStep()
                         .setWorkStepId(3)
                         .setOrder(3)
                         .setName("Embalagem")
                         .setType(0)
-                        .setGoForward(0),
+                        .setGoForward(0)
+                        .setStatus(WorkStep.STATUS_PENDING),
 
                 new WorkStep()
                         .setWorkStepId(4)
                         .setOrder(4)
                         .setName("Entrega")
                         .setType(0)
-                        .setGoForward(0),
+                        .setGoForward(0)
+                        .setStatus(WorkStep.STATUS_PENDING),
 
                 new WorkStep()
                         .setWorkStepId(5)
                         .setOrder(5)
                         .setName("Liberação Obra")
                         .setType(0)
-                        .setGoForward(0),
+                        .setGoForward(0)
+                        .setStatus(WorkStep.STATUS_PENDING),
 
                 new WorkStep()
                         .setWorkStepId(6)
@@ -57,6 +62,7 @@ public final class WorkSteps {
                         .setName("Instalação")
                         .setType(0)
                         .setGoForward(0)
+                        .setStatus(WorkStep.STATUS_PENDING)
         );
     }
 

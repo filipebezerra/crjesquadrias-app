@@ -14,18 +14,17 @@ import br.com.libertsolutions.crs.app.android.recyclerview.OnClickListener;
 import br.com.libertsolutions.crs.app.android.recyclerview.OnTouchListener;
 import br.com.libertsolutions.crs.app.checkin.CheckinActivity;
 import butterknife.ButterKnife;
-import java.util.Locale;
 
 /**
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 16/02/2016
+ * @version 0.1.0, 27/02/2016
  * @since 0.1.0
  */
 public class WorkStepActivity extends BaseActivity implements OnClickListener {
 
-    private WorkStepAdapter mStageAdapter;
+    private WorkStepAdapter mWorkStepAdapter;
 
     @Override
     protected int provideLayoutResource() {
@@ -49,21 +48,21 @@ public class WorkStepActivity extends BaseActivity implements OnClickListener {
         stagesView.setLayoutManager(new LinearLayoutManager(this));
         stagesView.setHasFixedSize(true);
         stagesView.setAdapter(
-                mStageAdapter = new WorkStepAdapter());
+                mWorkStepAdapter = new WorkStepAdapter());
         stagesView.addItemDecoration(
                 new DividerDecoration(this));
         stagesView.addOnItemTouchListener(
                 new OnTouchListener(this, stagesView, this));
 
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setSubtitle(String.format(Locale.getDefault(),
-                    "%d etapas da obra em execução", mStageAdapter.getItemCount()));
+            getSupportActionBar().setSubtitle(getString(R.string.steps_in_running,
+                    mWorkStepAdapter.getWorkStepsInRunning()));
         }
     }
 
     @Override
     public void onSingleTapUp(View view, int position) {
-        final WorkStep item = mStageAdapter.getItem(position);
+        final WorkStep item = mWorkStepAdapter.getItem(position);
 
         if (item != null) {
             startActivity(CheckinActivity.getLauncherIntent(this, item));
