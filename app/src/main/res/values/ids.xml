@@ -4,6 +4,7 @@
     <item name="action_done" type="id" />
     <item name="root_view" type="id" />
     <item name="content_frame" type="id" />
+    <item name="workStatus" type="id" />
     <item name="workId" type="id" />
     <item name="customerName" type="id" />
     <item name="deliveryDate" type="id" />

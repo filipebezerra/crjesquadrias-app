@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -8,75 +8,82 @@
     android:clickable="true"
     android:focusable="true"
     android:focusableInTouchMode="true"
-    android:gravity="center_vertical"
+    android:orientation="horizontal"
     >
 
-    <TextView
-        android:id="@+id/workIdCaption"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-        android:text="@string/project_id_caption"
+    <View
+        android:id="@id/workStatus"
+        android:layout_width="10dp"
+        android:layout_height="match_parent"
+        android:background="#739e73"
         />
 
-    <TextView
-        android:id="@id/workId"
+    <TableLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/workIdCaption"
-        android:layout_toEndOf="@+id/workIdCaption"
-        android:layout_alignBaseline="@+id/workIdCaption"
-        android:layout_marginLeft="8dp"
+        android:layout_height="match_parent"
         android:layout_marginStart="8dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-        tools:text="JUL.379.15-REV05"
-        />
-
-    <TextView
-        android:id="@+id/customerNameCaption"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/workIdCaption"
-        android:layout_marginTop="8dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-        android:text="@string/customer_name_caption"
-        />
-
-    <TextView
-        android:id="@id/customerName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/customerNameCaption"
-        android:layout_toEndOf="@+id/customerNameCaption"
-        android:layout_alignBaseline="@+id/customerNameCaption"
         android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        tools:text="Gabriella e Cristiano"
-        />
+        android:stretchColumns="*"
+        android:gravity="center_vertical"
+        >
 
-    <TextView
-        android:id="@+id/deliveryDateCaption"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/customerNameCaption"
-        android:layout_marginTop="8dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-        android:text="@string/delivery_or_start_date_caption"
-        />
+        <TableRow>
 
-    <TextView
-        android:id="@id/deliveryDate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/deliveryDateCaption"
-        android:layout_toEndOf="@+id/deliveryDateCaption"
-        android:layout_alignBaseline="@+id/deliveryDateCaption"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        tools:text="26/01/2016"
-        />
+            <TextView
+                android:id="@+id/workIdCaption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                android:text="@string/project_id_caption"
+                />
 
-</RelativeLayout>
+            <TextView
+                android:id="@id/workId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                tools:text="JUL.379.15-REV05"
+                />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/customerNameCaption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                android:text="@string/customer_name_caption"
+                />
+
+            <TextView
+                android:id="@id/customerName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                tools:text="Gabriella e Cristiano"
+                />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/deliveryDateCaption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                android:text="@string/delivery_or_start_date_caption"
+                />
+
+            <TextView
+                android:id="@id/deliveryDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                tools:text="26/01/2016"
+                />
+        </TableRow>
+
+    </TableLayout>
+
+</LinearLayout>
