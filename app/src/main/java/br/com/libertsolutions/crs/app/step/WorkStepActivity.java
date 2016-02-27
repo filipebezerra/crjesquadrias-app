@@ -9,11 +9,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
-import br.com.libertsolutions.crs.app.checkin.CheckinActivity;
 import br.com.libertsolutions.crs.app.android.recyclerview.DividerDecoration;
 import br.com.libertsolutions.crs.app.android.recyclerview.OnClickListener;
 import br.com.libertsolutions.crs.app.android.recyclerview.OnTouchListener;
+import br.com.libertsolutions.crs.app.checkin.CheckinActivity;
 import butterknife.ButterKnife;
+import java.util.Locale;
 
 /**
  * .
@@ -53,6 +54,11 @@ public class WorkStepActivity extends BaseActivity implements OnClickListener {
                 new DividerDecoration(this));
         stagesView.addOnItemTouchListener(
                 new OnTouchListener(this, stagesView, this));
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setSubtitle(String.format(Locale.getDefault(),
+                    "%d etapas da obra em execução", mStageAdapter.getItemCount()));
+        }
     }
 
     @Override
