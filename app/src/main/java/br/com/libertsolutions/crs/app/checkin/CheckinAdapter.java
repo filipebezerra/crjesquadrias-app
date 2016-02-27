@@ -10,6 +10,7 @@ import android.widget.TextView;
 import br.com.libertsolutions.crs.app.R;
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnCheckedChanged;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -105,6 +106,12 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+        }
+
+        @OnCheckedChanged(R.id.itemDone)
+        public void onCheckedChanged(boolean checked) {
+            final Checkin checkin = mCheckins.get(getLayoutPosition());
+            checkin.setStatus(checked ? Checkin.STATUS_FINISHED : Checkin.STATUS_PENDING);
         }
     }
 }
