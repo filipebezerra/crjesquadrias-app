@@ -7,7 +7,7 @@
     <string name="action_login">Entrar</string>
 
     <string name="server_url_pref_title">Endereço do Web service</string>
-    <string name="server_url_pref_default_value">http://</string>
+    <string name="server_url_pref_default_value">http://crs.libertsolutions.com.br/api/</string>
     <string name="server_url_pref_dialog_title">Confirme a URL do Web service</string>
     <string name="server_url_dialog_message">Informe o endereço completo incluindo http://</string>
     <string name="server_url_pref_desc">
