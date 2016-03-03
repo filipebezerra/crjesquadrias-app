@@ -1,5 +1,8 @@
 package br.com.libertsolutions.crs.app.checkin;
 
+import android.support.annotation.IntRange;
+import com.google.gson.annotations.SerializedName;
+
 /**
  * .
  *
@@ -11,12 +14,19 @@ public class Checkin {
     public static final int STATUS_PENDING = 0;
     public static final int STATUS_FINISHED = 2;
 
-    long mCheckinId;
+    @SerializedName("idCheckim")
+    Long mCheckinId;
 
-    int mStatus;
+    @SerializedName("data")
+    String mDate;
 
+    @SerializedName("status")
+    Integer mStatus;
+
+    @SerializedName("Itens")
     Item mItem;
 
+    @SerializedName("Vidros")
     OrderGlass mOrderGlass;
 
     public Checkin() {
@@ -29,20 +39,30 @@ public class Checkin {
         this.mOrderGlass = checkin.getOrderGlass();
     }
 
-    public long getCheckinId() {
+    public Long getCheckinId() {
         return mCheckinId;
     }
 
-    public Checkin setCheckinId(long checkinId) {
+    public Checkin setCheckinId(Long checkinId) {
         mCheckinId = checkinId;
         return this;
     }
 
-    public int getStatus() {
+    public String getDate() {
+        return mDate;
+    }
+
+    public Checkin setDate(String date) {
+        mDate = date;
+        return this;
+    }
+
+    public Integer getStatus() {
         return mStatus;
     }
 
-    public Checkin setStatus(int status) {
+    public Checkin setStatus(
+            @IntRange(from = STATUS_PENDING, to = STATUS_PENDING) Integer status) {
         mStatus = status;
         return this;
     }
