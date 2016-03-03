@@ -1,5 +1,6 @@
 package br.com.libertsolutions.crs.app.work;
 
+import android.support.annotation.IntRange;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -82,7 +83,8 @@ public class Work {
         return mStatus;
     }
 
-    public Work setStatus(Integer status) {
+    public Work setStatus(
+            @IntRange(from = STATUS_PENDING, to = STATUS_STARTED) Integer status) {
         mStatus = status;
         return this;
     }
