@@ -6,6 +6,7 @@
 
     <string name="action_login">Entrar</string>
 
+    <string name="server_url_pref_key">server_url</string>
     <string name="server_url_pref_title">Endereço do Web service</string>
     <string name="server_url_pref_default_value">http://crs.libertsolutions.com.br/api/</string>
     <string name="server_url_pref_dialog_title">Confirme a URL do Web service</string>
@@ -14,6 +15,7 @@
         Endereço do Web service que o aplicativo comunicará para envio e recebimento de dados.
     </string>
 
+    <string name="server_auth_key_pref_key">server_auth_key</string>
     <string name="server_auth_key_pref_title">Chave de autenticação</string>
     <string name="server_auth_key_pref_default_value">626c6f63736b696e</string>
     <string name="server_auth_key_pref_dialog_title">Confirme a chave de autenticação</string>

@@ -3,7 +3,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <com.afollestad.materialdialogs.prefs.MaterialEditTextPreference
-        android:key="server_url"
+        android:key="@string/server_url_pref_key"
         android:title="@string/server_url_pref_title"
         android:inputType="text|textUri"
         android:persistent="true"
@@ -14,7 +14,7 @@
         />
 
     <com.afollestad.materialdialogs.prefs.MaterialEditTextPreference
-        android:key="server_auth_key"
+        android:key="@string/server_auth_key_pref_key"
         android:title="@string/server_auth_key_pref_title"
         android:inputType="text"
         android:persistent="true"

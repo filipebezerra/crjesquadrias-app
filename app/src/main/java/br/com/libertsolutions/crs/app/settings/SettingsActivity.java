@@ -76,8 +76,10 @@ public class SettingsActivity extends BaseActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.settings);
-            bindPreferenceSummaryToValue(findPreference("server_url"));
-            bindPreferenceSummaryToValue(findPreference("auth_key"));
+            bindPreferenceSummaryToValue(findPreference(
+                    getString(R.string.server_url_pref_key)));
+            bindPreferenceSummaryToValue(findPreference(
+                    getString(R.string.server_auth_key_pref_key)));
         }
 
         private static void bindPreferenceSummaryToValue(Preference preference) {
