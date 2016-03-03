@@ -30,6 +30,7 @@ public class Work {
     @SerializedName("obra")
     String mJob;
 
+    @SerializedName("status")
     Integer mStatus;
 
     public Customer getCustomer() {

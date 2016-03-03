@@ -158,14 +158,6 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
                         @Override
                         public void onNext(List<Work> works) {
-                            //TODO: Trecho usado somente em testes. Deve ser removido.
-                            for (Work work : works) {
-                                if (work.getStatus() == null) {
-                                    work.setStatus(Work.STATUS_PENDING);
-                                }
-                            }
-                            //ENDTODO
-
                             mWorksView.setAdapter(mWorkAdapter =
                                     new WorkAdapter(MainActivity.this, works));
                         }
