@@ -1,80 +1,78 @@
 package br.com.libertsolutions.crs.app.checkin;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 15/02/2016
+ * @version 0.1.0, 03/03/2016
  * @since 0.1.0
  */
 public class Item {
-    long mItemId;
+    @SerializedName("idItem")
+    Long mItemId;
 
-    int mQuantity;
+    @SerializedName("quantidade")
+    Integer mQuantity;
 
-    float mWidth;
+    @SerializedName("largura")
+    Float mWidth;
 
-    float mHeight;
+    @SerializedName("altura")
+    Float mHeight;
 
-    float mWeight;
+    @SerializedName("peso")
+    Float mWeight;
 
-    String mLocation;
-
+    @SerializedName("tratamento")
     String mTreatment;
 
+    @SerializedName("Produto")
     Product mProduct;
 
-    public long getItemId() {
+    public Long getItemId() {
         return mItemId;
     }
 
-    public Item setItemId(long itemId) {
+    public Item setItemId(Long itemId) {
         mItemId = itemId;
         return this;
     }
 
-    public int getQuantity() {
+    public Integer getQuantity() {
         return mQuantity;
     }
 
-    public Item setQuantity(int quantity) {
+    public Item setQuantity(Integer quantity) {
         mQuantity = quantity;
         return this;
     }
 
-    public float getWidth() {
+    public Float getWidth() {
         return mWidth;
     }
 
-    public Item setWidth(float width) {
+    public Item setWidth(Float width) {
         mWidth = width;
         return this;
     }
 
-    public float getHeight() {
+    public Float getHeight() {
         return mHeight;
     }
 
-    public Item setHeight(float height) {
+    public Item setHeight(Float height) {
         mHeight = height;
         return this;
     }
 
-    public float getWeight() {
+    public Float getWeight() {
         return mWeight;
     }
 
-    public Item setWeight(float weight) {
+    public Item setWeight(Float weight) {
         mWeight = weight;
-        return this;
-    }
-
-    public String getLocation() {
-        return mLocation;
-    }
-
-    public Item setLocation(String location) {
-        mLocation = location;
         return this;
     }
 
