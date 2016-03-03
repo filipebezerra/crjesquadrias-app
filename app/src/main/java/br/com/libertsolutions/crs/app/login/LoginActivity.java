@@ -19,6 +19,14 @@ import butterknife.Bind;
 import butterknife.OnEditorAction;
 import butterknife.OnFocusChange;
 
+/**
+ * Tela de login, nesta usuários do sistema deverão logar para ter acesso
+ * aos dados obtidos do servidor.
+ *
+ * @author Filipe Bezerra
+ * @version 0.1.0, 03/03/2016
+ * @since 0.1.0
+ */
 public class LoginActivity extends BaseActivity {
     @Override
     protected int provideLayoutResource() {

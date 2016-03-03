@@ -33,10 +33,10 @@ import butterknife.Bind;
 import java.util.Collections;
 
 /**
- * Application main screen.
+ * Tela principal, nesta são listadas as obras cadastradas no servidor.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 27/02/2016
+ * @version 0.1.0, 03/03/2016
  * @since 0.1.0
  */
 public class MainActivity extends BaseActivity implements OnClickListener {

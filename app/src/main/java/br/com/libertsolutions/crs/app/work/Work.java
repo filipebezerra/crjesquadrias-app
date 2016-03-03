@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
  * de um imóvel.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 27/02/2016
+ * @version 0.1.0, 03/03/2016
  * @since 0.1.0
  * @see br.com.libertsolutions.crs.app.step.WorkStep
  */
