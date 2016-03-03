@@ -81,6 +81,14 @@ public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder> {
         return count;
     }
 
+    public Work getItem(int position) {
+        if (position < 0 || position >= mWorks.size()) {
+            return null;
+        }
+
+        return mWorks.get(position);
+    }
+
     class ViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.workStatus) View workStatus;
         @Bind(R.id.workCode) TextView workCode;

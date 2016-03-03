@@ -43,11 +43,6 @@ public class FlowAdapter extends RecyclerView.Adapter<FlowAdapter.ViewHolder> {
         final WorkStep workStep = flow.getStep();
         holder.stepName.setText(workStep.getName());
 
-        if (workStep.getGoForward() == 0 && position != 0) {
-            holder.stepName.setTextColor(
-                    ContextCompat.getColor(holder.itemView.getContext(), R.color.blackTranslucent));
-        }
-
         switch (flow.getStatus()) {
             case Flow.STATUS_PENDING:
                 holder.stepStatus.setBackgroundColor(

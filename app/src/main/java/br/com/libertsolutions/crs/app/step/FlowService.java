@@ -2,6 +2,7 @@ package br.com.libertsolutions.crs.app.step;
 
 import java.util.List;
 import retrofit2.http.GET;
+import retrofit2.http.Query;
 import rx.Observable;
 
 /**
@@ -13,5 +14,5 @@ import rx.Observable;
  */
 public interface FlowService {
     @GET("FluxoApi/Get")
-    Observable<List<Flow>> getAll(int workId);
+    Observable<List<Flow>> getAll(@Query("id_obra") long workId);
 }

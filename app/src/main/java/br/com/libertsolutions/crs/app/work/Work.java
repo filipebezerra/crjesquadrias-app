@@ -1,7 +1,10 @@
 package br.com.libertsolutions.crs.app.work;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.IntRange;
 import com.google.gson.annotations.SerializedName;
+import com.hannesdorfmann.parcelableplease.annotation.ParcelablePlease;
 
 /**
  * Entidade Obra, representa os projetos de construção ou reforma dos interiores
@@ -12,7 +15,8 @@ import com.google.gson.annotations.SerializedName;
  * @since 0.1.0
  * @see br.com.libertsolutions.crs.app.step.WorkStep
  */
-public class Work {
+@ParcelablePlease
+public class Work implements Parcelable {
     public static final int STATUS_PENDING = 0;
     public static final int STATUS_STARTED = 1;
 
@@ -88,4 +92,26 @@ public class Work {
         mStatus = status;
         return this;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        WorkParcelablePlease.writeToParcel(this, dest, flags);
+    }
+
+    public static final Creator<Work> CREATOR = new Creator<Work>() {
+        public Work createFromParcel(Parcel source) {
+            Work target = new Work();
+            WorkParcelablePlease.readFromParcel(target, source);
+            return target;
+        }
+
+        public Work[] newArray(int size) {
+            return new Work[size];
+        }
+    };
 }

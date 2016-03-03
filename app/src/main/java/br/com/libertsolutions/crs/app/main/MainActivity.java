@@ -208,7 +208,11 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
     @Override
     public void onSingleTapUp(View view, int position) {
-        startActivity(WorkStepActivity.getLauncherIntent(this));
+        final Work item = mWorkAdapter.getItem(position);
+
+        if (item != null) {
+            startActivity(WorkStepActivity.getLauncherIntent(this, item));
+        }
     }
 
     @Override

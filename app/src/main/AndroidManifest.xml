@@ -59,6 +59,7 @@
             android:label="@string/title_activity_stage"
             android:parentActivityName=".main.MainActivity"
             android:theme="@style/Crs.NoActionBar"
+            android:launchMode="singleTop"
             >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

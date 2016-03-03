@@ -15,7 +15,14 @@ import br.com.libertsolutions.crs.app.android.recyclerview.GridDividerDecoration
 import br.com.libertsolutions.crs.app.android.recyclerview.OnClickListener;
 import br.com.libertsolutions.crs.app.android.recyclerview.OnTouchListener;
 import br.com.libertsolutions.crs.app.checkin.CheckinActivity;
+import br.com.libertsolutions.crs.app.retrofit.RetrofitHelper;
+import br.com.libertsolutions.crs.app.work.Work;
 import butterknife.Bind;
+import com.afollestad.materialdialogs.MaterialDialog;
+import java.util.List;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * .
@@ -26,6 +33,9 @@ import butterknife.Bind;
  */
 public class WorkStepActivity extends BaseActivity implements OnClickListener {
 
+    private static final String EXTRA_DATA = "data";
+
+    private Work mWorkRelatedTo;
     private FlowAdapter mFlowAdapter;
     
     @Bind(android.R.id.list) RecyclerView mWorkStepsView;
@@ -40,24 +50,60 @@ public class WorkStepActivity extends BaseActivity implements OnClickListener {
         return R.drawable.ic_arrow_back_24dp;
     }
 
-    public static Intent getLauncherIntent(@NonNull Context context) {
-        return new Intent(context, WorkStepActivity.class);
+    public static Intent getLauncherIntent(@NonNull Context context, @NonNull Work work) {
+        return new Intent(context, WorkStepActivity.class)
+                .putExtra(EXTRA_DATA, work);
     }
 
     @Override
     protected void onCreate(Bundle inState) {
         super.onCreate(inState);
 
+        if (getIntent().hasExtra(EXTRA_DATA)) {
+            mWorkRelatedTo = getIntent().getParcelableExtra(EXTRA_DATA);
+        } else {
+            throw new IllegalStateException("You need to use the method "
+                    + "WorkStepActivity.getLauncherIntent() passing the "
+                    + "Work in the second parameter");
+        }
+
         changeListLayout(getResources().getConfiguration());
         mWorkStepsView.setHasFixedSize(true);
-        mWorkStepsView.setAdapter(mFlowAdapter = new FlowAdapter(this, null));
         mWorkStepsView.addItemDecoration(new GridDividerDecoration(this));
         mWorkStepsView.addOnItemTouchListener(
                 new OnTouchListener(this, mWorkStepsView, this));
+    }
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setSubtitle(getString(R.string.steps_in_running,
-                    mFlowAdapter.getRunningFlowsCount()));
+    @Override
+    protected void onStart() {
+        super.onStart();
+        final FlowService service = RetrofitHelper.createService(FlowService.class, this);
+        if (service != null) {
+            service.getAll(mWorkRelatedTo.getWorkdId())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.newThread())
+                    .subscribe(new Subscriber<List<Flow>>() {
+                        @Override
+                        public void onCompleted() {
+                            setSubtitle(getString(R.string.steps_in_running,
+                                    mFlowAdapter.getRunningFlowsCount()));
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            new MaterialDialog.Builder(WorkStepActivity.this)
+                                    .title("Erro")
+                                    .content(e.getMessage())
+                                    .positiveText("OK")
+                                    .show();
+                        }
+
+                        @Override
+                        public void onNext(List<Flow> flowList) {
+                            mWorkStepsView.setAdapter(mFlowAdapter =
+                                    new FlowAdapter(WorkStepActivity.this, flowList));
+                        }
+                    });
         }
     }
 
@@ -72,7 +118,6 @@ public class WorkStepActivity extends BaseActivity implements OnClickListener {
 
     @Override
     public void onLongPress(View view, int position) {
-
     }
 
     @Override
