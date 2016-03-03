@@ -71,7 +71,7 @@ public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder> {
         return mWorks.size();
     }
 
-    public int getWorksRunningCount() {
+    public int getRunningWorksCount() {
         int count = 0;
         for (Work work : mWorks) {
             if (work.getStatus() == Work.STATUS_STARTED) {

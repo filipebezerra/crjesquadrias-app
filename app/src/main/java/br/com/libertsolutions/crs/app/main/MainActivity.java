@@ -144,7 +144,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                         @Override
                         public void onCompleted() {
                             setSubtitle(getString(R.string.works_in_running,
-                                    mWorkAdapter.getWorksRunningCount()));
+                                    mWorkAdapter.getRunningWorksCount()));
                         }
 
                         @Override
