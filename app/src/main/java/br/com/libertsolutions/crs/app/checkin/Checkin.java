@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 13/02/2016
+ * @version 0.1.0, 03/03/2016
  * @since 0.1.0
  */
 public class Checkin {
@@ -62,7 +62,7 @@ public class Checkin {
     }
 
     public Checkin setStatus(
-            @IntRange(from = STATUS_PENDING, to = STATUS_PENDING) Integer status) {
+            @IntRange(from = STATUS_PENDING, to = STATUS_FINISHED) Integer status) {
         mStatus = status;
         return this;
     }

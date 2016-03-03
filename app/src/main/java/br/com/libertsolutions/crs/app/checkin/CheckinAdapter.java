@@ -13,37 +13,24 @@ import br.com.libertsolutions.crs.app.R;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 16/02/2016
+ * @version 0.1.0, 03/03/2016
  * @since 0.1.0
  */
 public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHolder> {
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getNumberInstance();
 
-    @NonNull private List<Checkin> mOriginalCheckins;
     @NonNull private List<Checkin> mCheckins;
     @NonNull private Context mContext;
 
     public CheckinAdapter(@NonNull Context context, @NonNull List<Checkin> checkins) {
-        mOriginalCheckins = checkins;
+        mCheckins = checkins;
         mContext = context;
-
-        mCheckins = new ArrayList<>();
-        for(Checkin checkin : mOriginalCheckins) {
-            if (checkin.getItem() != null) {
-                mCheckins.add(checkin);
-            } else {
-                for (int i = 0; i < checkin.getOrderGlass().getQuantity(); i++) {
-                    mCheckins.add(new Checkin(checkin));
-                }
-            }
-        }
     }
 
     @Override
