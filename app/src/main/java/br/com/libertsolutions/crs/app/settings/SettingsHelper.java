@@ -14,8 +14,8 @@ import android.support.annotation.NonNull;
  */
 public class SettingsHelper {
     private static final String KEY_APPLIED_ON_FIRST_RUN = "applied_on_first_run";
-    public static final String KEY_SERVER_URL = "server_url";
-    public static final String KEY_AUTH_KEY = "auth_key";
+    public static final String PREF_SERVER_URL = "server_url";
+    public static final String PREF_SERVER_AUTH_KEY = "server_auth_key";
 
     private SettingsHelper() {
         // no constructor
@@ -25,7 +25,19 @@ public class SettingsHelper {
         final SharedPreferences sharedPreferences
                 = PreferenceManager.getDefaultSharedPreferences(context);
 
-        return (sharedPreferences.getString(KEY_SERVER_URL, null) != null)
-                && (sharedPreferences.getString(KEY_AUTH_KEY, null) != null);
+        return (sharedPreferences.getString(PREF_SERVER_URL, null) != null)
+                && (sharedPreferences.getString(PREF_SERVER_AUTH_KEY, null) != null);
+    }
+
+    public static String getServerUrl(@NonNull  Context context) {
+        final SharedPreferences preferences
+                = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getString(PREF_SERVER_URL, null);
+    }
+
+    public static String getServerAuthKey(@NonNull Context context) {
+        final SharedPreferences preferences
+                = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getString(PREF_SERVER_AUTH_KEY, null);
     }
 }

@@ -14,14 +14,14 @@
         />
 
     <com.afollestad.materialdialogs.prefs.MaterialEditTextPreference
-        android:key="auth_key"
-        android:title="@string/auth_key_pref_title"
+        android:key="server_auth_key"
+        android:title="@string/server_auth_key_pref_title"
         android:inputType="text"
         android:persistent="true"
-        android:defaultValue="@string/auth_key_pref_default_value"
-        android:dialogTitle="@string/auth_key_pref_dialog_title"
-        android:dialogMessage="@string/auth_key_dialog_message"
-        android:summary="@string/auth_key_pref_desc"
+        android:defaultValue="@string/server_auth_key_pref_default_value"
+        android:dialogTitle="@string/server_auth_key_pref_dialog_title"
+        android:dialogMessage="@string/server_auth_key_dialog_message"
+        android:summary="@string/server_auth_key_pref_desc"
         />
 
 </PreferenceScreen>
