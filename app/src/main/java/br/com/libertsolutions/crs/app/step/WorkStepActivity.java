@@ -26,7 +26,7 @@ import butterknife.Bind;
  */
 public class WorkStepActivity extends BaseActivity implements OnClickListener {
 
-    private WorkStepAdapter mWorkStepAdapter;
+    private FlowAdapter mFlowAdapter;
     
     @Bind(android.R.id.list) RecyclerView mWorkStepsView;
 
@@ -50,20 +50,20 @@ public class WorkStepActivity extends BaseActivity implements OnClickListener {
 
         changeListLayout(getResources().getConfiguration());
         mWorkStepsView.setHasFixedSize(true);
-        mWorkStepsView.setAdapter(mWorkStepAdapter = new WorkStepAdapter(this));
+        mWorkStepsView.setAdapter(mFlowAdapter = new FlowAdapter(this, null));
         mWorkStepsView.addItemDecoration(new GridDividerDecoration(this));
         mWorkStepsView.addOnItemTouchListener(
                 new OnTouchListener(this, mWorkStepsView, this));
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setSubtitle(getString(R.string.steps_in_running,
-                    mWorkStepAdapter.getWorkStepsInRunning()));
+                    mFlowAdapter.getRunningFlowsCount()));
         }
     }
 
     @Override
     public void onSingleTapUp(View view, int position) {
-        final WorkStep item = mWorkStepAdapter.getItem(position);
+        final WorkStep item = mFlowAdapter.getItem(position).getStep();
 
         if (item != null) {
             startActivity(CheckinActivity.getLauncherIntent(this, item));

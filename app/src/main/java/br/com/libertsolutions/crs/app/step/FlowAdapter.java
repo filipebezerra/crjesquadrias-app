@@ -21,13 +21,13 @@ import java.util.List;
  * @version #, 27/02/2016
  * @since #
  */
-public class WorkStepAdapter extends RecyclerView.Adapter<WorkStepAdapter.ViewHolder> {
-    @NonNull  private final List<WorkStep> mWorkSteps;
+public class FlowAdapter extends RecyclerView.Adapter<FlowAdapter.ViewHolder> {
+    @NonNull private final List<Flow> mFlows;
     @NonNull private Context mContext;
 
-    public WorkStepAdapter(@NonNull Context context) {
+    public FlowAdapter(@NonNull Context context, @NonNull List<Flow> flowList) {
         mContext = context;
-        mWorkSteps = WorkSteps.getDataSet();
+        mFlows = flowList;
     }
 
     @Override
@@ -39,26 +39,27 @@ public class WorkStepAdapter extends RecyclerView.Adapter<WorkStepAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final WorkStep workStep = mWorkSteps.get(position);
-        holder.stageName.setText(workStep.getName());
+        final Flow flow = mFlows.get(position);
+        final WorkStep workStep = flow.getStep();
+        holder.stepName.setText(workStep.getName());
 
         if (workStep.getGoForward() == 0 && position != 0) {
-            holder.stageName.setTextColor(
+            holder.stepName.setTextColor(
                     ContextCompat.getColor(holder.itemView.getContext(), R.color.blackTranslucent));
         }
 
-        switch (workStep.getStatus()) {
-            case WorkStep.STATUS_PENDING:
+        switch (flow.getStatus()) {
+            case Flow.STATUS_PENDING:
                 holder.stepStatus.setBackgroundColor(
                         ContextCompat.getColor(mContext, R.color.status_pending));
                 break;
 
-            case WorkStep.STATUS_STARTED:
+            case Flow.STATUS_STARTED:
                 holder.stepStatus.setBackgroundColor(
                         ContextCompat.getColor(mContext, R.color.status_started));
                 break;
 
-            case WorkStep.STATUS_FINISHED:
+            case Flow.STATUS_FINISHED:
                 holder.stepStatus.setBackgroundColor(
                         ContextCompat.getColor(mContext, R.color.status_finished));
                 break;
@@ -67,21 +68,21 @@ public class WorkStepAdapter extends RecyclerView.Adapter<WorkStepAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        return mWorkSteps.size();
+        return mFlows.size();
     }
 
-    public WorkStep getItem(int position) {
-        if (position < 0 || position >= mWorkSteps.size()) {
+    public Flow getItem(int position) {
+        if (position < 0 || position >= mFlows.size()) {
             return null;
         }
 
-        return mWorkSteps.get(position);
+        return mFlows.get(position);
     }
 
-    public int getWorkStepsInRunning() {
+    public int getRunningFlowsCount() {
         int count = 0;
-        for (WorkStep workStep : mWorkSteps) {
-            if (workStep.getStatus() == Work.STATUS_STARTED) {
+        for (Flow flow : mFlows) {
+            if (flow.getStatus() == Work.STATUS_STARTED) {
                 count++;
             }
         }
@@ -90,7 +91,7 @@ public class WorkStepAdapter extends RecyclerView.Adapter<WorkStepAdapter.ViewHo
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.stepStatus) View stepStatus;
-        @Bind(R.id.stage_name) TextView stageName;
+        @Bind(R.id.stepName) TextView stepName;
 
         public ViewHolder(View itemView) {
             super(itemView);

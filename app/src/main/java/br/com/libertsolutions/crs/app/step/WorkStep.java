@@ -2,7 +2,9 @@ package br.com.libertsolutions.crs.app.step;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
+import com.google.gson.annotations.SerializedName;
 import com.hannesdorfmann.parcelableplease.annotation.ParcelablePlease;
 
 /**
@@ -14,36 +16,38 @@ import com.hannesdorfmann.parcelableplease.annotation.ParcelablePlease;
  */
 @ParcelablePlease
 public class WorkStep implements Comparable<WorkStep>, Parcelable {
-    public static final int STATUS_PENDING = 0;
-    public static final int STATUS_STARTED = 1;
-    public static final int STATUS_FINISHED = 2;
+    public static final int TYPE_PRODUCT = 0;
+    public static final int TYPE_ORDER_GLASS = 1;
 
-    long mWorkStepId;
+    @SerializedName("idEtapa")
+    Long mWorkStepId;
 
-    int mOrder;
+    @SerializedName("ordem")
+    Integer mOrder;
 
+    @SerializedName("nome")
     String mName;
 
-    int mType;
+    @SerializedName("tipo")
+    Integer mType;
 
-    int mGoForward;
+    @SerializedName("avanca")
+    Integer mGoForward;
 
-    int mStatus;
-
-    public long getWorkStepId() {
+    public Long getWorkStepId() {
         return mWorkStepId;
     }
 
-    public WorkStep setWorkStepId(long workStepId) {
+    public WorkStep setWorkStepId(Long workStepId) {
         mWorkStepId = workStepId;
         return this;
     }
 
-    public int getOrder() {
+    public Integer getOrder() {
         return mOrder;
     }
 
-    public WorkStep setOrder(int order) {
+    public WorkStep setOrder(Integer order) {
         mOrder = order;
         return this;
     }
@@ -57,36 +61,28 @@ public class WorkStep implements Comparable<WorkStep>, Parcelable {
         return this;
     }
 
-    public int getType() {
+    public Integer getType() {
         return mType;
     }
 
-    public WorkStep setType(int type) {
+    public WorkStep setType(
+            @IntRange(from = TYPE_PRODUCT, to = TYPE_ORDER_GLASS) Integer type) {
         mType = type;
         return this;
     }
 
-    public int getGoForward() {
+    public Integer getGoForward() {
         return mGoForward;
     }
 
-    public WorkStep setGoForward(int goForward) {
+    public WorkStep setGoForward(@IntRange(from = 0, to = 1) Integer goForward) {
         mGoForward = goForward;
         return this;
     }
 
-    public int getStatus() {
-        return mStatus;
-    }
-
-    public WorkStep setStatus(int status) {
-        mStatus = status;
-        return this;
-    }
-
     @Override
-    public int compareTo(@NonNull  WorkStep another) {
-        if (getOrder() == another.getOrder()) {
+    public int compareTo(@NonNull WorkStep another) {
+        if (getOrder().equals(another.getOrder())) {
             return 0;
         }
 
