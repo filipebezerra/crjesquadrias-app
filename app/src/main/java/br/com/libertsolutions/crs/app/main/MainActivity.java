@@ -143,8 +143,13 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                     .subscribe(new Subscriber<List<Work>>() {
                         @Override
                         public void onCompleted() {
-                            setSubtitle(getString(R.string.works_in_running,
-                                    mWorkAdapter.getRunningWorksCount()));
+                            final int count = mWorkAdapter.getRunningWorksCount();
+                            if (count == 0) {
+                                setSubtitle(getString(R.string.no_work_running));
+                            } else {
+                                setSubtitle(getString(R.string.works_in_running,
+                                        count));
+                            }
                         }
 
                         @Override

@@ -34,5 +34,6 @@
     <string name="title_activity_checkin">Check-ins</string>
     <string name="action_check_all">Marcar todos</string>
     <string name="works_in_running">%1$d obra(s) em execução</string>
+    <string name="no_work_running">Nenhuma obra em execução</string>
     <string name="steps_in_running">%1$d etapa(s) da obra em execução</string>
 </resources>
