@@ -13,23 +13,32 @@ import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
 import br.com.libertsolutions.crs.app.android.recyclerview.DividerDecoration;
 import br.com.libertsolutions.crs.app.android.recyclerview.OnClickListener;
 import br.com.libertsolutions.crs.app.android.recyclerview.OnTouchListener;
-import br.com.libertsolutions.crs.app.step.WorkStep;
+import br.com.libertsolutions.crs.app.retrofit.RetrofitHelper;
+import butterknife.Bind;
 import butterknife.ButterKnife;
+import com.afollestad.materialdialogs.MaterialDialog;
 import java.util.List;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 13/02/2016
+ * @version 0.1.0, 03/03/2016
  * @since 0.1.0
  */
 public class CheckinActivity extends BaseActivity implements OnClickListener {
 
-    private static final String EXTRA_DATA = "data";
+    private static final String EXTRA_WORK_ID = "workId";
+    private static final String EXTRA_STEP_ID = "stepId";
 
-    private WorkStep mWorkStep;
+    private Long mWorkId;
+    private Long mStepId;
     private CheckinAdapter mCheckinAdapter;
+
+    @Bind(android.R.id.list) RecyclerView mCheckinsView;
 
     @Override
     protected int provideLayoutResource() {
@@ -47,28 +56,68 @@ public class CheckinActivity extends BaseActivity implements OnClickListener {
     }
 
     public static Intent getLauncherIntent(@NonNull Context context,
-            @NonNull WorkStep step) {
+            Long workId, @NonNull Long stepId) {
         return new Intent(context, CheckinActivity.class)
-                .putExtra(EXTRA_DATA, step);
+                .putExtra(EXTRA_WORK_ID, workId)
+                .putExtra(EXTRA_STEP_ID, stepId);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mWorkStep = getIntent().getParcelableExtra(EXTRA_DATA);
+        if (getIntent().hasExtra(EXTRA_WORK_ID) 
+                && getIntent().hasExtra(EXTRA_STEP_ID)) {
+            mWorkId = getIntent().getLongExtra(EXTRA_WORK_ID, 0);
+            mStepId = getIntent().getLongExtra(EXTRA_STEP_ID, 0);
+        } else {
+            throw new IllegalStateException("You need to use the method "
+                    + "CheckinActivity.getLauncherIntent() passing the "
+                    + "Work ID in the second parameter and the Step ID " 
+                    + "in the third parameter");
+        }
 
-        final List<Checkin> checkins = Checkins.getDataSet(mWorkStep.getType());
-
-        RecyclerView checkingsView = ButterKnife.findById(this, android.R.id.list);
-        checkingsView.setLayoutManager(new LinearLayoutManager(this));
-        checkingsView.setHasFixedSize(true);
-        checkingsView.setAdapter(
-                mCheckinAdapter = new CheckinAdapter(checkins, this));
-        checkingsView.addItemDecoration(
+        mCheckinsView = ButterKnife.findById(this, android.R.id.list);
+        mCheckinsView.setLayoutManager(new LinearLayoutManager(this));
+        mCheckinsView.setHasFixedSize(true);
+        mCheckinsView.addItemDecoration(
                 new DividerDecoration(this));
-        checkingsView.addOnItemTouchListener(
-                new OnTouchListener(this, checkingsView, this));
+        mCheckinsView.addOnItemTouchListener(
+                new OnTouchListener(this, mCheckinsView, this));
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        final CheckinService service = RetrofitHelper
+                .createService(CheckinService.class, this);
+        if (service != null) {
+            service.getAllByStep(mWorkId, mStepId)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.newThread())
+                    .subscribe(new Subscriber<List<Checkin>>() {
+                        @Override
+                        public void onCompleted() {
+                            
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            new MaterialDialog.Builder(CheckinActivity.this)
+                                    .title("Erro")
+                                    .content(e.getMessage())
+                                    .positiveText("OK")
+                                    .show();
+                        }
+
+                        @Override
+                        public void onNext(List<Checkin> checkins) {
+                            mCheckinsView.setAdapter(
+                                    mCheckinAdapter = new CheckinAdapter(CheckinActivity.this,
+                                            checkins));
+                        }
+                    });
+        }
     }
 
     @Override

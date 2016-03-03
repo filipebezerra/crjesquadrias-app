@@ -112,7 +112,8 @@ public class WorkStepActivity extends BaseActivity implements OnClickListener {
         final WorkStep item = mFlowAdapter.getItem(position).getStep();
 
         if (item != null) {
-            startActivity(CheckinActivity.getLauncherIntent(this, item));
+            startActivity(CheckinActivity.getLauncherIntent(this,
+                    mWorkRelatedTo.getWorkdId(), item.getWorkStepId()));
         }
     }
 

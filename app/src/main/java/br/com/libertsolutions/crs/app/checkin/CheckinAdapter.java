@@ -30,7 +30,7 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
     @NonNull private List<Checkin> mCheckins;
     @NonNull private Context mContext;
 
-    public CheckinAdapter(@NonNull List<Checkin> checkins, @NonNull Context context) {
+    public CheckinAdapter(@NonNull Context context, @NonNull List<Checkin> checkins) {
         mOriginalCheckins = checkins;
         mContext = context;
 
