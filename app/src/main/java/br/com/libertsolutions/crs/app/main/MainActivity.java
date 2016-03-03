@@ -23,14 +23,20 @@ import br.com.libertsolutions.crs.app.feedback.FeedbackHelper;
 import br.com.libertsolutions.crs.app.launchscreen.LaunchScreenActivity;
 import br.com.libertsolutions.crs.app.login.LoginActivity;
 import br.com.libertsolutions.crs.app.login.LoginHelper;
+import br.com.libertsolutions.crs.app.retrofit.RetrofitHelper;
 import br.com.libertsolutions.crs.app.settings.SettingsActivity;
 import br.com.libertsolutions.crs.app.settings.SettingsActivityCompat;
 import br.com.libertsolutions.crs.app.settings.SettingsHelper;
 import br.com.libertsolutions.crs.app.step.WorkStepActivity;
 import br.com.libertsolutions.crs.app.work.Work;
 import br.com.libertsolutions.crs.app.work.WorkAdapter;
+import br.com.libertsolutions.crs.app.work.WorkService;
 import butterknife.Bind;
-import java.util.Collections;
+import com.afollestad.materialdialogs.MaterialDialog;
+import java.util.List;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Tela principal, nesta são listadas as obras cadastradas no servidor.
@@ -64,13 +70,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         changeListLayout(getResources().getConfiguration());
         mWorksView.addItemDecoration(new GridDividerDecoration(this));
         mWorksView.setHasFixedSize(true);
-        mWorksView.setAdapter(
-                mWorkAdapter = new WorkAdapter(this, Collections.<Work>emptyList()));
         mWorksView.addOnItemTouchListener(
                 new OnTouchListener(this, mWorksView, this));
-
-        getSupportActionBar().setSubtitle(getString(R.string.works_in_running,
-                mWorkAdapter.getWorksRunningCount()));
 
         if (mToolbarAsActionBar != null) {
             final Drawable navigationIcon = DrawableHelper.withContext(this)
@@ -91,7 +92,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //TODO Redefinir fluxo das telas para: LaunchScreen -> Login -> Main
+        //TODO: Redefinir fluxo das telas para: LaunchScreen -> Login -> Main
         //      para que fique claro e sem muito controle de fluxo no código
         switch (requestCode) {
             case RequestCodes.LAUNCH_BRAND_SCREEN:
@@ -131,6 +132,45 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         FeedbackHelper
                 .snackbar(mRootView, String.format("Logado com cpf %s.",
                         LoginHelper.formatCpf(userCpf)), false);
+
+        final WorkService service = RetrofitHelper
+                .createService(WorkService.class, this);
+
+        if (service != null) {
+            service.getAllRunning()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.newThread())
+                    .subscribe(new Subscriber<List<Work>>() {
+                        @Override
+                        public void onCompleted() {
+                            setSubtitle(getString(R.string.works_in_running,
+                                    mWorkAdapter.getWorksRunningCount()));
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            new MaterialDialog.Builder(MainActivity.this)
+                                    .title("Erro")
+                                    .content(e.getMessage())
+                                    .positiveText("OK")
+                                    .show();
+                        }
+
+                        @Override
+                        public void onNext(List<Work> works) {
+                            //TODO: Trecho usado somente em testes. Deve ser removido.
+                            for (Work work : works) {
+                                if (work.getStatus() == null) {
+                                    work.setStatus(Work.STATUS_PENDING);
+                                }
+                            }
+                            //ENDTODO
+
+                            mWorksView.setAdapter(mWorkAdapter =
+                                    new WorkAdapter(MainActivity.this, works));
+                        }
+                    });
+        }
     }
 
     private void showLoginScreen() {
