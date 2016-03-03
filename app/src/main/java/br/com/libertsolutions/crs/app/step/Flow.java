@@ -1,5 +1,6 @@
 package br.com.libertsolutions.crs.app.step;
 
+import android.support.annotation.IntRange;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -19,4 +20,23 @@ public class Flow {
 
     @SerializedName("status")
     Integer mStatus;
+
+    public WorkStep getStep() {
+        return mStep;
+    }
+
+    public Flow setStep(WorkStep step) {
+        mStep = step;
+        return this;
+    }
+
+    public Integer getStatus() {
+        return mStatus;
+    }
+
+    public Flow setStatus(
+            @IntRange(from = STATUS_PENDING, to = STATUS_FINISHED) Integer status) {
+        mStatus = status;
+        return this;
+    }
 }
