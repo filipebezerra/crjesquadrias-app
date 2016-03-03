@@ -16,7 +16,7 @@
         android:id="@id/checkinStatus"
         android:layout_width="10dp"
         android:layout_height="match_parent"
-        android:background="@color/status_pending"
+        android:background="@color/statusPending"
         />
 
     <LinearLayout

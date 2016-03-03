@@ -56,12 +56,12 @@ public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder> {
         switch (work.getStatus()) {
             case Work.STATUS_PENDING:
                 holder.workStatus.setBackgroundColor(
-                        ContextCompat.getColor(mContext, R.color.status_pending));
+                        ContextCompat.getColor(mContext, R.color.statusPending));
                 break;
 
             case Work.STATUS_STARTED:
                 holder.workStatus.setBackgroundColor(
-                        ContextCompat.getColor(mContext, R.color.status_started));
+                        ContextCompat.getColor(mContext, R.color.statusStarted));
                 break;
         }
     }

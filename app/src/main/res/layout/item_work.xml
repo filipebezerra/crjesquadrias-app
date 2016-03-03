@@ -15,7 +15,7 @@
         android:id="@id/workStatus"
         android:layout_width="10dp"
         android:layout_height="match_parent"
-        tools:background="@color/status_pending"
+        tools:background="@color/statusPending"
         />
 
     <TableLayout

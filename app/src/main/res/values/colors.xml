@@ -4,12 +4,12 @@
     <color name="colorPrimaryDark">#3f825e</color>
     <color name="colorAccent">#3f825e</color>
     <color name="white">#FFFFFF</color>
-    <color name="launch_background">@color/colorPrimaryDark</color>
+    <color name="launchBackground">@color/colorPrimaryDark</color>
     <color name="accentTranslucent">#803f825e</color>
     <color name="blackTranslucent">#20000000</color>
-    <color name="item_background_color">#def1e5</color>
+    <color name="itemBackgroundColor">#def1e5</color>
 
-    <color name="status_pending">#a90329</color>
-    <color name="status_started">#3276b1</color>
-    <color name="status_finished">#739e73</color>
+    <color name="statusPending">#a90329</color>
+    <color name="statusStarted">#3276b1</color>
+    <color name="statusFinished">#739e73</color>
 </resources>

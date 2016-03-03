@@ -46,17 +46,17 @@ public class FlowAdapter extends RecyclerView.Adapter<FlowAdapter.ViewHolder> {
         switch (flow.getStatus()) {
             case Flow.STATUS_PENDING:
                 holder.stepStatus.setBackgroundColor(
-                        ContextCompat.getColor(mContext, R.color.status_pending));
+                        ContextCompat.getColor(mContext, R.color.statusPending));
                 break;
 
             case Flow.STATUS_STARTED:
                 holder.stepStatus.setBackgroundColor(
-                        ContextCompat.getColor(mContext, R.color.status_started));
+                        ContextCompat.getColor(mContext, R.color.statusStarted));
                 break;
 
             case Flow.STATUS_FINISHED:
                 holder.stepStatus.setBackgroundColor(
-                        ContextCompat.getColor(mContext, R.color.status_finished));
+                        ContextCompat.getColor(mContext, R.color.statusFinished));
                 break;
         }
     }
