@@ -1,43 +1,53 @@
 package br.com.libertsolutions.crs.app.checkin;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 15/02/2016
+ * @version 0.1.0, 03/03/2016
  * @since 0.1.0
  */
 public class OrderGlass {
-    long mOrderGlassId;
+    @SerializedName("idPedVidro")
+    Long mOrderGlassId;
 
-    int mQuantity;
+    @SerializedName("quantidade")
+    Integer mQuantity;
 
+    @SerializedName("numero")
     String mNumber;
 
+    @SerializedName("cor")
     String mColor;
 
-    float mWidth;
+    @SerializedName("largura")
+    Float mWidth;
 
-    float mHeight;
+    @SerializedName("altura")
+    Float mHeight;
 
-    float mWeight;
+    @SerializedName("peso")
+    Float mWeight;
 
+    @SerializedName("Produto")
     Product mProduct;
 
-    public long getOrderGlassId() {
+    public Long getOrderGlassId() {
         return mOrderGlassId;
     }
 
-    public OrderGlass setOrderGlassId(long orderGlassId) {
+    public OrderGlass setOrderGlassId(Long orderGlassId) {
         mOrderGlassId = orderGlassId;
         return this;
     }
 
-    public int getQuantity() {
+    public Integer getQuantity() {
         return mQuantity;
     }
 
-    public OrderGlass setQuantity(int quantity) {
+    public OrderGlass setQuantity(Integer quantity) {
         mQuantity = quantity;
         return this;
     }
@@ -60,29 +70,29 @@ public class OrderGlass {
         return this;
     }
 
-    public float getWidth() {
+    public Float getWidth() {
         return mWidth;
     }
 
-    public OrderGlass setWidth(float width) {
+    public OrderGlass setWidth(Float width) {
         mWidth = width;
         return this;
     }
 
-    public float getHeight() {
+    public Float getHeight() {
         return mHeight;
     }
 
-    public OrderGlass setHeight(float height) {
+    public OrderGlass setHeight(Float height) {
         mHeight = height;
         return this;
     }
 
-    public float getWeight() {
+    public Float getWeight() {
         return mWeight;
     }
 
-    public OrderGlass setWeight(float weight) {
+    public OrderGlass setWeight(Float weight) {
         mWeight = weight;
         return this;
     }
