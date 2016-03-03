@@ -76,13 +76,7 @@ public class LoginActivity extends BaseActivity {
             if (!TextUtils.isEmpty(mCpfView.getText())
                     && mCpfView.getText().toString().length() == 11) {
                 final String cpf = mCpfView.getText().toString();
-
-                final StringBuilder cpfFormatted = new StringBuilder(cpf)
-                        .insert(3, ".")
-                        .insert(7, ".")
-                        .insert(11, "-");
-
-                mCpfView.setText(cpfFormatted.toString());
+                mCpfView.setText(LoginHelper.formatCpf(cpf));
                 mCpfView.setTag(cpf);
             }
         }
