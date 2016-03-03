@@ -85,8 +85,13 @@ public class WorkStepActivity extends BaseActivity implements OnClickListener {
                     .subscribe(new Subscriber<List<Flow>>() {
                         @Override
                         public void onCompleted() {
-                            setSubtitle(getString(R.string.steps_in_running,
-                                    mFlowAdapter.getRunningFlowsCount()));
+                            final int count = mFlowAdapter.getRunningFlowsCount();
+                            if (count == 0) {
+                                setSubtitle(getString(R.string.no_work_step_running));
+                            } else {
+                                setSubtitle(getString(R.string.work_steps_running,
+                                        count));
+                            }
                         }
 
                         @Override

@@ -147,7 +147,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                             if (count == 0) {
                                 setSubtitle(getString(R.string.no_work_running));
                             } else {
-                                setSubtitle(getString(R.string.works_in_running,
+                                setSubtitle(getString(R.string.works_running,
                                         count));
                             }
                         }

@@ -33,7 +33,8 @@
     <string name="title_activity_stage">Etapas</string>
     <string name="title_activity_checkin">Check-ins</string>
     <string name="action_check_all">Marcar todos</string>
-    <string name="works_in_running">%1$d obra(s) em execução</string>
+    <string name="works_running">%1$d obra(s) em execução</string>
     <string name="no_work_running">Nenhuma obra em execução</string>
-    <string name="steps_in_running">%1$d etapa(s) da obra em execução</string>
+    <string name="work_steps_running">%1$d etapa(s) da obra em execução</string>
+    <string name="no_work_step_running">Nenhuma etapa em execução</string>
 </resources>
