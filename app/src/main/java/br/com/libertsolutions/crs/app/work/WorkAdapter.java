@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +12,11 @@ import android.widget.TextView;
 import br.com.libertsolutions.crs.app.R;
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Project adapter.
@@ -40,9 +45,22 @@ public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder> {
     public void onBindViewHolder(ViewHolder holder, int position) {
         final Work work = mWorks.get(position);
 
-        holder.workCode.setText(work.getCode());
+        holder.workCode.setText(
+                String.format("%s/%s", work.getCode(), work.getJob()));
         holder.customerName.setText(work.getCustomer().getNome());
-        holder.workDate.setText(work.getDate());
+
+        final SimpleDateFormat dateFormatter = new SimpleDateFormat(
+                "yyyy-MM-dd'T'HH:mm:ss", new Locale("pt", "BR"));
+        try {
+            final Date date = dateFormatter.parse(work.getDate());
+
+            final CharSequence dateString = DateUtils.getRelativeTimeSpanString(
+                    date.getTime(), System.currentTimeMillis(),
+                    DateUtils.DAY_IN_MILLIS);
+            holder.workDate.setText(dateString);
+        } catch (ParseException e) {
+            holder.workDate.setText(work.getDate());
+        }
 
         switch (work.getStatus()) {
             case Work.STATUS_PENDING:
