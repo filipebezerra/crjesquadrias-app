@@ -27,8 +27,10 @@ import br.com.libertsolutions.crs.app.settings.SettingsActivity;
 import br.com.libertsolutions.crs.app.settings.SettingsActivityCompat;
 import br.com.libertsolutions.crs.app.settings.SettingsHelper;
 import br.com.libertsolutions.crs.app.step.WorkStepActivity;
+import br.com.libertsolutions.crs.app.work.Work;
 import br.com.libertsolutions.crs.app.work.WorkAdapter;
 import butterknife.Bind;
+import java.util.Collections;
 
 /**
  * Application main screen.
@@ -63,12 +65,12 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         mWorksView.addItemDecoration(new GridDividerDecoration(this));
         mWorksView.setHasFixedSize(true);
         mWorksView.setAdapter(
-                mWorkAdapter = new WorkAdapter(this));
+                mWorkAdapter = new WorkAdapter(this, Collections.<Work>emptyList()));
         mWorksView.addOnItemTouchListener(
                 new OnTouchListener(this, mWorksView, this));
 
         getSupportActionBar().setSubtitle(getString(R.string.works_in_running,
-                mWorkAdapter.getWorksInRunning()));
+                mWorkAdapter.getWorksRunningCount()));
 
         if (mToolbarAsActionBar != null) {
             final Drawable navigationIcon = DrawableHelper.withContext(this)
@@ -89,6 +91,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //TODO Redefinir fluxo das telas para: LaunchScreen -> Login -> Main
+        //      para que fique claro e sem muito controle de fluxo no código
         switch (requestCode) {
             case RequestCodes.LAUNCH_BRAND_SCREEN:
                 if (!SettingsHelper.isSettingsApplied(this)) {
@@ -125,8 +129,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     private void showUserLoggedInfo() {
         final String userCpf = LoginHelper.getUserLogged(this);
         FeedbackHelper
-                .snackbar(mRootView, String.format("Logado com cpf %s.", userCpf),
-                        false);
+                .snackbar(mRootView, String.format("Logado com cpf %s.",
+                        LoginHelper.formatCpf(userCpf)), false);
     }
 
     private void showLoginScreen() {

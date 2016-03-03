@@ -5,9 +5,9 @@
     <item name="root_view" type="id" />
     <item name="content_frame" type="id" />
     <item name="workStatus" type="id" />
-    <item name="workId" type="id" />
+    <item name="workCode" type="id" />
     <item name="customerName" type="id" />
-    <item name="deliveryDate" type="id" />
+    <item name="workDate" type="id" />
     <item name="list" type="id" />
     <item name="stage_name" type="id" />
     <item name="appbar" type="id" />

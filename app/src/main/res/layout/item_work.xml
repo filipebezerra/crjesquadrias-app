@@ -30,7 +30,7 @@
         <TableRow>
 
             <TextView
-                android:id="@+id/workIdCaption"
+                android:id="@+id/workCodeCaption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.AppCompat.Caption"
@@ -38,7 +38,7 @@
                 />
 
             <TextView
-                android:id="@id/workId"
+                android:id="@id/workCode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
@@ -68,7 +68,7 @@
         <TableRow>
 
             <TextView
-                android:id="@+id/deliveryDateCaption"
+                android:id="@+id/workDateCaption"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.AppCompat.Caption"
@@ -76,7 +76,7 @@
                 />
 
             <TextView
-                android:id="@id/deliveryDate"
+                android:id="@id/workDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
