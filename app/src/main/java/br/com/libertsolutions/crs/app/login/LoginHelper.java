@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.content.SharedPreferencesCompat;
+import android.text.TextUtils;
 
 /**
  * Utilities methods used in {@link LoginActivity}.
@@ -60,5 +61,17 @@ public class LoginHelper {
                         sharedPreferences.edit()
                                 .putBoolean(KEY_IS_USER_LOGGED, false)
                                 .remove(KEY_USER_CPF));
+    }
+
+    public static String formatCpf(@NonNull String cpf) {
+        if (TextUtils.isEmpty(cpf) || cpf.length() != 11) {
+            return cpf;
+        }
+
+        return new StringBuilder(cpf)
+                .insert(3, ".")
+                .insert(7, ".")
+                .insert(11, "-")
+                .toString();
     }
 }
