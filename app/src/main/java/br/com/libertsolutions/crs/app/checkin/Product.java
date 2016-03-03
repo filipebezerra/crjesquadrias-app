@@ -1,40 +1,39 @@
 package br.com.libertsolutions.crs.app.checkin;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 15/02/2016
+ * @version 0.1.0, 03/03/2016
  * @since 0.1.0
  */
 public class Product {
-    long mProductId;
+    @SerializedName("idProduto")
+    Long mProductId;
 
-    String mDescription;
-
+    @SerializedName("codigo")
     String mCode;
 
-    float mWeight;
+    @SerializedName("descricao")
+    String mDescription;
 
+    @SerializedName("peso")
+    Float mWeight;
+
+    @SerializedName("tratamento")
     String mTreatment;
 
+    @SerializedName("tipo")
     String mType;
 
-    public long getProductId() {
+    public Long getProductId() {
         return mProductId;
     }
 
-    public Product setProductId(long productId) {
+    public Product setProductId(Long productId) {
         mProductId = productId;
-        return this;
-    }
-
-    public String getDescription() {
-        return mDescription;
-    }
-
-    public Product setDescription(String description) {
-        mDescription = description;
         return this;
     }
 
@@ -47,11 +46,20 @@ public class Product {
         return this;
     }
 
-    public float getWeight() {
+    public String getDescription() {
+        return mDescription;
+    }
+
+    public Product setDescription(String description) {
+        mDescription = description;
+        return this;
+    }
+
+    public Float getWeight() {
         return mWeight;
     }
 
-    public Product setWeight(float weight) {
+    public Product setWeight(Float weight) {
         mWeight = weight;
         return this;
     }
