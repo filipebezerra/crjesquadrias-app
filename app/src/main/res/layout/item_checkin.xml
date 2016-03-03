@@ -72,42 +72,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                    android:text="Largura"
+                    android:text="Medidas"
                     />
 
                 <TextView
-                    android:id="@id/productWidth"
+                    android:id="@id/productMeasures"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_marginLeft="8dp"
                     android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                    tools:text="2900"
-                    />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                >
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                    android:text="Altura"
-                    />
-
-                <TextView
-                    android:id="@id/productHeight"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                    tools:text="2700"
+                    tools:text="2900x2700"
                     />
             </LinearLayout>
 

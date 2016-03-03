@@ -14,10 +14,9 @@
     <item name="spinner" type="id" />
     <item name="container" type="id" />
     <item name="productType" type="id" />
-    <item name="productWidth" type="id" />
+    <item name="productMeasures" type="id" />
     <item name="itemLocation" type="id" />
     <item name="itemDone" type="id" />
-    <item name="productHeight" type="id" />
     <item name="productLine" type="id" />
     <item name="itemTreatment" type="id" />
     <item name="stepStatus" type="id" />

@@ -57,8 +57,8 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
         }
 
         holder.productType.setText(product.getType());
-        holder.productWidth.setText(NUMBER_FORMAT.format(width));
-        holder.productHeight.setText(NUMBER_FORMAT.format(height));
+        holder.productMeasures.setText(String.format("%sx%s",
+                NUMBER_FORMAT.format(width), NUMBER_FORMAT.format(height)));
         holder.itemLocation.setText("-");
         holder.productLine.setText("-");
         holder.itemTreatment.setText(product.getTreatment());
@@ -109,8 +109,7 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
     public class ViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.checkinStatus) View checkinStatus;
         @Bind(R.id.productType) TextView productType;
-        @Bind(R.id.productWidth) TextView productWidth;
-        @Bind(R.id.productHeight) TextView productHeight;
+        @Bind(R.id.productMeasures) TextView productMeasures;
         @Bind(R.id.itemLocation) TextView itemLocation;
         @Bind(R.id.productLine) TextView productLine;
         @Bind(R.id.itemTreatment) TextView itemTreatment;
