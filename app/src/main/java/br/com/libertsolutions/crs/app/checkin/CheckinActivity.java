@@ -7,12 +7,9 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
-import android.view.View;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
 import br.com.libertsolutions.crs.app.android.recyclerview.DividerDecoration;
-import br.com.libertsolutions.crs.app.android.recyclerview.OnClickListener;
-import br.com.libertsolutions.crs.app.android.recyclerview.OnTouchListener;
 import br.com.libertsolutions.crs.app.retrofit.RetrofitHelper;
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -29,7 +26,7 @@ import rx.schedulers.Schedulers;
  * @version 0.1.0, 03/03/2016
  * @since 0.1.0
  */
-public class CheckinActivity extends BaseActivity implements OnClickListener {
+public class CheckinActivity extends BaseActivity {
 
     private static final String EXTRA_WORK_ID = "workId";
     private static final String EXTRA_STEP_ID = "stepId";
@@ -82,8 +79,6 @@ public class CheckinActivity extends BaseActivity implements OnClickListener {
         mCheckinsView.setHasFixedSize(true);
         mCheckinsView.addItemDecoration(
                 new DividerDecoration(this));
-        mCheckinsView.addOnItemTouchListener(
-                new OnTouchListener(this, mCheckinsView, this));
     }
 
     @Override
@@ -124,16 +119,6 @@ public class CheckinActivity extends BaseActivity implements OnClickListener {
                         }
                     });
         }
-    }
-
-    @Override
-    public void onSingleTapUp(View view, int position) {
-
-    }
-
-    @Override
-    public void onLongPress(View view, int position) {
-
     }
 
     @Override
