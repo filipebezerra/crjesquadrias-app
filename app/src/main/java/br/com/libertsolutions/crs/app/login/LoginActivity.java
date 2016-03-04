@@ -15,9 +15,14 @@ import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
 import br.com.libertsolutions.crs.app.feedback.FeedbackHelper;
 import br.com.libertsolutions.crs.app.form.FormUtil;
 import br.com.libertsolutions.crs.app.keyboard.KeyboardUtil;
+import br.com.libertsolutions.crs.app.retrofit.RetrofitHelper;
 import butterknife.Bind;
 import butterknife.OnEditorAction;
 import butterknife.OnFocusChange;
+import com.afollestad.materialdialogs.MaterialDialog;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Tela de login, nesta usuários do sistema deverão logar para ter acesso
@@ -110,8 +115,46 @@ public class LoginActivity extends BaseActivity {
                 mPasswordView);
 
         if (!mFormUtil.hasErrors()) {
-            LoginHelper.loginUser(this, mCpfView.getTag().toString());
-            finish();
+            final String cpf = mCpfView.getTag().toString();
+            final String password = mPasswordView.getText().toString();
+
+            final UserService service = RetrofitHelper
+                    .createService(UserService.class, this);
+
+            if (service != null) {
+                service.validateUser(cpf, password)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.newThread())
+                        .subscribe(new Subscriber<Boolean>() {
+                            @Override
+                            public void onCompleted() {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                new MaterialDialog.Builder(LoginActivity.this)
+                                        .title("Erro")
+                                        .content(e.getMessage())
+                                        .positiveText("OK")
+                                        .show();
+                            }
+
+                            @Override
+                            public void onNext(Boolean validUser) {
+                                if (validUser) {
+                                    LoginHelper.loginUser(LoginActivity.this, cpf);
+                                    finish();
+                                } else {
+                                    new MaterialDialog.Builder(LoginActivity.this)
+                                            .title("Problema com credenciais")
+                                            .content("Seu CPF ou senha estão incorretos")
+                                            .positiveText("OK")
+                                            .show();
+                                }
+                            }
+                        });
+            }
         } else {
             final View currentFocus = getCurrentFocus();
 

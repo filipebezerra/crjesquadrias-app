@@ -43,6 +43,9 @@
                 android:selectAllOnFocus="true"
                 android:imeOptions="actionNext"
                 android:hint="CPF"
+                android:drawableLeft="@drawable/ic_account"
+                android:drawableStart="@drawable/ic_account"
+                android:drawablePadding="32dp"
                 >
 
                 <requestFocus />
@@ -67,6 +70,9 @@
                 android:imeActionLabel="@string/action_login"
                 android:imeOptions="actionUnspecified"
                 android:hint="Senha"
+                android:drawableLeft="@drawable/ic_key"
+                android:drawableStart="@drawable/ic_key"
+                android:drawablePadding="32dp"
                 />
 
         </android.support.design.widget.TextInputLayout>
