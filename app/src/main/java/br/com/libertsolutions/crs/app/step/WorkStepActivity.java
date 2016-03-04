@@ -97,7 +97,7 @@ public class WorkStepActivity extends BaseActivity implements OnClickListener {
                         @Override
                         public void onError(Throwable e) {
                             new MaterialDialog.Builder(WorkStepActivity.this)
-                                    .title("Erro")
+                                    .title("Falha ao tentar carregar dados")
                                     .content(e.getMessage())
                                     .positiveText("OK")
                                     .show();
