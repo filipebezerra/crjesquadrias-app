@@ -118,6 +118,14 @@ public class LoginActivity extends BaseActivity {
             final String cpf = mCpfView.getTag().toString();
             final String password = mPasswordView.getText().toString();
 
+            final MaterialDialog progressDialog = new MaterialDialog
+                    .Builder(LoginActivity.this)
+                    .title("Entrando")
+                    .content("Por favor aguarde enquanto validamos suas credenciais...")
+                    .progress(true, 0)
+                    .cancelable(false)
+                    .show();
+
             final UserService service = RetrofitHelper
                     .createService(UserService.class, this);
 
@@ -133,8 +141,9 @@ public class LoginActivity extends BaseActivity {
 
                             @Override
                             public void onError(Throwable e) {
+                                progressDialog.dismiss();
                                 new MaterialDialog.Builder(LoginActivity.this)
-                                        .title("Erro")
+                                        .title("Falha ao tentar entrar")
                                         .content(e.getMessage())
                                         .positiveText("OK")
                                         .show();
@@ -142,12 +151,13 @@ public class LoginActivity extends BaseActivity {
 
                             @Override
                             public void onNext(Boolean validUser) {
+                                progressDialog.dismiss();
                                 if (validUser) {
                                     LoginHelper.loginUser(LoginActivity.this, cpf);
                                     finish();
                                 } else {
                                     new MaterialDialog.Builder(LoginActivity.this)
-                                            .title("Problema com credenciais")
+                                            .title("Problemas com credenciais")
                                             .content("Seu CPF ou senha estão incorretos")
                                             .positiveText("OK")
                                             .show();
