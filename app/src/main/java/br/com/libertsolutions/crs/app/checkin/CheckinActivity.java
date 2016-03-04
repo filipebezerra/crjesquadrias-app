@@ -98,7 +98,13 @@ public class CheckinActivity extends BaseActivity implements OnClickListener {
                     .subscribe(new Subscriber<List<Checkin>>() {
                         @Override
                         public void onCompleted() {
-                            
+                            final int count = mCheckinAdapter.getFinishedCheckinsCount();
+                            if (count == 0) {
+                                setSubtitle(getString(R.string.no_checkin_finished));
+                            } else {
+                                setSubtitle(getString(R.string.checkins_finished,
+                                        count));
+                            }
                         }
 
                         @Override

@@ -106,6 +106,16 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
         }
     }
 
+    public int getFinishedCheckinsCount() {
+        int count = 0;
+        for (Checkin checkin : mCheckins) {
+            if (checkin.getStatus() == Checkin.STATUS_FINISHED) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.checkinStatus) View checkinStatus;
         @Bind(R.id.productType) TextView productType;

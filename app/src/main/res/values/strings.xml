@@ -37,4 +37,6 @@
     <string name="no_work_running">Nenhuma obra em execução</string>
     <string name="work_steps_running">%1$d etapa(s) da obra em execução</string>
     <string name="no_work_step_running">Nenhuma etapa em execução</string>
+    <string name="checkins_finished">%1$d check-in(s) concluído(s)</string>
+    <string name="no_checkin_finished">Nenhum check-in concluído</string>
 </resources>
