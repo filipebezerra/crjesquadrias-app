@@ -23,7 +23,7 @@ import rx.schedulers.Schedulers;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 03/03/2016
+ * @version 0.1.0, 04/03/2016
  * @since 0.1.0
  */
 public class CheckinActivity extends BaseActivity {

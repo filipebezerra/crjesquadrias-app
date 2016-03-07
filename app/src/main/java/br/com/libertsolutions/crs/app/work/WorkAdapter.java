@@ -22,7 +22,7 @@ import java.util.List;
  * Project adapter.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 03/03/2016
+ * @version 0.1.0, 06/03/2016
  * @since 0.1.0
  */
 public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder>
