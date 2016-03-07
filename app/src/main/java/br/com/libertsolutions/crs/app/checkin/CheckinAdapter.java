@@ -20,7 +20,7 @@ import java.util.List;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 05/03/2016
+ * @version 0.1.0, 07/03/2016
  * @since 0.1.0
  */
 public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHolder> {
@@ -109,6 +109,10 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
 
         if (updated) {
             notifyDataSetChanged();
+
+            if (mCheckinCallback != null) {
+                mCheckinCallback.onCheckinsAllDone();
+            }
         }
     }
 
@@ -143,5 +147,6 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
 
     public interface CheckinCallback {
         void onStatusChanged(Checkin checkin);
+        void onCheckinsAllDone();
     }
 }

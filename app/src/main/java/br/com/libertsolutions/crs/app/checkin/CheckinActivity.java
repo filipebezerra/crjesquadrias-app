@@ -23,7 +23,7 @@ import rx.schedulers.Schedulers;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 05/03/2016
+ * @version 0.1.0, 07/03/2016
  * @since 0.1.0
  */
 public class CheckinActivity extends BaseActivity implements CheckinAdapter.CheckinCallback {
@@ -128,6 +128,11 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
 
     @Override
     public void onStatusChanged(Checkin checkin) {
+        updateSubtitle();
+    }
+
+    @Override
+    public void onCheckinsAllDone() {
         updateSubtitle();
     }
 
