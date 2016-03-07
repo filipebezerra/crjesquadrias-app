@@ -39,4 +39,6 @@
     <string name="no_work_step_running">Nenhuma etapa em execução</string>
     <string name="checkins_finished">%1$d check-in(s) concluído(s)</string>
     <string name="no_checkin_finished">Nenhum check-in concluído</string>
+    <string name="menu_search">Buscar</string>
+    <string name="search_query_hint">Por cliente ou código</string>
 </resources>
