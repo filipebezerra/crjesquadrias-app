@@ -130,6 +130,18 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
         mCheckinCallback = checkinCallback;
     }
 
+    public List<Checkin> getAll() {
+        return mCheckins;
+    }
+
+    public void updateCheckin(Checkin checkinDone) {
+        for (Checkin checkin : mCheckins) {
+            if (checkin.getCheckinId().equals(checkinDone.getCheckinId())) {
+                checkin.setDate(checkinDone.getDate());
+            }
+        }
+    }
+
     class ViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.checkinStatus) View checkinStatus;
         @Bind(R.id.productType) TextView productType;

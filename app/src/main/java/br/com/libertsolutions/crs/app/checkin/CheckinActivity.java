@@ -65,14 +65,14 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getIntent().hasExtra(EXTRA_WORK_ID) 
+        if (getIntent().hasExtra(EXTRA_WORK_ID)
                 && getIntent().hasExtra(EXTRA_STEP_ID)) {
             mWorkId = getIntent().getLongExtra(EXTRA_WORK_ID, 0);
             mStepId = getIntent().getLongExtra(EXTRA_STEP_ID, 0);
         } else {
             throw new IllegalStateException("You need to use the method "
                     + "CheckinActivity.getLauncherIntent() passing the "
-                    + "Work ID in the second parameter and the Step ID " 
+                    + "Work ID in the second parameter and the Step ID "
                     + "in the third parameter");
         }
 
@@ -135,7 +135,29 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
     @Override
     public void onStatusChanged(Checkin checkin) {
         updateSubtitle();
+        postCheckin(checkin);
+    }
 
+    @Override
+    public void onCheckinsAllDone() {
+        updateSubtitle();
+
+        for (Checkin checkin : mCheckinAdapter.getAll()) {
+            postCheckin(checkin);
+        }
+    }
+
+    private void updateSubtitle() {
+        final int count = mCheckinAdapter.getFinishedCheckinsCount();
+        if (count == 0) {
+            setSubtitle(getString(R.string.no_checkin_finished));
+        } else {
+            setSubtitle(getString(R.string.checkins_finished,
+                    count));
+        }
+    }
+
+    private void postCheckin(Checkin checkin) {
         if (mCheckinService != null) {
             final String cpf = LoginHelper.getUserLogged(this);
             mCheckinService.post(cpf, checkin)
@@ -156,25 +178,9 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
 
                         @Override
                         public void onNext(Checkin checkin) {
-                            checkin.setStatus(checkin.getStatus());
-                            checkin.setDate(checkin.getDate());
+                            mCheckinAdapter.updateCheckin(checkin);
                         }
                     });
-        }
-    }
-
-    @Override
-    public void onCheckinsAllDone() {
-        updateSubtitle();
-    }
-
-    private void updateSubtitle() {
-        final int count = mCheckinAdapter.getFinishedCheckinsCount();
-        if (count == 0) {
-            setSubtitle(getString(R.string.no_checkin_finished));
-        } else {
-            setSubtitle(getString(R.string.checkins_finished,
-                    count));
         }
     }
 }
