@@ -23,10 +23,10 @@ import rx.schedulers.Schedulers;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 04/03/2016
+ * @version 0.1.0, 05/03/2016
  * @since 0.1.0
  */
-public class CheckinActivity extends BaseActivity {
+public class CheckinActivity extends BaseActivity implements CheckinAdapter.CheckinCallback {
 
     private static final String EXTRA_WORK_ID = "workId";
     private static final String EXTRA_STEP_ID = "stepId";
@@ -93,13 +93,7 @@ public class CheckinActivity extends BaseActivity {
                     .subscribe(new Subscriber<List<Checkin>>() {
                         @Override
                         public void onCompleted() {
-                            final int count = mCheckinAdapter.getFinishedCheckinsCount();
-                            if (count == 0) {
-                                setSubtitle(getString(R.string.no_checkin_finished));
-                            } else {
-                                setSubtitle(getString(R.string.checkins_finished,
-                                        count));
-                            }
+                            updateSubtitle();
                         }
 
                         @Override
@@ -116,6 +110,7 @@ public class CheckinActivity extends BaseActivity {
                             mCheckinsView.setAdapter(
                                     mCheckinAdapter = new CheckinAdapter(CheckinActivity.this,
                                             checkins));
+                            mCheckinAdapter.setCheckinCallback(CheckinActivity.this);
                         }
                     });
         }
@@ -128,6 +123,21 @@ public class CheckinActivity extends BaseActivity {
             return true;
         } else {
             return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onStatusChanged(Checkin checkin) {
+        updateSubtitle();
+    }
+
+    private void updateSubtitle() {
+        final int count = mCheckinAdapter.getFinishedCheckinsCount();
+        if (count == 0) {
+            setSubtitle(getString(R.string.no_checkin_finished));
+        } else {
+            setSubtitle(getString(R.string.checkins_finished,
+                    count));
         }
     }
 }

@@ -2,6 +2,7 @@ package br.com.libertsolutions.crs.app.checkin;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,7 +20,7 @@ import java.util.List;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 03/03/2016
+ * @version 0.1.0, 05/03/2016
  * @since 0.1.0
  */
 public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHolder> {
@@ -27,6 +28,7 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
 
     @NonNull private List<Checkin> mCheckins;
     @NonNull private Context mContext;
+    @Nullable private CheckinCallback mCheckinCallback;
 
     public CheckinAdapter(@NonNull Context context, @NonNull List<Checkin> checkins) {
         mCheckins = checkins;
@@ -71,6 +73,10 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
                 checkin.setStatus(checkBox.isChecked() ?
                         Checkin.STATUS_FINISHED : Checkin.STATUS_PENDING);
                 notifyItemChanged(holder.getAdapterPosition());
+
+                if (mCheckinCallback != null) {
+                    mCheckinCallback.onStatusChanged(checkin);
+                }
             }
         });
 
@@ -116,7 +122,11 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
         return count;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public void setCheckinCallback(CheckinCallback checkinCallback) {
+        mCheckinCallback = checkinCallback;
+    }
+
+    class ViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.checkinStatus) View checkinStatus;
         @Bind(R.id.productType) TextView productType;
         @Bind(R.id.productMeasures) TextView productMeasures;
@@ -129,5 +139,9 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
+    }
+
+    public interface CheckinCallback {
+        void onStatusChanged(Checkin checkin);
     }
 }
