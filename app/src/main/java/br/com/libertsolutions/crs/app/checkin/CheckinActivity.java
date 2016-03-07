@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
 import br.com.libertsolutions.crs.app.android.recyclerview.DividerDecoration;
+import br.com.libertsolutions.crs.app.login.LoginHelper;
 import br.com.libertsolutions.crs.app.retrofit.RetrofitHelper;
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -34,6 +35,7 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
     private Long mWorkId;
     private Long mStepId;
     private CheckinAdapter mCheckinAdapter;
+    private CheckinService mCheckinService;
 
     @Bind(android.R.id.list) RecyclerView mCheckinsView;
 
@@ -84,10 +86,14 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
     @Override
     protected void onStart() {
         super.onStart();
-        final CheckinService service = RetrofitHelper
-                .createService(CheckinService.class, this);
-        if (service != null) {
-            service.getAllByStep(mWorkId, mStepId)
+
+        if (mCheckinService == null) {
+            mCheckinService = RetrofitHelper
+                    .createService(CheckinService.class, this);
+        }
+
+        if (mCheckinService != null) {
+            mCheckinService.getAllByStep(mWorkId, mStepId)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.newThread())
                     .subscribe(new Subscriber<List<Checkin>>() {
@@ -129,6 +135,32 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
     @Override
     public void onStatusChanged(Checkin checkin) {
         updateSubtitle();
+
+        if (mCheckinService != null) {
+            final String cpf = LoginHelper.getUserLogged(this);
+            mCheckinService.post(cpf, checkin)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.newThread())
+                    .subscribe(new Subscriber<Checkin>() {
+                        @Override
+                        public void onCompleted() {}
+
+                        @Override
+                        public void onError(Throwable e) {
+                            new MaterialDialog.Builder(CheckinActivity.this)
+                                    .title("Falha ao tentar atualizar os dados")
+                                    .content(e.getMessage())
+                                    .positiveText("OK")
+                                    .show();
+                        }
+
+                        @Override
+                        public void onNext(Checkin checkin) {
+                            checkin.setStatus(checkin.getStatus());
+                            checkin.setDate(checkin.getDate());
+                        }
+                    });
+        }
     }
 
     @Override
