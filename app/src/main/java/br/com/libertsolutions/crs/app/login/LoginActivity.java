@@ -130,10 +130,10 @@ public class LoginActivity extends BaseActivity {
                     .createService(UserService.class, this);
 
             if (service != null) {
-                service.validateUser(cpf, password)
+                service.authenticateUser(LoginBody.of(cpf, password))
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeOn(Schedulers.newThread())
-                        .subscribe(new Subscriber<Boolean>() {
+                        .subscribe(new Subscriber<User>() {
                             @Override
                             public void onCompleted() {
 
@@ -150,10 +150,10 @@ public class LoginActivity extends BaseActivity {
                             }
 
                             @Override
-                            public void onNext(Boolean validUser) {
+                            public void onNext(User user) {
                                 progressDialog.dismiss();
-                                if (validUser) {
-                                    LoginHelper.loginUser(LoginActivity.this, cpf);
+                                if (user != null) {
+                                    LoginHelper.loginUser(LoginActivity.this, user);
                                     finish();
                                 } else {
                                     new MaterialDialog.Builder(LoginActivity.this)

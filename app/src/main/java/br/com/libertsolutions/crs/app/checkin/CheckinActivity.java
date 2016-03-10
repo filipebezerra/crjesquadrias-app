@@ -11,6 +11,7 @@ import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
 import br.com.libertsolutions.crs.app.android.recyclerview.DividerDecoration;
 import br.com.libertsolutions.crs.app.login.LoginHelper;
+import br.com.libertsolutions.crs.app.login.User;
 import br.com.libertsolutions.crs.app.retrofit.RetrofitHelper;
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -159,28 +160,30 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
 
     private void postCheckin(Checkin checkin) {
         if (mCheckinService != null) {
-            final String cpf = LoginHelper.getUserLogged(this);
-            mCheckinService.post(cpf, checkin)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.newThread())
-                    .subscribe(new Subscriber<Checkin>() {
-                        @Override
-                        public void onCompleted() {}
+            final User userLogged = LoginHelper.getUserLogged(this);
+            if (userLogged != null) {
+                mCheckinService.post(userLogged.getCpf(), checkin)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.newThread())
+                        .subscribe(new Subscriber<Checkin>() {
+                            @Override
+                            public void onCompleted() {}
 
-                        @Override
-                        public void onError(Throwable e) {
-                            new MaterialDialog.Builder(CheckinActivity.this)
-                                    .title("Falha ao tentar atualizar os dados")
-                                    .content(e.getMessage())
-                                    .positiveText("OK")
-                                    .show();
-                        }
+                            @Override
+                            public void onError(Throwable e) {
+                                new MaterialDialog.Builder(CheckinActivity.this)
+                                        .title("Falha ao tentar atualizar os dados")
+                                        .content(e.getMessage())
+                                        .positiveText("OK")
+                                        .show();
+                            }
 
-                        @Override
-                        public void onNext(Checkin checkin) {
-                            mCheckinAdapter.updateCheckin(checkin);
-                        }
-                    });
+                            @Override
+                            public void onNext(Checkin checkin) {
+                                mCheckinAdapter.updateCheckin(checkin);
+                            }
+                        });
+            }
         }
     }
 }

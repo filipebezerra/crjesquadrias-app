@@ -25,6 +25,7 @@ import br.com.libertsolutions.crs.app.feedback.FeedbackHelper;
 import br.com.libertsolutions.crs.app.launchscreen.LaunchScreenActivity;
 import br.com.libertsolutions.crs.app.login.LoginActivity;
 import br.com.libertsolutions.crs.app.login.LoginHelper;
+import br.com.libertsolutions.crs.app.login.User;
 import br.com.libertsolutions.crs.app.retrofit.RetrofitHelper;
 import br.com.libertsolutions.crs.app.settings.SettingsActivity;
 import br.com.libertsolutions.crs.app.settings.SettingsActivityCompat;
@@ -130,10 +131,12 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     }
 
     private void showUserLoggedInfo() {
-        final String userCpf = LoginHelper.getUserLogged(this);
-        FeedbackHelper
-                .snackbar(mRootView, String.format("Logado com cpf %s.",
-                        LoginHelper.formatCpf(userCpf)), false);
+        final User userLogged = LoginHelper.getUserLogged(this);
+        if (userLogged != null) {
+            FeedbackHelper
+                    .snackbar(mRootView, String.format("Logado com cpf %s.",
+                            LoginHelper.formatCpf(userLogged.getCpf())), false);
+        }
 
         final WorkService service = RetrofitHelper
                 .createService(WorkService.class, this);

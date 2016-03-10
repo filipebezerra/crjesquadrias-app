@@ -1,7 +1,7 @@
 package br.com.libertsolutions.crs.app.login;
 
-import retrofit2.http.GET;
-import retrofit2.http.Query;
+import retrofit2.http.Body;
+import retrofit2.http.POST;
 import rx.Observable;
 
 /**
@@ -12,7 +12,6 @@ import rx.Observable;
  * @since 0.1.0
  */
 public interface UserService {
-    @GET("UsuarioApi/Get")
-    Observable<Boolean> validateUser(
-            @Query("cpf") String cpf, @Query("senha") String password);
+    @POST("UsuarioApi/Get")
+    Observable<User> authenticateUser(@Body LoginBody loginBody);
 }
