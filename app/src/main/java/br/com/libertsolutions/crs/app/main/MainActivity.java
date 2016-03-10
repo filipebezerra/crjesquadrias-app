@@ -134,8 +134,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         final User userLogged = LoginHelper.getUserLogged(this);
         if (userLogged != null) {
             FeedbackHelper
-                    .snackbar(mRootView, String.format("Logado com cpf %s.",
-                            LoginHelper.formatCpf(userLogged.getCpf())), false);
+                    .snackbar(mRootView, String.format("Logado como %s.",
+                            LoginHelper.formatCpf(userLogged.getName())), false);
         }
 
         final WorkService service = RetrofitHelper
