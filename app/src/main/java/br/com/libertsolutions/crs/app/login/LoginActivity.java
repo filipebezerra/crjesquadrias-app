@@ -152,7 +152,7 @@ public class LoginActivity extends BaseActivity {
                             @Override
                             public void onNext(User user) {
                                 progressDialog.dismiss();
-                                if (user != null) {
+                                if (LoginHelper.isValidUser(user)) {
                                     LoginHelper.loginUser(LoginActivity.this, user);
                                     finish();
                                 } else {

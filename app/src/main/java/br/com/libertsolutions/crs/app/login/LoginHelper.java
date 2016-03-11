@@ -89,4 +89,11 @@ public class LoginHelper {
                 .insert(11, "-")
                 .toString();
     }
+
+    public static boolean isValidUser(User user) {
+        return user != null &&
+                !TextUtils.isEmpty(user.getCpf()) &&
+                !TextUtils.isEmpty(user.getEmail()) &&
+                !TextUtils.isEmpty(user.getName());
+    }
 }
