@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:padding="16dp"
     android:background="@drawable/launch_screen_bg"
-    tools:context="com.suleiman.material.activities.LaunchScreenActivity"
+    tools:context="br.com.libertsolutions.crs.app.launchscreen.LaunchScreenActivity"
     >
 
     <ImageView
