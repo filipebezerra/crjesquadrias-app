@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import br.com.libertsolutions.crs.app.R;
 import butterknife.Bind;
@@ -65,17 +66,43 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
         holder.productLine.setText("-");
         holder.itemTreatment.setText(product.getTreatment());
         holder.itemDone.setChecked(checkin.getStatus() == Checkin.STATUS_FINISHED);
-        holder.itemDone.setOnClickListener(new View.OnClickListener() {
+        /*holder.itemDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final CheckBox checkBox = (CheckBox) v;
                 final Checkin checkin = mCheckins.get(holder.getAdapterPosition());
-                checkin.setStatus(checkBox.isChecked() ?
-                        Checkin.STATUS_FINISHED : Checkin.STATUS_PENDING);
-                notifyItemChanged(holder.getAdapterPosition());
 
-                if (mCheckinCallback != null) {
-                    mCheckinCallback.onStatusChanged(checkin);
+                if (checkin.getStatus() != Checkin.STATUS_FINISHED) {
+                    checkin.setStatus(Checkin.STATUS_FINISHED);
+                    notifyItemChanged(holder.getAdapterPosition());
+
+                    if (mCheckinCallback != null) {
+                        mCheckinCallback.onStatusChanged(checkin);
+                    }
+                } else {
+                    final CheckBox checkBox = (CheckBox) v;
+                    checkBox.setChecked(true);
+                }
+            }
+        });*/
+
+        holder.itemDone.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                final Checkin checkin = mCheckins.get(holder.getAdapterPosition());
+
+                if (isChecked) {
+                    checkin.setStatus(Checkin.STATUS_FINISHED);
+                    notifyItemChanged(holder.getAdapterPosition());
+
+                    if (mCheckinCallback != null) {
+                        mCheckinCallback.onStatusChanged(checkin);
+                    }
+                } else if (checkin.getStatus() == Checkin.STATUS_FINISHED) {
+                    buttonView.setChecked(true);
+                    
+                    if (mCheckinCallback != null) {
+                        mCheckinCallback.onStatusCannotChange();
+                    }
                 }
             }
         });
@@ -160,5 +187,6 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
     public interface CheckinCallback {
         void onStatusChanged(Checkin checkin);
         void onCheckinsAllDone();
+        void onStatusCannotChange();
     }
 }

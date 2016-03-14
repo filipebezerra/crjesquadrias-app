@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
 import br.com.libertsolutions.crs.app.android.recyclerview.DividerDecoration;
+import br.com.libertsolutions.crs.app.feedback.FeedbackHelper;
 import br.com.libertsolutions.crs.app.login.LoginHelper;
 import br.com.libertsolutions.crs.app.login.User;
 import br.com.libertsolutions.crs.app.retrofit.RetrofitHelper;
@@ -146,6 +147,11 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
         for (Checkin checkin : mCheckinAdapter.getAll()) {
             postCheckin(checkin);
         }
+    }
+
+    @Override
+    public void onStatusCannotChange() {
+        FeedbackHelper.snackbar(mRootView, "Não é permitido desfazer o check-in!", true);
     }
 
     private void updateSubtitle() {
