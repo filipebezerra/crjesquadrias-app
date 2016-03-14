@@ -5,7 +5,6 @@ import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -52,7 +51,6 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
     private WorkAdapter mWorkAdapter;
 
-    @Bind(R.id.root_view) CoordinatorLayout mRootView;
     @Bind(R.id.list) RecyclerView mWorksView;
 
     @Override

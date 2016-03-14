@@ -38,10 +38,10 @@ public class SettingsActivity extends BaseActivity {
     protected void onCreate(Bundle inState) {
         super.onCreate(inState);
 
-        if (getFragmentManager().findFragmentById(R.id.content_frame) == null) {
+        if (getFragmentManager().findFragmentById(R.id.root_view) == null) {
             getFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.content_frame, new SettingsFragment())
+                    .replace(R.id.root_view, new SettingsFragment())
                     .commit();
         }
     }

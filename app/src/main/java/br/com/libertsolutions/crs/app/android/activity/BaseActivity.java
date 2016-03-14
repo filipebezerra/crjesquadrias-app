@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.drawable.DrawableHelper;
 import butterknife.Bind;
@@ -28,6 +29,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected static final int NO_UP_INDICATOR = -1;
     protected static final int NO_MENU = -1;
 
+    @Bind(R.id.root_view) protected ViewGroup mRootView;
     @Nullable @Bind(R.id.toolbar) protected Toolbar mToolbarAsActionBar;
 
     @Override

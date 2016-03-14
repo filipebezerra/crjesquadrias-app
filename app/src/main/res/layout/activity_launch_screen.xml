@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@id/root_view"
     android:padding="16dp"
     android:background="@drawable/launch_screen_bg"
     tools:context="br.com.libertsolutions.crs.app.launchscreen.LaunchScreenActivity"
