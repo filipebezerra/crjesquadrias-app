@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import java.text.NumberFormat;
@@ -19,6 +18,7 @@ import java.util.List;
 import br.com.libertsolutions.crs.app.R;
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * .
@@ -53,14 +53,14 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
 
         Product product;
         float width, height;
-        if (checkin.getItem() != null) {
-            product = checkin.getItem().getProduct();
-            width = checkin.getItem().getWidth();
-            height = checkin.getItem().getHeight();
-        } else {
+        if (checkin.getItem() == null) {
             product = checkin.getOrderGlass().getProduct();
             width = checkin.getOrderGlass().getWidth();
             height = checkin.getOrderGlass().getHeight();
+        } else {
+            product = checkin.getItem().getProduct();
+            width = checkin.getItem().getWidth();
+            height = checkin.getItem().getHeight();
         }
 
         holder.productType.setText(product.getType());
@@ -70,46 +70,6 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
         holder.productLine.setText("-");
         holder.itemTreatment.setText(product.getTreatment());
         holder.itemDone.setChecked(checkin.getStatus() == Checkin.STATUS_FINISHED);
-        /*holder.itemDone.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final Checkin checkin = mCheckins.get(holder.getAdapterPosition());
-
-                if (checkin.getStatus() != Checkin.STATUS_FINISHED) {
-                    checkin.setStatus(Checkin.STATUS_FINISHED);
-                    notifyItemChanged(holder.getAdapterPosition());
-
-                    if (mCheckinCallback != null) {
-                        mCheckinCallback.onStatusChanged(checkin);
-                    }
-                } else {
-                    final CheckBox checkBox = (CheckBox) v;
-                    checkBox.setChecked(true);
-                }
-            }
-        });*/
-
-        holder.itemDone.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                final Checkin checkin = mCheckins.get(holder.getAdapterPosition());
-
-                if (isChecked) {
-                    checkin.setStatus(Checkin.STATUS_FINISHED);
-                    notifyItemChanged(holder.getAdapterPosition());
-
-                    if (mCheckinCallback != null) {
-                        mCheckinCallback.onStatusChanged(checkin);
-                    }
-                } else if (checkin.getStatus() == Checkin.STATUS_FINISHED) {
-                    buttonView.setChecked(true);
-                    
-                    if (mCheckinCallback != null) {
-                        mCheckinCallback.onStatusCannotChange();
-                    }
-                }
-            }
-        });
 
         switch (checkin.getStatus()) {
             case Checkin.STATUS_PENDING:
@@ -157,7 +117,7 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
         return count;
     }
 
-    public void setCheckinCallback(CheckinCallback checkinCallback) {
+    public void setCheckinCallback(@NonNull CheckinCallback checkinCallback) {
         mCheckinCallback = checkinCallback;
     }
 
@@ -185,6 +145,26 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+        }
+
+        @OnClick(R.id.itemDone)
+        public void onClickItemDone() {
+            final Checkin checkin = mCheckins.get(getAdapterPosition());
+
+            if (itemDone.isChecked()) {
+                checkin.setStatus(Checkin.STATUS_FINISHED);
+                notifyItemChanged(getAdapterPosition());
+
+                if (mCheckinCallback != null) {
+                    mCheckinCallback.onStatusChanged(checkin);
+                }
+            } else {
+                itemDone.setChecked(true);
+
+                if (mCheckinCallback != null) {
+                    mCheckinCallback.onStatusCannotChange();
+                }
+            }
         }
     }
 
