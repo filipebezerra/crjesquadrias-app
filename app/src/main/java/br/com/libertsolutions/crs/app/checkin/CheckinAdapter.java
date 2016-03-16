@@ -27,8 +27,11 @@ import butterknife.OnClick;
  * @version 0.1.0, 07/03/2016
  * @since 0.1.0
  */
-public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHolder> {
+public class CheckinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getNumberInstance();
+
+    private static final int VIEW_TYPE_ITEM = 0;
+    private static final int VIEW_TYPE_ORDER_GLASS = 1;
 
     @NonNull private List<Checkin> mCheckins;
     @NonNull private Context mContext;
@@ -41,44 +44,59 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final View itemView = LayoutInflater.from(mContext)
-                .inflate(R.layout.item_checkin, parent, false);
-        return new CheckinAdapter.ViewHolder(itemView);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        if (viewType == VIEW_TYPE_ITEM) {
+            final View itemView = LayoutInflater.from(mContext)
+                    .inflate(R.layout.item_checkin, parent, false);
+            return new ViewHolderItem(itemView);
+        } else if (viewType == VIEW_TYPE_ORDER_GLASS) {
+            final View itemView = LayoutInflater.from(mContext)
+                    .inflate(R.layout.item_checkin_order_glass, parent, false);
+            return new ViewHolderOrderGlass(itemView);
+        } else {
+            throw new IllegalArgumentException(
+                    "O viewType = " + viewType + " não é um valor conhecido!");
+        }
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, final int position) {
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
         final Checkin checkin = mCheckins.get(position);
-
-        Product product;
         float width, height;
-        if (checkin.getItem() == null) {
-            product = checkin.getOrderGlass().getProduct();
-            width = checkin.getOrderGlass().getWidth();
-            height = checkin.getOrderGlass().getHeight();
-        } else {
-            product = checkin.getItem().getProduct();
+
+        if (holder instanceof ViewHolderItem) {
+            final Product product = checkin.getItem().getProduct();
             width = checkin.getItem().getWidth();
             height = checkin.getItem().getHeight();
+
+            ((ViewHolderItem) holder).productType.setText(
+                    product.getType());
+            ((ViewHolderItem) holder).itemLocation.setText("-");
+            ((ViewHolderItem) holder).productLine.setText("-");
+            ((ViewHolderItem) holder).itemTreatment.setText(
+                    product.getTreatment());
+
+        } else {
+            width = checkin.getOrderGlass().getWidth();
+            height = checkin.getOrderGlass().getHeight();
+
+            ((ViewHolderOrderGlass) holder).productColor.setText(
+                    checkin.getOrderGlass().getColor());
         }
 
-        holder.productType.setText(product.getType());
-        holder.productMeasures.setText(String.format("%sx%s",
-                NUMBER_FORMAT.format(width), NUMBER_FORMAT.format(height)));
-        holder.itemLocation.setText("-");
-        holder.productLine.setText("-");
-        holder.itemTreatment.setText(product.getTreatment());
-        holder.itemDone.setChecked(checkin.getStatus() == Checkin.STATUS_FINISHED);
+        ((BaseViewHolder) holder).productMeasures.setText(
+                String.format("%sx%s", NUMBER_FORMAT.format(width), NUMBER_FORMAT.format(height)));
+        ((BaseViewHolder) holder).itemDone.setChecked(
+                checkin.getStatus() == Checkin.STATUS_FINISHED);
 
         switch (checkin.getStatus()) {
             case Checkin.STATUS_PENDING:
-                holder.checkinStatus.setBackgroundColor(
+                ((BaseViewHolder) holder).checkinStatus.setBackgroundColor(
                         ContextCompat.getColor(mContext, R.color.statusPending));
                 break;
 
             case Checkin.STATUS_FINISHED:
-                holder.checkinStatus.setBackgroundColor(
+                ((BaseViewHolder) holder).checkinStatus.setBackgroundColor(
                         ContextCompat.getColor(mContext, R.color.statusFinished));
                 break;
         }
@@ -87,6 +105,17 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
     @Override
     public int getItemCount() {
         return mCheckins.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        final Checkin checkin = mCheckins.get(position);
+
+        if (checkin.getOrderGlass() == null) {
+            return VIEW_TYPE_ITEM;
+        } else {
+            return VIEW_TYPE_ORDER_GLASS;
+        }
     }
 
     public void checkAllDone() {
@@ -133,36 +162,53 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
         }
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
-        @Bind(R.id.checkinStatus) View checkinStatus;
+    class ViewHolderItem extends BaseViewHolder {
         @Bind(R.id.productType) TextView productType;
-        @Bind(R.id.productMeasures) TextView productMeasures;
         @Bind(R.id.itemLocation) TextView itemLocation;
         @Bind(R.id.productLine) TextView productLine;
         @Bind(R.id.itemTreatment) TextView itemTreatment;
+
+        public ViewHolderItem(View itemView) {
+            super(itemView);
+        }
+    }
+
+    class ViewHolderOrderGlass extends BaseViewHolder {
+        @Bind(R.id.productColor) TextView productColor;
+
+        public ViewHolderOrderGlass(View itemView) {
+            super(itemView);
+        }
+    }
+
+    abstract class BaseViewHolder extends RecyclerView.ViewHolder {
+        @Bind(R.id.checkinStatus) View checkinStatus;
+        @Bind(R.id.productMeasures) TextView productMeasures;
         @Bind(R.id.itemDone) CheckBox itemDone;
 
-        public ViewHolder(View itemView) {
+        public BaseViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
         @OnClick(R.id.itemDone)
         public void onClickItemDone() {
-            final Checkin checkin = mCheckins.get(getAdapterPosition());
+            final Checkin checkin = mCheckins.get(getLayoutPosition());
 
-            if (itemDone.isChecked()) {
-                checkin.setStatus(Checkin.STATUS_FINISHED);
-                notifyItemChanged(getAdapterPosition());
+            if (checkin != null) {
+                if (itemDone.isChecked()) {
+                    checkin.setStatus(Checkin.STATUS_FINISHED);
+                    notifyItemChanged(getLayoutPosition());
 
-                if (mCheckinCallback != null) {
-                    mCheckinCallback.onStatusChanged(checkin);
-                }
-            } else {
-                itemDone.setChecked(true);
+                    if (mCheckinCallback != null) {
+                        mCheckinCallback.onStatusChanged(checkin);
+                    }
+                } else {
+                    itemDone.setChecked(true);
 
-                if (mCheckinCallback != null) {
-                    mCheckinCallback.onStatusCannotChange();
+                    if (mCheckinCallback != null) {
+                        mCheckinCallback.onStatusCannotChange();
+                    }
                 }
             }
         }

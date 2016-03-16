@@ -20,4 +20,5 @@
     <item name="itemTreatment" type="id" />
     <item name="stepStatus" type="id" />
     <item name="checkinStatus" type="id" />
+    <item name="productColor" type="id" />
 </resources>
