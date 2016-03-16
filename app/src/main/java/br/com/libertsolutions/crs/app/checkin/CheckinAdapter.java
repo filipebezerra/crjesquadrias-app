@@ -49,13 +49,10 @@ public class CheckinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             final View itemView = LayoutInflater.from(mContext)
                     .inflate(R.layout.item_checkin, parent, false);
             return new ViewHolderItem(itemView);
-        } else if (viewType == VIEW_TYPE_ORDER_GLASS) {
+        } else {
             final View itemView = LayoutInflater.from(mContext)
                     .inflate(R.layout.item_checkin_order_glass, parent, false);
             return new ViewHolderOrderGlass(itemView);
-        } else {
-            throw new IllegalArgumentException(
-                    "O viewType = " + viewType + " não é um valor conhecido!");
         }
     }
 
