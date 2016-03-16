@@ -11,11 +11,14 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+
+import java.text.NumberFormat;
+import java.util.Collections;
+import java.util.List;
+
 import br.com.libertsolutions.crs.app.R;
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import java.text.NumberFormat;
-import java.util.List;
 
 /**
  * .
@@ -32,8 +35,9 @@ public class CheckinAdapter extends RecyclerView.Adapter<CheckinAdapter.ViewHold
     @Nullable private CheckinCallback mCheckinCallback;
 
     public CheckinAdapter(@NonNull Context context, @NonNull List<Checkin> checkins) {
-        mCheckins = checkins;
         mContext = context;
+        mCheckins = checkins;
+        Collections.sort(mCheckins);
     }
 
     @Override
