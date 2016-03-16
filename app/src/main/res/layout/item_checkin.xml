@@ -121,6 +121,16 @@
                     tools:text="Quarto"
                     />
             </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/thirdLineContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="horizontal"
+            android:baselineAligned="false"
+            >
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -149,7 +159,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/thirdLineContainer"
+            android:id="@+id/fourthLineContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
