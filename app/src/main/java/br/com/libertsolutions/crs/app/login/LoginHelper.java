@@ -11,7 +11,7 @@ import android.text.TextUtils;
  * Utilities methods used in {@link LoginActivity}.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 22/01/2016
+ * @version 0.1.0, 17/03/2016
  * @since 0.1.0
  */
 public class LoginHelper {
@@ -34,6 +34,9 @@ public class LoginHelper {
         if (isUserLogged(context))
             return;
 
+        if (!isValidUser(user))
+            return;
+
         final SharedPreferences sharedPreferences
                 = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -48,9 +51,8 @@ public class LoginHelper {
     }
 
     public static User getUserLogged(@NonNull Context context) {
-        if (!isUserLogged(context)) {
+        if (!isUserLogged(context))
             return null;
-        }
 
         final SharedPreferences sharedPreferences
                 = PreferenceManager.getDefaultSharedPreferences(context);
