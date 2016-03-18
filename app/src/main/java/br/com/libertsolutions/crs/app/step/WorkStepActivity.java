@@ -16,7 +16,6 @@ import br.com.libertsolutions.crs.app.android.recyclerview.OnClickListener;
 import br.com.libertsolutions.crs.app.android.recyclerview.OnTouchListener;
 import br.com.libertsolutions.crs.app.checkin.CheckinActivity;
 import br.com.libertsolutions.crs.app.retrofit.RetrofitHelper;
-import br.com.libertsolutions.crs.app.work.Work;
 import butterknife.Bind;
 import com.afollestad.materialdialogs.MaterialDialog;
 import java.util.List;
@@ -28,14 +27,14 @@ import rx.schedulers.Schedulers;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 27/02/2016
+ * @version 0.1.0, 18/03/2016
  * @since 0.1.0
  */
 public class WorkStepActivity extends BaseActivity implements OnClickListener {
 
-    private static final String EXTRA_DATA = "data";
+    private static final String EXTRA_ID = "data";
 
-    private Work mWorkRelatedTo;
+    private Long mWorkId;
     private FlowAdapter mFlowAdapter;
     
     @Bind(android.R.id.list) RecyclerView mWorkStepsView;
@@ -50,17 +49,22 @@ public class WorkStepActivity extends BaseActivity implements OnClickListener {
         return R.drawable.ic_arrow_back_24dp;
     }
 
-    public static Intent getLauncherIntent(@NonNull Context context, @NonNull Work work) {
+    public static Intent getLauncherIntent(@NonNull Context context, @NonNull Long workId) {
         return new Intent(context, WorkStepActivity.class)
-                .putExtra(EXTRA_DATA, work);
+                .putExtra(EXTRA_ID, workId);
     }
 
     @Override
     protected void onCreate(Bundle inState) {
         super.onCreate(inState);
 
-        if (getIntent().hasExtra(EXTRA_DATA)) {
-            mWorkRelatedTo = getIntent().getParcelableExtra(EXTRA_DATA);
+        if (getIntent().hasExtra(EXTRA_ID)) {
+            mWorkId = getIntent().getLongExtra(EXTRA_ID, INVALID_EXTRA_ID);
+
+            if (mWorkId == INVALID_EXTRA_ID) {
+                throw new IllegalArgumentException(
+                        "You need to set a valid workId as long type");
+            }
         } else {
             throw new IllegalStateException("You need to use the method "
                     + "WorkStepActivity.getLauncherIntent() passing the "
@@ -79,7 +83,7 @@ public class WorkStepActivity extends BaseActivity implements OnClickListener {
         super.onStart();
         final FlowService service = RetrofitHelper.createService(FlowService.class, this);
         if (service != null) {
-            service.getAll(mWorkRelatedTo.getWorkdId())
+            service.getAll(mWorkId)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.newThread())
                     .subscribe(new Subscriber<List<Flow>>() {
@@ -117,8 +121,7 @@ public class WorkStepActivity extends BaseActivity implements OnClickListener {
         final WorkStep item = mFlowAdapter.getItem(position).getStep();
 
         if (item != null) {
-            startActivity(CheckinActivity.getLauncherIntent(this,
-                    mWorkRelatedTo.getWorkdId(), item.getWorkStepId()));
+            startActivity(CheckinActivity.getLauncherIntent(this, mWorkId, item.getWorkStepId()));
         }
     }
 

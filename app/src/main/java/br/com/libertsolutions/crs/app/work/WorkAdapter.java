@@ -19,19 +19,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Project adapter.
+ * Work adapter.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 06/03/2016
+ * @version 0.1.0, 18/03/2016
  * @since 0.1.0
  */
 public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder>
     implements Filterable {
-    @NonNull private List<Work> mWorks;
+    @NonNull private List<WorkEntity> mWorks;
     @NonNull private Context mContext;
-    final private List<Work> mOriginalWorks;
+    final private List<WorkEntity> mOriginalWorks;
 
-    public WorkAdapter(@NonNull Context context, List<Work> workList) {
+    public WorkAdapter(@NonNull Context context, @NonNull List<WorkEntity> workList) {
         mContext = context;
         mWorks = workList;
         mOriginalWorks = mWorks;
@@ -46,11 +46,11 @@ public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder>
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final Work work = mWorks.get(position);
+        final WorkEntity work = mWorks.get(position);
 
         holder.workCode.setText(
                 String.format("%s/%s", work.getCode(), work.getJob()));
-        holder.customerName.setText(work.getCustomer().getNome());
+        holder.customerName.setText(work.getClient().getName());
 
         final CharSequence dateString = DateUtil
                 .formatAsRelativeDateFromNow(work.getDate());
@@ -61,12 +61,12 @@ public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder>
         }
 
         switch (work.getStatus()) {
-            case Work.STATUS_PENDING:
+            case WorkEntity.STATUS_PENDING:
                 holder.workStatus.setBackgroundColor(
                         ContextCompat.getColor(mContext, R.color.statusPending));
                 break;
 
-            case Work.STATUS_STARTED:
+            case WorkEntity.STATUS_STARTED:
                 holder.workStatus.setBackgroundColor(
                         ContextCompat.getColor(mContext, R.color.statusStarted));
                 break;
@@ -80,15 +80,15 @@ public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder>
 
     public int getRunningWorksCount() {
         int count = 0;
-        for (Work work : mWorks) {
-            if (work.getStatus() == Work.STATUS_STARTED) {
+        for (WorkEntity work : mWorks) {
+            if (work.getStatus() == WorkEntity.STATUS_STARTED) {
                 count++;
             }
         }
         return count;
     }
 
-    public Work getItem(int position) {
+    public WorkEntity getItem(int position) {
         if (position < 0 || position >= mWorks.size()) {
             return null;
         }
@@ -123,12 +123,12 @@ public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder>
                 results.values = mOriginalWorks;
             } else {
                 final String filterText = constraint.toString().trim().toLowerCase();
-                final List<Work> newList = new ArrayList<>();
+                final List<WorkEntity> newList = new ArrayList<>();
 
-                for (Work work : mOriginalWorks) {
+                for (WorkEntity work : mOriginalWorks) {
                     if (work.getJob().toLowerCase().contains(filterText) ||
                             work.getCode().toLowerCase().contains(filterText) ||
-                            work.getCustomer().getNome().toLowerCase().contains(filterText)) {
+                            work.getClient().getName().toLowerCase().contains(filterText)) {
                         newList.add(work);
                     }
                 }
@@ -143,7 +143,7 @@ public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder>
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
             //noinspection unchecked
-            mWorks = (List<Work>) results.values;
+            mWorks = (List<WorkEntity>) results.values;
             notifyDataSetChanged();
         }
     }

@@ -26,7 +26,7 @@ import rx.schedulers.Schedulers;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 07/03/2016
+ * @version 0.1.0, 18/03/2016
  * @since 0.1.0
  */
 public class CheckinActivity extends BaseActivity implements CheckinAdapter.CheckinCallback {
@@ -57,7 +57,7 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
     }
 
     public static Intent getLauncherIntent(@NonNull Context context,
-            Long workId, @NonNull Long stepId) {
+            @NonNull Long workId, @NonNull Long stepId) {
         return new Intent(context, CheckinActivity.class)
                 .putExtra(EXTRA_WORK_ID, workId)
                 .putExtra(EXTRA_STEP_ID, stepId);

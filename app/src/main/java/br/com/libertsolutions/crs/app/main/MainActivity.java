@@ -32,6 +32,7 @@ import br.com.libertsolutions.crs.app.settings.SettingsHelper;
 import br.com.libertsolutions.crs.app.step.WorkStepActivity;
 import br.com.libertsolutions.crs.app.work.Work;
 import br.com.libertsolutions.crs.app.work.WorkAdapter;
+import br.com.libertsolutions.crs.app.work.WorkEntity;
 import br.com.libertsolutions.crs.app.work.WorkService;
 import butterknife.Bind;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -44,7 +45,7 @@ import rx.schedulers.Schedulers;
  * Tela principal, nesta são listadas as obras cadastradas no servidor.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 06/03/2016
+ * @version 0.1.0, 18/03/2016
  * @since 0.1.0
  */
 public class MainActivity extends BaseActivity implements OnClickListener {
@@ -167,7 +168,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                         @Override
                         public void onNext(List<Work> works) {
                             mWorksView.setAdapter(mWorkAdapter =
-                                    new WorkAdapter(MainActivity.this, works));
+                                    new WorkAdapter(MainActivity.this, WorkEntity.of(works)));
                         }
                     });
         }
@@ -231,10 +232,10 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
     @Override
     public void onSingleTapUp(View view, int position) {
-        final Work item = mWorkAdapter.getItem(position);
+        final WorkEntity item = mWorkAdapter.getItem(position);
 
         if (item != null) {
-            startActivity(WorkStepActivity.getLauncherIntent(this, item));
+            startActivity(WorkStepActivity.getLauncherIntent(this, item.getWorkId()));
         }
     }
 

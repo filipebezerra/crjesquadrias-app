@@ -28,6 +28,7 @@ import butterknife.ButterKnife;
 public abstract class BaseActivity extends AppCompatActivity {
     protected static final int NO_UP_INDICATOR = -1;
     protected static final int NO_MENU = -1;
+    protected static final long INVALID_EXTRA_ID = -1;
 
     @Bind(R.id.root_view) protected ViewGroup mRootView;
     @Nullable @Bind(R.id.toolbar) protected Toolbar mToolbarAsActionBar;

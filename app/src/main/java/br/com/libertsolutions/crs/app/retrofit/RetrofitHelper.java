@@ -23,7 +23,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * classes de serviço que fazem chamadas do Web service.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 02/03/2016
+ * @version 0.1.0, 18/03/2016
  * @since 0.1.0
  */
 public class RetrofitHelper {
@@ -55,12 +55,12 @@ public class RetrofitHelper {
                     .addInterceptor(createInterceptorWithAuthKey(authKey))
                     .build();
 
-            sRetrofit = new Retrofit.Builder().
-                    baseUrl(baseUrl).
-                    addConverterFactory(GsonConverterFactory.create()).
-                    addCallAdapterFactory(RxJavaCallAdapterFactory.create()).
-                    client(httpClient).
-                    build();
+            sRetrofit = new Retrofit.Builder()
+                    .baseUrl(baseUrl)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                    .client(httpClient)
+                    .build();
 
             sAuthKey = authKey;
             sBaseUrl = baseUrl;
