@@ -114,7 +114,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                             @Override
                             public void onError(Throwable e) {
                                 new MaterialDialog.Builder(MainActivity.this)
-                                        .title("Falha ao tentar carregar dados")
+                                        .title("Falha ao tentar obter dados do servidor")
                                         .content(e.getMessage())
                                         .positiveText("OK")
                                         .show();
@@ -123,8 +123,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                             @Override
                             public void onNext(List<Work> works) {
                                 if (works.isEmpty()) {
-                                    // TODO: load empty state
-                                    // TODO: update the datebase
+                                    // TODO: carregar estado vazio
+                                    // TODO: atualizar o banco de dados
                                 } else {
                                     saveAllToLocalStorage(works);
                                 }
@@ -146,8 +146,13 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                             },
                             new Action1<Throwable>() {
                                 @Override
-                                public void call(Throwable throwable) {
-
+                                public void call(Throwable e) {
+                                    //TODO: tratamento de exceção
+                                    new MaterialDialog.Builder(MainActivity.this)
+                                            .title("Falha ao tentar listar dados do banco de dados")
+                                            .content(e.getMessage())
+                                            .positiveText("OK")
+                                            .show();
                                 }
                             }
                     );
@@ -178,7 +183,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                //TODO: check is adapter is not null
+                //TODO: validar se o adaptador não está nulo
                 mWorkAdapter.getFilter().filter(newText);
                 return true;
             }
@@ -253,6 +258,31 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     }
 
     private void saveAllToLocalStorage(List<Work> works) {
+        final Subscription subscription = mWorkDataService.saveAll(works)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io()).
+                        subscribe(
+                                new Action1<List<Work>>() {
+                                    @Override
+                                    public void call(List<Work> workList) {
+                                        mWorksView.setAdapter(
+                                                mWorkAdapter = new WorkAdapter(MainActivity.this,
+                                                        workList));
+                                    }
+                                },
 
+                                new Action1<Throwable>() {
+                                    @Override
+                                    public void call(Throwable e) {
+                                        //TODO: tratamento de exceção
+                                        new MaterialDialog.Builder(MainActivity.this)
+                                                .title("Falha ao tentar salvar dados no banco de dados")
+                                                .content(e.getMessage())
+                                                .positiveText("OK")
+                                                .show();
+                                    }
+                                }
+                        );
+        mCompositeSubscription.add(subscription);
     }
 }

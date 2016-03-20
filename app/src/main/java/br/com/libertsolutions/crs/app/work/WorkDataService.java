@@ -12,5 +12,6 @@ import rx.Observable;
  */
 public interface WorkDataService {
     Observable<List<Work>> list();
-    Observable<Work> save(long id, Client client, String code, String date, String job, int status);
+    Observable<Work> save(Work work);
+    Observable<List<Work>> saveAll(List<Work> workList);
 }

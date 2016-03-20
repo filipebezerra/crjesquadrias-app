@@ -3,6 +3,7 @@ package br.com.libertsolutions.crs.app.work;
 import android.content.Context;
 import br.com.libertsolutions.crs.app.rx.RealmObservable;
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,11 +46,10 @@ public class WorkRealmDataService implements WorkDataService {
     }
 
     @Override
-    public Observable<Work> save(final long id, Client client, final String code, final String date,
-            final String job, final int status) {
+    public Observable<Work> save(final Work work) {
         // map internal UI objects to Realm objects
         final ClientEntity clientEntity = new ClientEntity();
-        clientEntity.setName(client.getName());
+        clientEntity.setName(work.getClient().getName());
 
         return RealmObservable.object(mContext, new Func1<Realm, WorkEntity>() {
             @Override
@@ -59,12 +59,12 @@ public class WorkRealmDataService implements WorkDataService {
                 ClientEntity client = realm.copyToRealmOrUpdate(clientEntity);
 
                 WorkEntity workEntity = new WorkEntity();
-                workEntity.setWorkId(id);
+                workEntity.setWorkId(work.getWorkId());
                 workEntity.setClient(client);
-                workEntity.setCode(code);
-                workEntity.setDate(date);
-                workEntity.setJob(job);
-                workEntity.setStatus(status);
+                workEntity.setCode(work.getCode());
+                workEntity.setDate(work.getDate());
+                workEntity.setJob(work.getJob());
+                workEntity.setStatus(work.getStatus());
 
                 return realm.copyToRealmOrUpdate(workEntity);
             }
@@ -72,6 +72,43 @@ public class WorkRealmDataService implements WorkDataService {
             @Override
             public Work call(WorkEntity workEntity) {
                 return workFromRealm(workEntity);
+            }
+        });
+    }
+
+    @Override
+    public Observable<List<Work>> saveAll(final List<Work> workList) {
+        return RealmObservable.list(mContext, new Func1<Realm, RealmList<WorkEntity>>() {
+            @Override
+            public RealmList<WorkEntity> call(Realm realm) {
+                List<WorkEntity> workEntities = new ArrayList<>(workList.size());
+
+                for (Work work : workList) {
+                    ClientEntity clientEntity = new ClientEntity();
+                    clientEntity.setName(work.getClient().getName());
+                    clientEntity = realm.copyToRealmOrUpdate(clientEntity);
+
+                    WorkEntity workEntity = new WorkEntity();
+                    workEntity.setWorkId(work.getWorkId());
+                    workEntity.setClient(clientEntity);
+                    workEntity.setCode(work.getCode());
+                    workEntity.setDate(work.getDate());
+                    workEntity.setJob(work.getJob());
+                    workEntity.setStatus(work.getStatus());
+
+                    workEntities.add(realm.copyToRealmOrUpdate(workEntity));
+                }
+
+                return new RealmList<>(workEntities.toArray(new WorkEntity[workEntities.size()]));
+            }
+        }).map(new Func1<RealmList<WorkEntity>, List<Work>>() {
+            @Override
+            public List<Work> call(RealmList<WorkEntity> workEntities) {
+                List<Work> list = new ArrayList<>(workList.size());
+                for (WorkEntity workEntity : workEntities) {
+                    list.add(workFromRealm(workEntity));
+                }
+                return list;
             }
         });
     }
