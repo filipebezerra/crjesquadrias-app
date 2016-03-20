@@ -157,7 +157,7 @@ public class LoginActivity extends BaseActivity {
                                 progressDialog.dismiss();
                                 if (LoginHelper.isValidUser(user)) {
                                     LoginHelper.loginUser(LoginActivity.this, user);
-                                    finish();
+                                    NavigationHelper.navigateToMainScreen(LoginActivity.this);
                                 } else {
                                     new MaterialDialog.Builder(LoginActivity.this)
                                             .title("Problemas com credenciais")
