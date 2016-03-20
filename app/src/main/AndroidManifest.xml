@@ -14,47 +14,56 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Crs"
-        tools:ignore="AllowBackup,UnusedAttribute"
+        tools:ignore="AllowBackup,GoogleAppIndexingWarning,UnusedAttribute"
         >
-        <activity
-            android:name=".main.MainActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
-            android:label="@string/app_name"
-            android:launchMode="singleTop"
-            android:theme="@style/Crs.NoActionBar"
-            >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
         <activity
             android:name=".launchscreen.LaunchScreenActivity"
             android:label="@string/app_name"
             android:noHistory="true"
             android:screenOrientation="portrait"
             android:theme="@style/Crs.LaunchScreen"
-            />
+            >
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".login.LoginActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             android:label="@string/title_login_activity"
+            android:noHistory="true"
             android:theme="@style/Crs.NoActionBar"
             android:windowSoftInputMode="stateVisible|adjustResize"
             />
+
+        <activity
+            android:name=".main.MainActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
+            android:label="@string/app_name"
+            android:launchMode="singleTop"
+            android:theme="@style/Crs.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            />
+
         <activity
             android:name=".settings.SettingsActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             android:label="@string/title_activity_settings"
             android:theme="@style/Crs.NoActionBar"
             />
+
         <activity
             android:name=".settings.SettingsActivityCompat"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             android:label="@string/title_activity_settings"
             android:theme="@style/Crs.NoActionBar"
             />
+
         <activity
             android:name=".step.WorkStepActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
@@ -68,6 +77,7 @@
                 android:value="br.com.libertsolutions.crs.app.main.MainActivity"
                 />
         </activity>
+
         <activity
             android:name=".checkin.CheckinActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"

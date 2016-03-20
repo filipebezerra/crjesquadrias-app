@@ -1,14 +1,11 @@
 package br.com.libertsolutions.crs.app.settings;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import br.com.libertsolutions.crs.app.R;
@@ -18,8 +15,8 @@ import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
  * Application settings screen.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 22/01/2016
- * @since 0.1.0
+ * @version 0.1.0, 20/03/2016
+ * @since 0.1.0, 22/01/2016
  */
 @SuppressLint("NewApi")
 public class SettingsActivity extends BaseActivity {
@@ -90,9 +87,5 @@ public class SettingsActivity extends BaseActivity {
                             .getDefaultSharedPreferences(preference.getContext())
                             .getString(preference.getKey(), ""));
         }
-    }
-
-    public static Intent getLauncherIntent(@NonNull Context context) {
-        return new Intent(context, SettingsActivity.class);
     }
 }

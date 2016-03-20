@@ -3,7 +3,6 @@ package br.com.libertsolutions.crs.app.main;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.GridLayoutManager;
@@ -21,20 +20,17 @@ import br.com.libertsolutions.crs.app.android.recyclerview.OnTouchListener;
 import br.com.libertsolutions.crs.app.application.RequestCodes;
 import br.com.libertsolutions.crs.app.drawable.DrawableHelper;
 import br.com.libertsolutions.crs.app.feedback.FeedbackHelper;
-import br.com.libertsolutions.crs.app.launchscreen.LaunchScreenActivity;
-import br.com.libertsolutions.crs.app.login.LoginActivity;
 import br.com.libertsolutions.crs.app.login.LoginHelper;
 import br.com.libertsolutions.crs.app.login.User;
+import br.com.libertsolutions.crs.app.navigation.NavigationHelper;
 import br.com.libertsolutions.crs.app.network.NetworkUtil;
 import br.com.libertsolutions.crs.app.retrofit.RetrofitHelper;
-import br.com.libertsolutions.crs.app.settings.SettingsActivity;
-import br.com.libertsolutions.crs.app.settings.SettingsActivityCompat;
 import br.com.libertsolutions.crs.app.settings.SettingsHelper;
 import br.com.libertsolutions.crs.app.step.WorkStepActivity;
-import br.com.libertsolutions.crs.app.work.WorkRealmDataService;
 import br.com.libertsolutions.crs.app.work.Work;
 import br.com.libertsolutions.crs.app.work.WorkAdapter;
 import br.com.libertsolutions.crs.app.work.WorkDataService;
+import br.com.libertsolutions.crs.app.work.WorkRealmDataService;
 import br.com.libertsolutions.crs.app.work.WorkService;
 import butterknife.Bind;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -72,8 +68,6 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     protected void onCreate(Bundle inState) {
         super.onCreate(inState);
 
-        showLaunchScreen();
-
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(R.string.title_activity_main);
         }
@@ -95,6 +89,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         }
 
         mWorkDataService = new WorkRealmDataService(this);
+
+        showUserLoggedInfo();
     }
 
     @Override
@@ -182,6 +178,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                //TODO: check is adapter is not null
                 mWorkAdapter.getFilter().filter(newText);
                 return true;
             }
@@ -198,7 +195,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                 return true;
 
             case R.id.action_settings:
-                showSettingsScreen();
+                NavigationHelper.navigateToSettingsScreen(this);
                 return true;
 
             default:
@@ -214,34 +211,10 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //TODO: Redefinir fluxo das telas para: LaunchScreen -> Login -> Main
-        //      para que fique claro e sem muito controle de fluxo no código
         switch (requestCode) {
-            case RequestCodes.LAUNCH_BRAND_SCREEN:
-                if (!SettingsHelper.isSettingsApplied(this)) {
-                    showSettingsScreen();
-                } else if (!LoginHelper.isUserLogged(this)) {
-                    showLoginScreen();
-                } else {
-                    showUserLoggedInfo();
-                }
-                break;
-
             case RequestCodes.LAUNCH_SETTINGS_SCREEN:
                 if (!SettingsHelper.isSettingsApplied(this)) {
                     finish();
-                }
-
-                if (!LoginHelper.isUserLogged(this)) {
-                    showLoginScreen();
-                }
-                break;
-
-            case RequestCodes.LAUNCH_LOGIN_SCREEN:
-                if (!LoginHelper.isUserLogged(this)) {
-                    finish();
-                } else {
-                    showUserLoggedInfo();
                 }
                 break;
         }
@@ -251,6 +224,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
     @Override
     public void onSingleTapUp(View view, int position) {
+        //TODO: check if adapter is not null
         final Work item = mWorkAdapter.getItem(position);
 
         if (item != null) {
@@ -269,12 +243,6 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         }
     }
 
-    private void showLaunchScreen() {
-        startActivityForResult(
-                LaunchScreenActivity.getLauncherIntent(this),
-                RequestCodes.LAUNCH_BRAND_SCREEN);
-    }
-
     private void showUserLoggedInfo() {
         final User userLogged = LoginHelper.getUserLogged(this);
         if (userLogged != null) {
@@ -286,23 +254,5 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
     private void saveAllToLocalStorage(List<Work> works) {
 
-    }
-
-    private void showLoginScreen() {
-        startActivityForResult(
-                LoginActivity.getLauncherIntent(getApplicationContext()),
-                RequestCodes.LAUNCH_LOGIN_SCREEN);
-    }
-
-    private void showSettingsScreen() {
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.GINGERBREAD_MR1) {
-            startActivityForResult(
-                    SettingsActivity.getLauncherIntent(getApplicationContext()),
-                    RequestCodes.LAUNCH_SETTINGS_SCREEN);
-        } else {
-            startActivityForResult(
-                    SettingsActivityCompat.getLauncherIntent(getApplicationContext()),
-                    RequestCodes.LAUNCH_SETTINGS_SCREEN);
-        }
     }
 }

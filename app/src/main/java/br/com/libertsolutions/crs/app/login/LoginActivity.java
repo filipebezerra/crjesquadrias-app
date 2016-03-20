@@ -1,8 +1,6 @@
 package br.com.libertsolutions.crs.app.login;
 
-import android.content.Context;
-import android.content.Intent;
-import android.support.annotation.NonNull;
+import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
@@ -15,6 +13,7 @@ import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
 import br.com.libertsolutions.crs.app.feedback.FeedbackHelper;
 import br.com.libertsolutions.crs.app.form.FormUtil;
 import br.com.libertsolutions.crs.app.keyboard.KeyboardUtil;
+import br.com.libertsolutions.crs.app.navigation.NavigationHelper;
 import br.com.libertsolutions.crs.app.retrofit.RetrofitHelper;
 import butterknife.Bind;
 import butterknife.OnEditorAction;
@@ -29,10 +28,18 @@ import rx.schedulers.Schedulers;
  * aos dados obtidos do servidor.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 03/03/2016
+ * @version 0.1.0, 20/03/2016
  * @since 0.1.0
  */
 public class LoginActivity extends BaseActivity {
+    private FormUtil mFormUtil = new FormUtil();
+
+    @Bind(R.id.root_view) protected FrameLayout mRootView;
+    @Bind(R.id.cpf) protected EditText mCpfView;
+    @Bind(R.id.cpf_helper) protected TextInputLayout mCpfHelper;
+    @Bind(R.id.password) protected EditText mPasswordView;
+    @Bind(R.id.password_helper) protected TextInputLayout mPasswordHelper;
+
     @Override
     protected int provideLayoutResource() {
         return R.layout.activity_login;
@@ -48,16 +55,12 @@ public class LoginActivity extends BaseActivity {
         return R.menu.menu_login;
     }
 
-    @Bind(R.id.root_view) protected FrameLayout mRootView;
-    @Bind(R.id.cpf) protected EditText mCpfView;
-    @Bind(R.id.cpf_helper) protected TextInputLayout mCpfHelper;
-    @Bind(R.id.password) protected EditText mPasswordView;
-    @Bind(R.id.password_helper) protected TextInputLayout mPasswordHelper;
-
-    private FormUtil mFormUtil = new FormUtil();
-
-    public static Intent getLauncherIntent(@NonNull Context context) {
-        return new Intent(context, LoginActivity.class);
+    @Override
+    protected void onCreate(Bundle inState) {
+        super.onCreate(inState);
+        if (LoginHelper.isUserLogged(this)) {
+            NavigationHelper.navigateToMainScreen(this);
+        }
     }
 
     @Override
@@ -181,5 +184,10 @@ public class LoginActivity extends BaseActivity {
                         }
                     });
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }
