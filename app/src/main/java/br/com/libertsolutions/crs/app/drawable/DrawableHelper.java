@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
@@ -22,7 +23,7 @@ import android.widget.ImageView;
  */
 public class DrawableHelper {
     @NonNull Context mContext;
-    @ColorRes private int mColor;
+    @ColorInt private int mColor;
     private Drawable mDrawable;
     private Drawable mWrappedDrawable;
 
