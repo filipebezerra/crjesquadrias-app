@@ -25,21 +25,26 @@ import br.com.libertsolutions.crs.app.launchscreen.LaunchScreenActivity;
 import br.com.libertsolutions.crs.app.login.LoginActivity;
 import br.com.libertsolutions.crs.app.login.LoginHelper;
 import br.com.libertsolutions.crs.app.login.User;
+import br.com.libertsolutions.crs.app.network.NetworkUtil;
 import br.com.libertsolutions.crs.app.retrofit.RetrofitHelper;
 import br.com.libertsolutions.crs.app.settings.SettingsActivity;
 import br.com.libertsolutions.crs.app.settings.SettingsActivityCompat;
 import br.com.libertsolutions.crs.app.settings.SettingsHelper;
 import br.com.libertsolutions.crs.app.step.WorkStepActivity;
+import br.com.libertsolutions.crs.app.work.WorkRealmDataService;
 import br.com.libertsolutions.crs.app.work.Work;
 import br.com.libertsolutions.crs.app.work.WorkAdapter;
-import br.com.libertsolutions.crs.app.work.WorkEntity;
+import br.com.libertsolutions.crs.app.work.WorkDataService;
 import br.com.libertsolutions.crs.app.work.WorkService;
 import butterknife.Bind;
 import com.afollestad.materialdialogs.MaterialDialog;
 import java.util.List;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
 /**
  * Tela principal, nesta são listadas as obras cadastradas no servidor.
@@ -51,6 +56,10 @@ import rx.schedulers.Schedulers;
 public class MainActivity extends BaseActivity implements OnClickListener {
 
     private WorkAdapter mWorkAdapter;
+
+    private WorkDataService mWorkDataService;
+
+    private CompositeSubscription mCompositeSubscription;
 
     @Bind(R.id.list) RecyclerView mWorksView;
 
@@ -84,100 +93,79 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
             mToolbarAsActionBar.setNavigationIcon(navigationIcon);
         }
-    }
 
-    private void showLaunchScreen() {
-        startActivityForResult(
-                LaunchScreenActivity.getLauncherIntent(this),
-                RequestCodes.LAUNCH_BRAND_SCREEN);
+        mWorkDataService = new WorkRealmDataService(this);
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //TODO: Redefinir fluxo das telas para: LaunchScreen -> Login -> Main
-        //      para que fique claro e sem muito controle de fluxo no código
-        switch (requestCode) {
-            case RequestCodes.LAUNCH_BRAND_SCREEN:
-                if (!SettingsHelper.isSettingsApplied(this)) {
-                    showSettingsScreen();
-                } else if (!LoginHelper.isUserLogged(this)) {
-                    showLoginScreen();
-                } else {
-                    showUserLoggedInfo();
-                }
-                break;
+    protected void onStart() {
+        super.onStart();
+        mCompositeSubscription = new CompositeSubscription();
 
-            case RequestCodes.LAUNCH_SETTINGS_SCREEN:
-                if (!SettingsHelper.isSettingsApplied(this)) {
-                    finish();
-                }
+        if (NetworkUtil.isDeviceConnectedToInternet(this)) {
+            final WorkService service = RetrofitHelper
+                    .createService(WorkService.class, this);
 
-                if (!LoginHelper.isUserLogged(this)) {
-                    showLoginScreen();
-                }
-                break;
-
-            case RequestCodes.LAUNCH_LOGIN_SCREEN:
-                if (!LoginHelper.isUserLogged(this)) {
-                    finish();
-                } else {
-                    showUserLoggedInfo();
-                }
-                break;
-        }
-
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    private void showUserLoggedInfo() {
-        final User userLogged = LoginHelper.getUserLogged(this);
-        if (userLogged != null) {
-            FeedbackHelper
-                    .snackbar(mRootView, String.format("Logado como %s.",
-                            LoginHelper.formatCpf(userLogged.getName())), false);
-        }
-
-        final WorkService service = RetrofitHelper
-                .createService(WorkService.class, this);
-
-        if (service != null) {
-            service.getAllRunning()
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.newThread())
-                    .subscribe(new Subscriber<List<Work>>() {
-                        @Override
-                        public void onCompleted() {
-                            final int count = mWorkAdapter.getRunningWorksCount();
-                            if (count == 0) {
-                                setSubtitle(getString(R.string.no_work_running));
-                            } else {
-                                setSubtitle(getString(R.string.works_running,
-                                        count));
+            if (service != null) {
+                final Subscription subscription = service.getAllRunning()
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.newThread())
+                        .subscribe(new Subscriber<List<Work>>() {
+                            @Override
+                            public void onCompleted() {
                             }
-                        }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            new MaterialDialog.Builder(MainActivity.this)
-                                    .title("Falha ao tentar carregar dados")
-                                    .content(e.getMessage())
-                                    .positiveText("OK")
-                                    .show();
-                        }
+                            @Override
+                            public void onError(Throwable e) {
+                                new MaterialDialog.Builder(MainActivity.this)
+                                        .title("Falha ao tentar carregar dados")
+                                        .content(e.getMessage())
+                                        .positiveText("OK")
+                                        .show();
+                            }
 
-                        @Override
-                        public void onNext(List<Work> works) {
-                            mWorksView.setAdapter(mWorkAdapter =
-                                    new WorkAdapter(MainActivity.this, WorkEntity.of(works)));
-                        }
-                    });
+                            @Override
+                            public void onNext(List<Work> works) {
+                                if (works.isEmpty()) {
+                                    // TODO: load empty state
+                                    // TODO: update the datebase
+                                } else {
+                                    saveAllToLocalStorage(works);
+                                }
+                            }
+                        });
+                mCompositeSubscription.add(subscription);
+            }
+        } else {
+            final Subscription subscription = mWorkDataService.list()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(
+                            new Action1<List<Work>>() {
+                                @Override
+                                public void call(List<Work> list) {
+                                    mWorksView.setAdapter(mWorkAdapter =
+                                            new WorkAdapter(MainActivity.this, list));
+                                }
+                            },
+                            new Action1<Throwable>() {
+                                @Override
+                                public void call(Throwable throwable) {
+
+                                }
+                            }
+                    );
+            mCompositeSubscription.add(subscription);
         }
     }
 
-    private void showLoginScreen() {
-        startActivityForResult(
-                LoginActivity.getLauncherIntent(getApplicationContext()),
-                RequestCodes.LAUNCH_LOGIN_SCREEN);
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if (mCompositeSubscription != null) {
+            mCompositeSubscription.unsubscribe();
+        }
     }
 
     @Override
@@ -218,6 +206,94 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         }
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        changeListLayout(newConfig);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //TODO: Redefinir fluxo das telas para: LaunchScreen -> Login -> Main
+        //      para que fique claro e sem muito controle de fluxo no código
+        switch (requestCode) {
+            case RequestCodes.LAUNCH_BRAND_SCREEN:
+                if (!SettingsHelper.isSettingsApplied(this)) {
+                    showSettingsScreen();
+                } else if (!LoginHelper.isUserLogged(this)) {
+                    showLoginScreen();
+                } else {
+                    showUserLoggedInfo();
+                }
+                break;
+
+            case RequestCodes.LAUNCH_SETTINGS_SCREEN:
+                if (!SettingsHelper.isSettingsApplied(this)) {
+                    finish();
+                }
+
+                if (!LoginHelper.isUserLogged(this)) {
+                    showLoginScreen();
+                }
+                break;
+
+            case RequestCodes.LAUNCH_LOGIN_SCREEN:
+                if (!LoginHelper.isUserLogged(this)) {
+                    finish();
+                } else {
+                    showUserLoggedInfo();
+                }
+                break;
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onSingleTapUp(View view, int position) {
+        final Work item = mWorkAdapter.getItem(position);
+
+        if (item != null) {
+            startActivity(WorkStepActivity.getLauncherIntent(this, item.getWorkId()));
+        }
+    }
+
+    @Override
+    public void onLongPress(View view, int position) {}
+
+    private void changeListLayout(Configuration configuration) {
+        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mWorksView.setLayoutManager(new GridLayoutManager(this, 2));
+        } else {
+            mWorksView.setLayoutManager(new LinearLayoutManager(this));
+        }
+    }
+
+    private void showLaunchScreen() {
+        startActivityForResult(
+                LaunchScreenActivity.getLauncherIntent(this),
+                RequestCodes.LAUNCH_BRAND_SCREEN);
+    }
+
+    private void showUserLoggedInfo() {
+        final User userLogged = LoginHelper.getUserLogged(this);
+        if (userLogged != null) {
+            FeedbackHelper
+                    .snackbar(mRootView, String.format("Logado como %s.",
+                            LoginHelper.formatCpf(userLogged.getName())), false);
+        }
+    }
+
+    private void saveAllToLocalStorage(List<Work> works) {
+
+    }
+
+    private void showLoginScreen() {
+        startActivityForResult(
+                LoginActivity.getLauncherIntent(getApplicationContext()),
+                RequestCodes.LAUNCH_LOGIN_SCREEN);
+    }
+
     private void showSettingsScreen() {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.GINGERBREAD_MR1) {
             startActivityForResult(
@@ -227,34 +303,6 @@ public class MainActivity extends BaseActivity implements OnClickListener {
             startActivityForResult(
                     SettingsActivityCompat.getLauncherIntent(getApplicationContext()),
                     RequestCodes.LAUNCH_SETTINGS_SCREEN);
-        }
-    }
-
-    @Override
-    public void onSingleTapUp(View view, int position) {
-        final WorkEntity item = mWorkAdapter.getItem(position);
-
-        if (item != null) {
-            startActivity(WorkStepActivity.getLauncherIntent(this, item.getWorkId()));
-        }
-    }
-
-    @Override
-    public void onLongPress(View view, int position) {
-
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        changeListLayout(newConfig);
-    }
-
-    private void changeListLayout(Configuration configuration) {
-        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mWorksView.setLayoutManager(new GridLayoutManager(this, 2));
-        } else {
-            mWorksView.setLayoutManager(new LinearLayoutManager(this));
         }
     }
 }

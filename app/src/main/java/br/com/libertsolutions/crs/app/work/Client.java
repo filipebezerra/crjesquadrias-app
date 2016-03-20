@@ -7,10 +7,18 @@ import com.google.gson.annotations.SerializedName;
  * Esta classe é o modelo da camada da API.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 18/03/2016
+ * @version 0.1.0, 20/03/2016
  * @since 0.1.0
  */
 public class Client {
     @SerializedName("nome")
-    public String name;
+    private final String name;
+
+    public Client(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
 }

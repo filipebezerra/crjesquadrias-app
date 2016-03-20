@@ -7,25 +7,58 @@ import com.google.gson.annotations.SerializedName;
  * dos interiores de um imóvel. Esta classe é o modelo da camada da API
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 18/03/2016
+ * @version 0.1.0, 20/03/2016
  * @since 0.1.0
  */
 public class Work {
     @SerializedName("idObra")
-    public long id;
+    private final long workId;
 
     @SerializedName("Cliente")
-    public Client client;
+    private final Client client;
 
     @SerializedName("codigo")
-    public String code;
+    private final String code;
 
     @SerializedName("data")
-    public String date;
+    private final String date;
 
     @SerializedName("obra")
-    public String job;
+    private final String job;
 
     @SerializedName("status")
-    public int status;
+    private final int status;
+
+    public Work(long id, Client client, String code, String date, String job, int status) {
+        this.workId = id;
+        this.client = client;
+        this.code = code;
+        this.date = date;
+        this.job = job;
+        this.status = status;
+    }
+
+    public long getWorkId() {
+        return workId;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public String getJob() {
+        return job;
+    }
+
+    public int getStatus() {
+        return status;
+    }
 }
