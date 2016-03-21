@@ -2,6 +2,8 @@ package br.com.libertsolutions.crs.app.flow;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,13 +14,19 @@ import br.com.libertsolutions.crs.app.android.recyclerview.GridDividerDecoration
 import br.com.libertsolutions.crs.app.android.recyclerview.OnClickListener;
 import br.com.libertsolutions.crs.app.android.recyclerview.OnTouchListener;
 import br.com.libertsolutions.crs.app.checkin.CheckinActivity;
+import br.com.libertsolutions.crs.app.feedback.FeedbackHelper;
+import br.com.libertsolutions.crs.app.navigation.NavigationHelper;
+import br.com.libertsolutions.crs.app.network.NetworkUtil;
 import br.com.libertsolutions.crs.app.retrofit.RetrofitHelper;
+import br.com.libertsolutions.crs.app.settings.SettingsHelper;
 import butterknife.Bind;
 import com.afollestad.materialdialogs.MaterialDialog;
 import java.util.List;
-import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
 /**
  * .
@@ -32,7 +40,12 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
     public static final String EXTRA_WORK_ID = "workId";
 
     private Long mWorkId;
+
     private FlowAdapter mFlowAdapter;
+
+    private FlowDataService mFlowDataService;
+
+    private CompositeSubscription mCompositeSubscription;
     
     @Bind(android.R.id.list) RecyclerView mWorkStepsView;
 
@@ -68,43 +81,83 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
         mWorkStepsView.addItemDecoration(new GridDividerDecoration(this));
         mWorkStepsView.addOnItemTouchListener(
                 new OnTouchListener(this, mWorkStepsView, this));
+
+        mFlowDataService = new FlowRealmDataService(this);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        final FlowService service = RetrofitHelper.createService(FlowService.class, this);
-        if (service != null) {
-            service.getAll(mWorkId)
+        mCompositeSubscription = new CompositeSubscription();
+
+        if (NetworkUtil.isDeviceConnectedToInternet(this)) {
+            final FlowService service = RetrofitHelper.createService(FlowService.class, this);
+
+            if (service != null) {
+                final Subscription subscription = service.getAll(mWorkId)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.newThread())
+                        .subscribe(
+                                new Action1<List<Flow>>() {
+                                    @Override
+                                    public void call(List<Flow> flowList) {
+                                        if (flowList.isEmpty()) {
+                                            // TODO: carregar estado vazio
+                                            // TODO: atualizar o banco de dados
+                                        } else {
+                                            mWorkStepsView.setAdapter(mFlowAdapter =
+                                                    new FlowAdapter(FlowActivity.this, flowList));
+
+                                            updateSubtitle();
+                                        }
+                                    }
+                                },
+
+                                new Action1<Throwable>() {
+                                    @Override
+                                    public void call(Throwable e) {
+                                        showError(R.string.title_dialog_error_loading_data_from_server, e);
+                                    }
+                                }
+                        );
+                mCompositeSubscription.add(subscription);
+            } else {
+                validateAppSettings();
+            }
+        } else {
+            /*
+            final Subscription subscription = mFlowDataService.list()
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.newThread())
-                    .subscribe(new Subscriber<List<Flow>>() {
-                        @Override
-                        public void onCompleted() {
-                            final int count = mFlowAdapter.getRunningFlowsCount();
-                            if (count == 0) {
-                                setSubtitle(getString(R.string.no_work_step_running));
-                            } else {
-                                setSubtitle(getString(R.string.work_steps_running,
-                                        count));
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(
+                            new Action1<List<Flow>>() {
+                                @Override
+                                public void call(List<Flow> list) {
+                                    mWorkStepsView.setAdapter(mFlowAdapter =
+                                            new FlowAdapter(FlowActivity.this, list));
+
+                                    updateSubtitle();
+                                }
+                            },
+
+                            new Action1<Throwable>() {
+                                @Override
+                                public void call(Throwable e) {
+                                    showError(R.string.title_dialog_error_loading_data_from_local, e);
+                                }
                             }
-                        }
+                    );
+            mCompositeSubscription.add(subscription);
+            */0
+        }
+    }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            new MaterialDialog.Builder(FlowActivity.this)
-                                    .title("Falha ao tentar carregar dados")
-                                    .content(e.getMessage())
-                                    .positiveText("OK")
-                                    .show();
-                        }
+    @Override
+    protected void onStop() {
+        super.onStop();
 
-                        @Override
-                        public void onNext(List<Flow> flowList) {
-                            mWorkStepsView.setAdapter(mFlowAdapter =
-                                    new FlowAdapter(FlowActivity.this, flowList));
-                        }
-                    });
+        if (mCompositeSubscription != null) {
+            mCompositeSubscription.unsubscribe();
         }
     }
 
@@ -134,6 +187,64 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
             mWorkStepsView.setLayoutManager(new GridLayoutManager(this, 3));
         } else {
             mWorkStepsView.setLayoutManager(new LinearLayoutManager(this));
+        }
+    }
+
+    private void validateAppSettings() {
+        if (!SettingsHelper.isSettingsApplied(this)) {
+            FeedbackHelper.snackbar(mRootView, getString(R.string.msg_settings_not_applied), true,
+                    new Snackbar.Callback() {
+                        @Override
+                        public void onDismissed(Snackbar snackbar, int event) {
+                            NavigationHelper.navigateToSettingsScreen(FlowActivity.this);
+                        }
+                    });
+        }
+    }
+
+    private void saveAllToLocalStorage(List<Flow> flows) {
+        final Subscription subscription = mFlowDataService.saveAll(flows)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io()).
+                        subscribe(
+                                new Action1<List<Flow>>() {
+                                    @Override
+                                    public void call(List<Flow> flowList) {
+                                        mWorkStepsView.setAdapter(mFlowAdapter =
+                                                new FlowAdapter(FlowActivity.this, flowList));
+
+                                        updateSubtitle();
+                                    }
+                                },
+
+                                new Action1<Throwable>() {
+                                    @Override
+                                    public void call(Throwable e) {
+                                        showError(R.string.title_dialog_error_saving_data, e);
+                                    }
+                                }
+                        );
+        mCompositeSubscription.add(subscription);
+    }
+
+    private void showError(@StringRes int titleRes, Throwable e) {
+        //TODO: tratamento de exceção
+        new MaterialDialog.Builder(FlowActivity.this)
+                .title(titleRes)
+                .content(e.getMessage())
+                .positiveText(R.string.text_dialog_button_ok)
+                .show();
+    }
+
+    private void updateSubtitle() {
+        if (mFlowAdapter != null) {
+            final int count = mFlowAdapter.getRunningFlowsCount();
+            if (count == 0) {
+                setSubtitle(getString(R.string.no_work_step_running));
+            } else {
+                setSubtitle(getString(R.string.work_steps_running,
+                        count));
+            }
         }
     }
 }

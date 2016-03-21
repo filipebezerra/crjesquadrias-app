@@ -63,7 +63,7 @@ public class FlowRealmDataService implements FlowDataService {
                     flowEntity.setStep(workStepEntity);
                     flowEntity.setStatus(flow.getStatus());
 
-                    flowEntityList.add(flowEntity);
+                    flowEntityList.add(realm.copyToRealm(flowEntity));
                 }
 
                 return new RealmList<>(
