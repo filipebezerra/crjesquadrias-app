@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:showIn="@layout/activity_work_step"
-    tools:context=".step.WorkStepActivity"
+    tools:showIn="@layout/activity_flow"
+    tools:context=".flow.FlowActivity"
     >
 
     <android.support.v7.widget.RecyclerView

@@ -1,4 +1,4 @@
-package br.com.libertsolutions.crs.app.step;
+package br.com.libertsolutions.crs.app.flow;
 
 import java.util.List;
 import retrofit2.http.GET;

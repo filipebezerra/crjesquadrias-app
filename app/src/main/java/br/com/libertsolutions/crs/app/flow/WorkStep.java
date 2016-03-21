@@ -1,4 +1,4 @@
-package br.com.libertsolutions.crs.app.step;
+package br.com.libertsolutions.crs.app.flow;
 
 import android.support.annotation.NonNull;
 import com.google.gson.annotations.SerializedName;

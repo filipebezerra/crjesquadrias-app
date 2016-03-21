@@ -11,13 +11,14 @@ import br.com.libertsolutions.crs.app.login.LoginActivity;
 import br.com.libertsolutions.crs.app.main.MainActivity;
 import br.com.libertsolutions.crs.app.settings.SettingsActivity;
 import br.com.libertsolutions.crs.app.settings.SettingsActivityCompat;
+import br.com.libertsolutions.crs.app.flow.FlowActivity;
 
 /**
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 20/03/2016
- * @since 0.1.0
+ * @version 0.1.0, 21/03/2016
+ * @since 0.1.0, 20/03/2016
  */
 public class NavigationHelper {
     private NavigationHelper(){}
@@ -42,5 +43,10 @@ public class NavigationHelper {
                     new Intent(activity, SettingsActivityCompat.class),
                     RequestCodes.LAUNCH_SETTINGS_SCREEN);
         }
+    }
+
+    public static void navigateToFlowScreen(@NonNull Activity activity , @NonNull Long workId) {
+        activity.startActivity(new Intent(activity, FlowActivity.class)
+                .putExtra(FlowActivity.EXTRA_WORK_ID, workId));
     }
 }

@@ -1,10 +1,7 @@
-package br.com.libertsolutions.crs.app.step;
+package br.com.libertsolutions.crs.app.flow;
 
-import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,12 +24,12 @@ import rx.schedulers.Schedulers;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 18/03/2016
+ * @version 0.1.0, 20/03/2016
  * @since 0.1.0
  */
-public class WorkStepActivity extends BaseActivity implements OnClickListener {
+public class FlowActivity extends BaseActivity implements OnClickListener {
 
-    private static final String EXTRA_ID = "data";
+    public static final String EXTRA_WORK_ID = "workId";
 
     private Long mWorkId;
     private FlowAdapter mFlowAdapter;
@@ -41,7 +38,7 @@ public class WorkStepActivity extends BaseActivity implements OnClickListener {
 
     @Override
     protected int provideLayoutResource() {
-        return R.layout.activity_work_step;
+        return R.layout.activity_flow;
     }
 
     @Override
@@ -49,17 +46,12 @@ public class WorkStepActivity extends BaseActivity implements OnClickListener {
         return R.drawable.ic_arrow_back_24dp;
     }
 
-    public static Intent getLauncherIntent(@NonNull Context context, @NonNull Long workId) {
-        return new Intent(context, WorkStepActivity.class)
-                .putExtra(EXTRA_ID, workId);
-    }
-
     @Override
     protected void onCreate(Bundle inState) {
         super.onCreate(inState);
 
-        if (getIntent().hasExtra(EXTRA_ID)) {
-            mWorkId = getIntent().getLongExtra(EXTRA_ID, INVALID_EXTRA_ID);
+        if (getIntent().hasExtra(EXTRA_WORK_ID)) {
+            mWorkId = getIntent().getLongExtra(EXTRA_WORK_ID, INVALID_EXTRA_ID);
 
             if (mWorkId == INVALID_EXTRA_ID) {
                 throw new IllegalArgumentException(
@@ -100,7 +92,7 @@ public class WorkStepActivity extends BaseActivity implements OnClickListener {
 
                         @Override
                         public void onError(Throwable e) {
-                            new MaterialDialog.Builder(WorkStepActivity.this)
+                            new MaterialDialog.Builder(FlowActivity.this)
                                     .title("Falha ao tentar carregar dados")
                                     .content(e.getMessage())
                                     .positiveText("OK")
@@ -110,7 +102,7 @@ public class WorkStepActivity extends BaseActivity implements OnClickListener {
                         @Override
                         public void onNext(List<Flow> flowList) {
                             mWorkStepsView.setAdapter(mFlowAdapter =
-                                    new FlowAdapter(WorkStepActivity.this, flowList));
+                                    new FlowAdapter(FlowActivity.this, flowList));
                         }
                     });
         }
@@ -118,16 +110,18 @@ public class WorkStepActivity extends BaseActivity implements OnClickListener {
 
     @Override
     public void onSingleTapUp(View view, int position) {
-        final WorkStep item = mFlowAdapter.getItem(position).getStep();
+        if (mFlowAdapter != null) {
+            final WorkStep item = mFlowAdapter.getItem(position).getStep();
 
-        if (item != null) {
-            startActivity(CheckinActivity.getLauncherIntent(this, mWorkId, item.getWorkStepId()));
+            if (item != null) {
+                startActivity(
+                        CheckinActivity.getLauncherIntent(this, mWorkId, item.getWorkStepId()));
+            }
         }
     }
 
     @Override
-    public void onLongPress(View view, int position) {
-    }
+    public void onLongPress(View view, int position) {}
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {

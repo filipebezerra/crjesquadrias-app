@@ -26,7 +26,6 @@ import br.com.libertsolutions.crs.app.navigation.NavigationHelper;
 import br.com.libertsolutions.crs.app.network.NetworkUtil;
 import br.com.libertsolutions.crs.app.retrofit.RetrofitHelper;
 import br.com.libertsolutions.crs.app.settings.SettingsHelper;
-import br.com.libertsolutions.crs.app.step.WorkStepActivity;
 import br.com.libertsolutions.crs.app.work.Work;
 import br.com.libertsolutions.crs.app.work.WorkAdapter;
 import br.com.libertsolutions.crs.app.work.WorkDataService;
@@ -45,7 +44,7 @@ import rx.subscriptions.CompositeSubscription;
  * Tela principal, nesta são listadas as obras cadastradas no servidor.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 20/03/2016
+ * @version 0.1.0, 21/03/2016
  * @since 0.1.0
  */
 public class MainActivity extends BaseActivity implements OnClickListener {
@@ -215,7 +214,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
             final Work item = mWorkAdapter.getItem(position);
 
             if (item != null) {
-                startActivity(WorkStepActivity.getLauncherIntent(this, item.getWorkId()));
+                NavigationHelper.navigateToFlowScreen(this, item.getWorkId());
             }
         }
     }

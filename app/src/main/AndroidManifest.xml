@@ -64,7 +64,7 @@
             />
 
         <activity
-            android:name=".step.WorkStepActivity"
+            android:name=".flow.FlowActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             android:label="@string/title_activity_stage"
             android:parentActivityName=".main.MainActivity"
@@ -81,12 +81,12 @@
             android:name=".checkin.CheckinActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             android:label="@string/title_activity_checkin"
-            android:parentActivityName=".step.WorkStepActivity"
+            android:parentActivityName=".flow.FlowActivity"
             android:theme="@style/Crs.NoActionBar"
             >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="br.com.libertsolutions.crs.app.step.WorkStepActivity"
+                android:value=".flow.FlowActivity"
                 />
         </activity>
     </application>

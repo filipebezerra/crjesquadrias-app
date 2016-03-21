@@ -1,4 +1,4 @@
-package br.com.libertsolutions.crs.app.step;
+package br.com.libertsolutions.crs.app.flow;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
