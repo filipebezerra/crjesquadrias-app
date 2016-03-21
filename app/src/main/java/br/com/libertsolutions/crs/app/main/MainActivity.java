@@ -137,6 +137,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                                 public void call(List<Work> list) {
                                     mWorksView.setAdapter(mWorkAdapter =
                                             new WorkAdapter(MainActivity.this, list));
+
+                                    updateSubtitle();
                                 }
                             },
                             new Action1<Throwable>() {
@@ -249,18 +251,15 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                                         mWorksView.setAdapter(
                                                 mWorkAdapter = new WorkAdapter(MainActivity.this,
                                                         workList));
+
+                                        updateSubtitle();
                                     }
                                 },
 
                                 new Action1<Throwable>() {
                                     @Override
                                     public void call(Throwable e) {
-                                        //TODO: tratamento de exceção
-                                        new MaterialDialog.Builder(MainActivity.this)
-                                                .title("Falha ao tentar salvar dados no banco de dados")
-                                                .content(e.getMessage())
-                                                .positiveText(R.string.text_dialog_button_ok)
-                                                .show();
+                                        showError(R.string.title_dialog_error_saving_data, e);
                                     }
                                 }
                         );
@@ -286,5 +285,17 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                 .content(e.getMessage())
                 .positiveText(R.string.text_dialog_button_ok)
                 .show();
+    }
+
+    private void updateSubtitle() {
+        if (mWorkAdapter != null) {
+            final int count = mWorkAdapter.getRunningWorksCount();
+            if (count == 0) {
+                setSubtitle(getString(R.string.no_work_running));
+            } else {
+                setSubtitle(getString(R.string.works_running,
+                        count));
+            }
+        }
     }
 }
