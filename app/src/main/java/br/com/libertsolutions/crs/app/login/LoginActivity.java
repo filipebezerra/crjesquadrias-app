@@ -136,9 +136,9 @@ public class LoginActivity extends BaseActivity {
             final String cpf = mCpfView.getTag().toString();
             final String password = mPasswordView.getText().toString();
 
-            final UserService service = RetrofitHelper.createService(UserService.class, this);
-
             if (NetworkUtil.isDeviceConnectedToInternet(this)) {
+                final UserService service = RetrofitHelper.createService(UserService.class, this);
+
                 if (service != null) {
                     final MaterialDialog progressDialog = new MaterialDialog
                             .Builder(LoginActivity.this)

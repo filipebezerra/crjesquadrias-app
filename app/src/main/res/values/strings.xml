@@ -57,4 +57,6 @@
     <string name="text_dialog_button_ok">OK</string>
     <string name="title_dialog_invalid_credentials">Problemas com credenciais</string>
     <string name="msg_dialog_invalid_credentials">Seu CPF ou senha estão incorretos</string>
+    <string name="title_dialog_error_loading_data_from_server">Falha ao tentar obter dados do servidor</string>
+    <string name="title_dialog_error_loading_data_from_local">Falha ao tentar listar dados do banco de dados</string>
 </resources>

@@ -1,9 +1,10 @@
 package br.com.libertsolutions.crs.app.main;
 
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,7 +18,6 @@ import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
 import br.com.libertsolutions.crs.app.android.recyclerview.GridDividerDecoration;
 import br.com.libertsolutions.crs.app.android.recyclerview.OnClickListener;
 import br.com.libertsolutions.crs.app.android.recyclerview.OnTouchListener;
-import br.com.libertsolutions.crs.app.application.RequestCodes;
 import br.com.libertsolutions.crs.app.drawable.DrawableHelper;
 import br.com.libertsolutions.crs.app.feedback.FeedbackHelper;
 import br.com.libertsolutions.crs.app.login.LoginHelper;
@@ -35,7 +35,6 @@ import br.com.libertsolutions.crs.app.work.WorkService;
 import butterknife.Bind;
 import com.afollestad.materialdialogs.MaterialDialog;
 import java.util.List;
-import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -46,7 +45,7 @@ import rx.subscriptions.CompositeSubscription;
  * Tela principal, nesta são listadas as obras cadastradas no servidor.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 18/03/2016
+ * @version 0.1.0, 20/03/2016
  * @since 0.1.0
  */
 public class MainActivity extends BaseActivity implements OnClickListener {
@@ -99,38 +98,34 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         mCompositeSubscription = new CompositeSubscription();
 
         if (NetworkUtil.isDeviceConnectedToInternet(this)) {
-            final WorkService service = RetrofitHelper
-                    .createService(WorkService.class, this);
+            final WorkService service = RetrofitHelper.createService(WorkService.class, this);
 
             if (service != null) {
                 final Subscription subscription = service.getAllRunning()
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeOn(Schedulers.newThread())
-                        .subscribe(new Subscriber<List<Work>>() {
-                            @Override
-                            public void onCompleted() {
-                            }
+                        .subscribe(
+                                new Action1<List<Work>>() {
+                                    @Override
+                                    public void call(List<Work> workList) {
+                                        if (workList.isEmpty()) {
+                                            // TODO: carregar estado vazio
+                                            // TODO: atualizar o banco de dados
+                                        } else {
+                                            saveAllToLocalStorage(workList);
+                                        }
+                                    }
+                                },
 
-                            @Override
-                            public void onError(Throwable e) {
-                                new MaterialDialog.Builder(MainActivity.this)
-                                        .title("Falha ao tentar obter dados do servidor")
-                                        .content(e.getMessage())
-                                        .positiveText("OK")
-                                        .show();
-                            }
-
-                            @Override
-                            public void onNext(List<Work> works) {
-                                if (works.isEmpty()) {
-                                    // TODO: carregar estado vazio
-                                    // TODO: atualizar o banco de dados
-                                } else {
-                                    saveAllToLocalStorage(works);
-                                }
-                            }
-                        });
+                                new Action1<Throwable>() {
+                                    @Override
+                                    public void call(Throwable e) {
+                                        showError(R.string.title_dialog_error_loading_data_from_server, e);
+                                    }
+                                });
                 mCompositeSubscription.add(subscription);
+            } else {
+                validateAppSettings();
             }
         } else {
             final Subscription subscription = mWorkDataService.list()
@@ -147,12 +142,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                             new Action1<Throwable>() {
                                 @Override
                                 public void call(Throwable e) {
-                                    //TODO: tratamento de exceção
-                                    new MaterialDialog.Builder(MainActivity.this)
-                                            .title("Falha ao tentar listar dados do banco de dados")
-                                            .content(e.getMessage())
-                                            .positiveText("OK")
-                                            .show();
+                                    showError(R.string.title_dialog_error_loading_data_from_local, e);
                                 }
                             }
                     );
@@ -183,9 +173,12 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                //TODO: validar se o adaptador não está nulo
-                mWorkAdapter.getFilter().filter(newText);
-                return true;
+                if (mWorkAdapter != null) {
+                    mWorkAdapter.getFilter().filter(newText);
+                    return true;
+                } else {
+                    return false;
+                }
             }
         });
         return true;
@@ -215,25 +208,13 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case RequestCodes.LAUNCH_SETTINGS_SCREEN:
-                if (!SettingsHelper.isSettingsApplied(this)) {
-                    finish();
-                }
-                break;
-        }
-
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
     public void onSingleTapUp(View view, int position) {
-        //TODO: check if adapter is not null
-        final Work item = mWorkAdapter.getItem(position);
+        if (mWorkAdapter != null) {
+            final Work item = mWorkAdapter.getItem(position);
 
-        if (item != null) {
-            startActivity(WorkStepActivity.getLauncherIntent(this, item.getWorkId()));
+            if (item != null) {
+                startActivity(WorkStepActivity.getLauncherIntent(this, item.getWorkId()));
+            }
         }
     }
 
@@ -278,11 +259,32 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                                         new MaterialDialog.Builder(MainActivity.this)
                                                 .title("Falha ao tentar salvar dados no banco de dados")
                                                 .content(e.getMessage())
-                                                .positiveText("OK")
+                                                .positiveText(R.string.text_dialog_button_ok)
                                                 .show();
                                     }
                                 }
                         );
         mCompositeSubscription.add(subscription);
+    }
+
+    private void validateAppSettings() {
+        if (!SettingsHelper.isSettingsApplied(this)) {
+            FeedbackHelper.snackbar(mRootView, getString(R.string.msg_settings_not_applied), true,
+                    new Snackbar.Callback() {
+                        @Override
+                        public void onDismissed(Snackbar snackbar, int event) {
+                            NavigationHelper.navigateToSettingsScreen(MainActivity.this);
+                        }
+                    });
+        }
+    }
+
+    private void showError(@StringRes int titleRes, Throwable e) {
+        //TODO: tratamento de exceção
+        new MaterialDialog.Builder(MainActivity.this)
+                .title(titleRes)
+                .content(e.getMessage())
+                .positiveText(R.string.text_dialog_button_ok)
+                .show();
     }
 }
