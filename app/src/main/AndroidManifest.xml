@@ -36,7 +36,6 @@
             android:name=".login.LoginActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             android:label="@string/title_login_activity"
-            android:noHistory="true"
             android:theme="@style/Crs.NoActionBar"
             android:windowSoftInputMode="stateVisible|adjustResize"
             />

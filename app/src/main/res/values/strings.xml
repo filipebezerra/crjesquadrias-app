@@ -41,4 +41,20 @@
     <string name="no_checkin_finished">Nenhum check-in concluído</string>
     <string name="menu_search">Buscar</string>
     <string name="search_query_hint">Por cliente ou código</string>
+    <string name="msg_unable_to_sign_in_no_network">
+        Não foi possível entrar. Verifique sua conexão com a internet
+    </string>
+    <string name="msg_fix_errors_to_sign_in">Corrija os erros para continuar com login</string>
+    <string name="hint_cpf_required">CPF deve ser informado</string>
+    <string name="hint_cpf_invalid">CPF deve conter 11 dígitos</string>
+    <string name="hint_password_required">Senha deve ser informada</string>
+    <string name="title_dialog_signing_in">Entrando</string>
+    <string name="msg_dialog_signing_in">
+        Por favor aguarde enquanto validamos suas credenciais…
+    </string>
+    <string name="msg_settings_not_applied">As configurações não foram feitas corretamente</string>
+    <string name="title_dialog_sign_in_failed">Falha ao tentar entrar</string>
+    <string name="text_dialog_button_ok">OK</string>
+    <string name="title_dialog_invalid_credentials">Problemas com credenciais</string>
+    <string name="msg_dialog_invalid_credentials">Seu CPF ou senha estão incorretos</string>
 </resources>

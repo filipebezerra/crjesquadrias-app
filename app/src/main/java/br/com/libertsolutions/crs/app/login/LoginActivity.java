@@ -1,12 +1,13 @@
 package br.com.libertsolutions.crs.app.login;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
@@ -14,18 +15,21 @@ import br.com.libertsolutions.crs.app.feedback.FeedbackHelper;
 import br.com.libertsolutions.crs.app.form.FormUtil;
 import br.com.libertsolutions.crs.app.keyboard.KeyboardUtil;
 import br.com.libertsolutions.crs.app.navigation.NavigationHelper;
+import br.com.libertsolutions.crs.app.network.NetworkUtil;
 import br.com.libertsolutions.crs.app.retrofit.RetrofitHelper;
+import br.com.libertsolutions.crs.app.settings.SettingsHelper;
 import butterknife.Bind;
 import butterknife.OnEditorAction;
 import butterknife.OnFocusChange;
 import com.afollestad.materialdialogs.MaterialDialog;
-import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 /**
- * Tela de login, nesta usuários do sistema deverão logar para ter acesso
- * aos dados obtidos do servidor.
+ * Tela de login, nesta usuários do sistema deverão logar para ter acesso aos dados obtidos do
+ * servidor.
  *
  * @author Filipe Bezerra
  * @version 0.1.0, 20/03/2016
@@ -33,12 +37,13 @@ import rx.schedulers.Schedulers;
  */
 public class LoginActivity extends BaseActivity {
     private FormUtil mFormUtil = new FormUtil();
+    private Subscription mSubscription;
 
-    @Bind(R.id.root_view) protected FrameLayout mRootView;
-    @Bind(R.id.cpf) protected EditText mCpfView;
-    @Bind(R.id.cpf_helper) protected TextInputLayout mCpfHelper;
-    @Bind(R.id.password) protected EditText mPasswordView;
-    @Bind(R.id.password_helper) protected TextInputLayout mPasswordHelper;
+    @Bind(R.id.root_view) FrameLayout mRootView;
+    @Bind(R.id.cpf) TextInputEditText mCpfView;
+    @Bind(R.id.cpf_helper) TextInputLayout mCpfHelper;
+    @Bind(R.id.password) TextInputEditText mPasswordView;
+    @Bind(R.id.password_helper) TextInputLayout mPasswordHelper;
 
     @Override
     protected int provideLayoutResource() {
@@ -60,6 +65,9 @@ public class LoginActivity extends BaseActivity {
         super.onCreate(inState);
         if (LoginHelper.isUserLogged(this)) {
             NavigationHelper.navigateToMainScreen(this);
+            finish();
+        } else if (!SettingsHelper.isSettingsApplied(this)) {
+            NavigationHelper.navigateToSettingsScreen(this);
         }
     }
 
@@ -77,6 +85,12 @@ public class LoginActivity extends BaseActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unsubscribeAuthentication();
     }
 
     @OnFocusChange(R.id.cpf)
@@ -108,86 +122,129 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void doLogin() {
-        if (!mFormUtil.enableOrRemoveErrorInView(mCpfHelper, "CPF deve ser informado",
-                mCpfView)) {
-            mFormUtil.enableOrRemoveErrorInView(mCpfHelper, "CPF deve conter 11 dígitos",
+        if (!mFormUtil.enableOrRemoveErrorInView(mCpfHelper,
+                getString(R.string.hint_cpf_required), mCpfView)) {
+            mFormUtil.enableOrRemoveErrorInView(mCpfHelper,
+                    getString(R.string.hint_cpf_invalid),
                     mCpfView.getTag() != null || mCpfView.getText().length() == 11);
         }
 
-        mFormUtil.enableOrRemoveErrorInView(mPasswordHelper, "Senha deve ser informada",
-                mPasswordView);
+        mFormUtil.enableOrRemoveErrorInView(mPasswordHelper,
+                getString(R.string.hint_password_required), mPasswordView);
 
         if (!mFormUtil.hasErrors()) {
             final String cpf = mCpfView.getTag().toString();
             final String password = mPasswordView.getText().toString();
 
-            final MaterialDialog progressDialog = new MaterialDialog
-                    .Builder(LoginActivity.this)
-                    .title("Entrando")
-                    .content("Por favor aguarde enquanto validamos suas credenciais...")
-                    .progress(true, 0)
-                    .cancelable(false)
-                    .show();
+            final UserService service = RetrofitHelper.createService(UserService.class, this);
 
-            final UserService service = RetrofitHelper
-                    .createService(UserService.class, this);
-
-            if (service != null) {
-                service.authenticateUser(LoginBody.of(cpf, password))
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.newThread())
-                        .subscribe(new Subscriber<User>() {
-                            @Override
-                            public void onCompleted() {
-
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                progressDialog.dismiss();
-                                new MaterialDialog.Builder(LoginActivity.this)
-                                        .title("Falha ao tentar entrar")
-                                        .content(e.getMessage())
-                                        .positiveText("OK")
-                                        .show();
-                            }
-
-                            @Override
-                            public void onNext(User user) {
-                                progressDialog.dismiss();
-                                if (LoginHelper.isValidUser(user)) {
-                                    LoginHelper.loginUser(LoginActivity.this, user);
-                                    NavigationHelper.navigateToMainScreen(LoginActivity.this);
-                                } else {
-                                    new MaterialDialog.Builder(LoginActivity.this)
-                                            .title("Problemas com credenciais")
-                                            .content("Seu CPF ou senha estão incorretos")
-                                            .positiveText("OK")
-                                            .show();
+            if (NetworkUtil.isDeviceConnectedToInternet(this)) {
+                if (service != null) {
+                    final MaterialDialog progressDialog = new MaterialDialog
+                            .Builder(LoginActivity.this)
+                            .title(R.string.title_dialog_signing_in)
+                            .content(R.string.msg_dialog_signing_in)
+                            .progress(true, 0)
+                            .cancelable(true)
+                            .cancelListener(new DialogInterface.OnCancelListener() {
+                                @Override
+                                public void onCancel(DialogInterface dialog) {
+                                    unsubscribeAuthentication();
                                 }
-                            }
-                        });
+                            })
+                            .canceledOnTouchOutside(false)
+                            .show();
+
+                    mSubscription = service.authenticateUser(LoginBody.of(cpf, password))
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribeOn(Schedulers.newThread())
+                            .subscribe(
+                                    new Action1<User>() {
+                                        @Override
+                                        public void call(User user) {
+                                            progressDialog.dismiss();
+                                            validateUser(user);
+                                        }
+                                    },
+
+                                    new Action1<Throwable>() {
+                                        @Override
+                                        public void call(Throwable e) {
+                                            progressDialog.dismiss();
+                                            showAuthenticationError(e);
+                                        }
+                                    }
+                            );
+                } else {
+                    validateAppSettings();
+                }
+            } else {
+                showNetworkError();
             }
         } else {
-            final View currentFocus = getCurrentFocus();
+            showFormError();
+        }
+    }
 
-            FeedbackHelper.snackbar(mRootView, "Corrija os erros para continuar com login",
-                    true, new Snackbar.Callback() {
+    private void unsubscribeAuthentication() {
+        if (mSubscription != null && !mSubscription.isUnsubscribed()) {
+            mSubscription.unsubscribe();
+        }
+    }
+
+    private void validateUser(User user) {
+        if (LoginHelper.isValidUser(user)) {
+            LoginHelper.loginUser(LoginActivity.this, user);
+            NavigationHelper.navigateToMainScreen(LoginActivity.this);
+            finish();
+        } else {
+            new MaterialDialog.Builder(LoginActivity.this)
+                    .title(R.string.title_dialog_invalid_credentials)
+                    .content(R.string.msg_dialog_invalid_credentials)
+                    .positiveText(R.string.text_dialog_button_ok)
+                    .show();
+        }
+    }
+
+    private void showAuthenticationError(Throwable e) {
+        new MaterialDialog.Builder(LoginActivity.this)
+                .title(R.string.title_dialog_sign_in_failed)
+                .content(e.getMessage())
+                .positiveText(R.string.text_dialog_button_ok)
+                .show();
+    }
+
+    private void validateAppSettings() {
+        if (!SettingsHelper.isSettingsApplied(this)) {
+            FeedbackHelper.snackbar(mRootView, getString(R.string.msg_settings_not_applied), true,
+                    new Snackbar.Callback() {
                         @Override
                         public void onDismissed(Snackbar snackbar, int event) {
-                            KeyboardUtil.showKeyboard(LoginActivity.this, currentFocus);
-                        }
-
-                        @Override
-                        public void onShown(Snackbar snackbar) {
-                            KeyboardUtil.hideKeyboard(LoginActivity.this, currentFocus);
+                            NavigationHelper.navigateToSettingsScreen(LoginActivity.this);
                         }
                     });
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    private void showNetworkError() {
+        FeedbackHelper
+                .snackbar(mRootView, getString(R.string.msg_unable_to_sign_in_no_network),
+                        true);
+    }
+
+    private void showFormError() {
+        final View currentFocus = getCurrentFocus();
+        FeedbackHelper.snackbar(mRootView, getString(R.string.msg_fix_errors_to_sign_in),
+                true, new Snackbar.Callback() {
+                    @Override
+                    public void onDismissed(Snackbar snackbar, int event) {
+                        KeyboardUtil.showKeyboard(LoginActivity.this, currentFocus);
+                    }
+
+                    @Override
+                    public void onShown(Snackbar snackbar) {
+                        KeyboardUtil.hideKeyboard(LoginActivity.this, currentFocus);
+                    }
+                });
     }
 }
