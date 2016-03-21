@@ -29,18 +29,18 @@ public class WorkRealmDataService implements WorkDataService {
         return RealmObservable.results(mContext, new Func1<Realm, RealmResults<WorkEntity>>() {
             @Override
             public RealmResults<WorkEntity> call(Realm realm) {
-                // find all issues
+                // find all
                 return realm.where(WorkEntity.class).findAll();
             }
         }).map(new Func1<RealmResults<WorkEntity>, List<Work>>() {
             @Override
             public List<Work> call(RealmResults<WorkEntity> workEntities) {
                 // map them to UI objects
-                final List<Work> works = new ArrayList<>(workEntities.size());
+                final List<Work> workList = new ArrayList<>(workEntities.size());
                 for (WorkEntity workEntity : workEntities) {
-                    works.add(workFromRealm(workEntity));
+                    workList.add(workFromRealm(workEntity));
                 }
-                return works;
+                return workList;
             }
         });
     }
@@ -81,7 +81,7 @@ public class WorkRealmDataService implements WorkDataService {
         return RealmObservable.list(mContext, new Func1<Realm, RealmList<WorkEntity>>() {
             @Override
             public RealmList<WorkEntity> call(Realm realm) {
-                List<WorkEntity> workEntities = new ArrayList<>(workList.size());
+                List<WorkEntity> workEntityList = new ArrayList<>(workList.size());
 
                 for (Work work : workList) {
                     ClientEntity clientEntity = new ClientEntity();
@@ -96,10 +96,10 @@ public class WorkRealmDataService implements WorkDataService {
                     workEntity.setJob(work.getJob());
                     workEntity.setStatus(work.getStatus());
 
-                    workEntities.add(realm.copyToRealmOrUpdate(workEntity));
+                    workEntityList.add(realm.copyToRealmOrUpdate(workEntity));
                 }
 
-                return new RealmList<>(workEntities.toArray(new WorkEntity[workEntities.size()]));
+                return new RealmList<>(workEntityList.toArray(new WorkEntity[workEntityList.size()]));
             }
         }).map(new Func1<RealmList<WorkEntity>, List<Work>>() {
             @Override
