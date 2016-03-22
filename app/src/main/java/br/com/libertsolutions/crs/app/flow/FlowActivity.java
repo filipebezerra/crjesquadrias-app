@@ -105,10 +105,7 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
                                             // TODO: carregar estado vazio
                                             // TODO: atualizar o banco de dados
                                         } else {
-                                            mWorkStepsView.setAdapter(mFlowAdapter =
-                                                    new FlowAdapter(FlowActivity.this, flowList));
-
-                                            updateSubtitle();
+                                            saveAllToLocalStorage(flowList);
                                         }
                                     }
                                 },
@@ -125,8 +122,7 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
                 validateAppSettings();
             }
         } else {
-            /*
-            final Subscription subscription = mFlowDataService.list()
+            final Subscription subscription = mFlowDataService.list(mWorkId)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.io())
                     .subscribe(
@@ -148,7 +144,6 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
                             }
                     );
             mCompositeSubscription.add(subscription);
-            */0
         }
     }
 
@@ -203,7 +198,7 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
     }
 
     private void saveAllToLocalStorage(List<Flow> flows) {
-        final Subscription subscription = mFlowDataService.saveAll(flows)
+        final Subscription subscription = mFlowDataService.saveAll(mWorkId, flows)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io()).
                         subscribe(

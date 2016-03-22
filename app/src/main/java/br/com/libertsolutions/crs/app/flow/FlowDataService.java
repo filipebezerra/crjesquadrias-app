@@ -11,6 +11,6 @@ import rx.Observable;
  * @since 0.1.0
  */
 public interface FlowDataService {
-    Observable<List<Flow>> list();
-    Observable<List<Flow>> saveAll(List<Flow> flowList);
+    Observable<List<Flow>> list(long workId);
+    Observable<List<Flow>> saveAll(long workId, List<Flow> flowList);
 }

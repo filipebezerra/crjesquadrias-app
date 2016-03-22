@@ -25,11 +25,12 @@ public class FlowRealmDataService implements FlowDataService {
     }
 
     @Override
-    public Observable<List<Flow>> list() {
+    public Observable<List<Flow>> list(final long workId) {
         return RealmObservable.results(mContext, new Func1<Realm, RealmResults<FlowEntity>>() {
             @Override
             public RealmResults<FlowEntity> call(Realm realm) {
-                return realm.where(FlowEntity.class).findAll();
+                return realm.where(FlowEntity.class).equalTo(FlowEntity.FIELD_WORK_ID, workId)
+                        .findAll();
             }
         }).map(new Func1<RealmResults<FlowEntity>, List<Flow>>() {
             @Override
@@ -44,7 +45,7 @@ public class FlowRealmDataService implements FlowDataService {
     }
 
     @Override
-    public Observable<List<Flow>> saveAll(final List<Flow> flowList) {
+    public Observable<List<Flow>> saveAll(final long workId, final List<Flow> flowList) {
         return RealmObservable.list(mContext, new Func1<Realm, RealmList<FlowEntity>>() {
             @Override
             public RealmList<FlowEntity> call(Realm realm) {
@@ -60,14 +61,16 @@ public class FlowRealmDataService implements FlowDataService {
                     workStepEntity = realm.copyToRealmOrUpdate(workStepEntity);
 
                     FlowEntity flowEntity = new FlowEntity();
+                    flowEntity.setFlowId(flow.getFlowId());
+                    flowEntity.setWorkId(workId);
                     flowEntity.setStep(workStepEntity);
                     flowEntity.setStatus(flow.getStatus());
 
-                    flowEntityList.add(realm.copyToRealm(flowEntity));
+                    flowEntityList.add(realm.copyToRealmOrUpdate(flowEntity));
                 }
 
-                return new RealmList<>(
-                        flowEntityList.toArray(new FlowEntity[flowEntityList.size()]));
+                return new RealmList<>(flowEntityList.toArray(
+                        new FlowEntity[flowEntityList.size()]));
             }
         }).map(new Func1<RealmList<FlowEntity>, List<Flow>>() {
             @Override
@@ -82,7 +85,8 @@ public class FlowRealmDataService implements FlowDataService {
     }
 
     private static Flow flowFromRealm(FlowEntity flowEntity) {
-        return new Flow(workStepFromRealm(flowEntity.getStep()), flowEntity.getStatus());
+        final WorkStep workStep = workStepFromRealm(flowEntity.getStep());
+        return new Flow(workStep, flowEntity.getFlowId(), flowEntity.getStatus());
     }
 
     private static WorkStep workStepFromRealm(WorkStepEntity workStepEntity) {

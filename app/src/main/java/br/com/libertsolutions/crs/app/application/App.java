@@ -19,8 +19,6 @@ public class App extends Application {
         RealmConfiguration configuration = new RealmConfiguration.Builder(this)
                 .name("crs.realm")
                 .build();
-        // TODO: remover deleção do banco de dados
-        Realm.deleteRealm(configuration);
         Realm.setDefaultConfiguration(configuration);
     }
 }
