@@ -1,6 +1,7 @@
 package br.com.libertsolutions.crs.app.flow;
 
 import android.support.annotation.IntRange;
+import br.com.libertsolutions.crs.app.work.WorkEntity;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
@@ -55,5 +56,14 @@ public class FlowEntity extends RealmObject {
 
     public void setWorkId(Long workId) {
         this.workId = workId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o != null && o instanceof FlowEntity) {
+            final FlowEntity anotherFlow = (FlowEntity) o;
+            return getFlowId().compareTo(anotherFlow.getFlowId()) == 0;
+        }
+        return false;
     }
 }
