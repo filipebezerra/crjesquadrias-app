@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import br.com.libertsolutions.crs.app.R;
-import br.com.libertsolutions.crs.app.work.WorkEntity;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import java.util.List;
@@ -18,7 +17,7 @@ import java.util.List;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 18/03/2016
+ * @version 0.1.0, 24/03/2016
  * @since 0.1.0
  */
 public class FlowAdapter extends RecyclerView.Adapter<FlowAdapter.ViewHolder> {
@@ -77,7 +76,7 @@ public class FlowAdapter extends RecyclerView.Adapter<FlowAdapter.ViewHolder> {
     public int getRunningFlowsCount() {
         int count = 0;
         for (Flow flow : mFlows) {
-            if (flow.getStatus() == WorkEntity.STATUS_STARTED) {
+            if (flow.getStatus() == Flow.STATUS_STARTED) {
                 count++;
             }
         }
