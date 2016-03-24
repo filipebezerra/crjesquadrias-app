@@ -10,6 +10,10 @@ import com.google.gson.annotations.SerializedName;
  * @since 0.1.0
  */
 public class Flow {
+    public static final int STATUS_PENDING = 0;
+    public static final int STATUS_STARTED = 1;
+    public static final int STATUS_FINISHED = 2;
+
     @SerializedName("Etapa")
     private final WorkStep step;
 

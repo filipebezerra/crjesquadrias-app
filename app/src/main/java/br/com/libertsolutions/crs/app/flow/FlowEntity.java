@@ -1,10 +1,12 @@
 package br.com.libertsolutions.crs.app.flow;
 
 import android.support.annotation.IntRange;
-import br.com.libertsolutions.crs.app.work.WorkEntity;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
+
+import static br.com.libertsolutions.crs.app.flow.Flow.STATUS_FINISHED;
+import static br.com.libertsolutions.crs.app.flow.Flow.STATUS_PENDING;
 
 /**
  * .
@@ -14,10 +16,6 @@ import io.realm.annotations.Required;
  * @since 0.1.0
  */
 public class FlowEntity extends RealmObject {
-    public static final int STATUS_PENDING = 0;
-    public static final int STATUS_STARTED = 1;
-    public static final int STATUS_FINISHED = 2;
-
     public static final String FIELD_WORK_ID = "workId";
 
     private WorkStepEntity step;
