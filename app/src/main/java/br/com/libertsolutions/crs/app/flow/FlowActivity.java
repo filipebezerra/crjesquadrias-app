@@ -159,11 +159,11 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
     @Override
     public void onSingleTapUp(View view, int position) {
         if (mFlowAdapter != null) {
-            final WorkStep item = mFlowAdapter.getItem(position).getStep();
+            final Flow item = mFlowAdapter.getItem(position);
 
             if (item != null) {
-                startActivity(
-                        CheckinActivity.getLauncherIntent(this, mWorkId, item.getWorkStepId()));
+                startActivity(CheckinActivity.getLauncherIntent(this, mWorkId,
+                        item.getStep().getWorkStepId()));
             }
         }
     }
