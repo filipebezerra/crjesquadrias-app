@@ -6,103 +6,84 @@ import com.google.gson.annotations.SerializedName;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 03/03/2016
+ * @version 0.1.0, 23/03/2016
  * @since 0.1.0
  */
 public class OrderGlass {
     @SerializedName("idPedVidro")
-    Long mOrderGlassId;
+    private final long orderGlassId;
 
     @SerializedName("quantidade")
-    Integer mQuantity;
+    private final int quantity;
 
     @SerializedName("numero")
-    String mNumber;
+    private final String number;
 
     @SerializedName("cor")
-    String mColor;
+    private final String color;
 
     @SerializedName("largura")
-    Float mWidth;
+    private final float width;
 
     @SerializedName("altura")
-    Float mHeight;
+    private final float height;
 
     @SerializedName("peso")
-    Float mWeight;
+    private final float weight;
 
     @SerializedName("Produto")
-    Product mProduct;
+    private final Product product;
 
-    public Long getOrderGlassId() {
-        return mOrderGlassId;
+    public OrderGlass(long orderGlassId, int quantity, String number, String color, float width,
+            float height, float weight, Product product) {
+        this.orderGlassId = orderGlassId;
+        this.quantity = quantity;
+        this.number = number;
+        this.color = color;
+        this.width = width;
+        this.height = height;
+        this.weight = weight;
+        this.product = product;
     }
 
-    public OrderGlass setOrderGlassId(Long orderGlassId) {
-        mOrderGlassId = orderGlassId;
-        return this;
+    public long getOrderGlassId() {
+        return orderGlassId;
     }
 
-    public Integer getQuantity() {
-        return mQuantity;
-    }
-
-    public OrderGlass setQuantity(Integer quantity) {
-        mQuantity = quantity;
-        return this;
+    public int getQuantity() {
+        return quantity;
     }
 
     public String getNumber() {
-        return mNumber;
-    }
-
-    public OrderGlass setNumber(String number) {
-        mNumber = number;
-        return this;
+        return number;
     }
 
     public String getColor() {
-        return mColor;
+        return color;
     }
 
-    public OrderGlass setColor(String color) {
-        mColor = color;
-        return this;
+    public float getWidth() {
+        return width;
     }
 
-    public Float getWidth() {
-        return mWidth;
+    public float getHeight() {
+        return height;
     }
 
-    public OrderGlass setWidth(Float width) {
-        mWidth = width;
-        return this;
-    }
-
-    public Float getHeight() {
-        return mHeight;
-    }
-
-    public OrderGlass setHeight(Float height) {
-        mHeight = height;
-        return this;
-    }
-
-    public Float getWeight() {
-        return mWeight;
-    }
-
-    public OrderGlass setWeight(Float weight) {
-        mWeight = weight;
-        return this;
+    public float getWeight() {
+        return weight;
     }
 
     public Product getProduct() {
-        return mProduct;
+        return product;
     }
 
-    public OrderGlass setProduct(Product product) {
-        mProduct = product;
-        return this;
+    @Override
+    public boolean equals(Object o) {
+        if (o != null && o instanceof OrderGlass) {
+            final OrderGlass anotherOrderGlass = (OrderGlass) o;
+            return getOrderGlassId() == anotherOrderGlass.getOrderGlassId();
+        }
+        return false;
     }
 }

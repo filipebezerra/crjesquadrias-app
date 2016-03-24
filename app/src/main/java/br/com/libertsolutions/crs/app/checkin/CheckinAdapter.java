@@ -153,7 +153,7 @@ public class CheckinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     public void updateCheckin(Checkin checkinDone) {
         for (Checkin checkin : mCheckins) {
-            if (checkin.getCheckinId().equals(checkinDone.getCheckinId())) {
+            if (checkin.equals(checkinDone)) {
                 checkin.setDate(checkinDone.getDate());
             }
         }

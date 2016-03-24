@@ -1,15 +1,13 @@
 package br.com.libertsolutions.crs.app.checkin;
 
-import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
-
 import com.google.gson.annotations.SerializedName;
 
 /**
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 03/03/2016
+ * @version 0.1.0, 23/03/2016
  * @since 0.1.0
  */
 public class Checkin implements Comparable<Checkin> {
@@ -17,74 +15,63 @@ public class Checkin implements Comparable<Checkin> {
     public static final int STATUS_FINISHED = 2;
 
     @SerializedName("idCheckim")
-    Long mCheckinId;
+    private final long checkinId;
 
     @SerializedName("data")
-    String mDate;
+    private String date;
 
     @SerializedName("status")
-    Integer mStatus;
+    private int status;
 
     @SerializedName("Itens")
-    Item mItem;
+    private final Item item;
 
     @SerializedName("Vidros")
-    OrderGlass mOrderGlass;
+    private final OrderGlass orderGlass;
 
-    public Checkin() {
+    public Checkin(long checkinId, String date, int status, Item item, OrderGlass orderGlass) {
+        this.checkinId = checkinId;
+        this.date = date;
+        this.status = status;
+        this.item = item;
+        this.orderGlass = orderGlass;
     }
 
-    public Checkin(Checkin checkin) {
-        this.mCheckinId = checkin.getCheckinId();
-        this.mStatus = checkin.getStatus();
-        this.mItem = checkin.getItem();
-        this.mOrderGlass = checkin.getOrderGlass();
+    public long getCheckinId() {
+        return checkinId;
     }
 
-    public Long getCheckinId() {
-        return mCheckinId;
-    }
-
-    public Checkin setCheckinId(Long checkinId) {
-        mCheckinId = checkinId;
-        return this;
+    public void setDate(String date) {
+        this.date = date;
     }
 
     public String getDate() {
-        return mDate;
+        return date;
     }
 
-    public Checkin setDate(String date) {
-        mDate = date;
-        return this;
+    public void setStatus(int status) {
+        this.status = status;
     }
 
-    public Integer getStatus() {
-        return mStatus;
-    }
-
-    public Checkin setStatus(
-            @IntRange(from = STATUS_PENDING, to = STATUS_FINISHED) Integer status) {
-        mStatus = status;
-        return this;
+    public int getStatus() {
+        return status;
     }
 
     public Item getItem() {
-        return mItem;
-    }
-
-    public Checkin setItem(Item item) {
-        mItem = item;
-        return this;
+        return item;
     }
 
     public OrderGlass getOrderGlass() {
-        return mOrderGlass;
+        return orderGlass;
     }
 
-    public Checkin setOrderGlass(OrderGlass orderGlass) {
-        mOrderGlass = orderGlass;
-        return this;
+    @Override
+    public boolean equals(Object o) {
+        if (o != null && o instanceof Checkin) {
+            final Checkin anotherCheckin = (Checkin) o;
+            return getCheckinId() == anotherCheckin.getCheckinId();
+        }
+        return false;
     }
 
     @Override

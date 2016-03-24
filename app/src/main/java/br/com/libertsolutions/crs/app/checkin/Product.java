@@ -6,79 +6,68 @@ import com.google.gson.annotations.SerializedName;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 03/03/2016
+ * @version 0.1.0, 23/03/2016
  * @since 0.1.0
  */
 public class Product {
     @SerializedName("idProduto")
-    Long mProductId;
+    private final long productId;
 
     @SerializedName("codigo")
-    String mCode;
+    private final String code;
 
     @SerializedName("descricao")
-    String mDescription;
+    private final String description;
 
     @SerializedName("peso")
-    Float mWeight;
+    private final float weight;
 
     @SerializedName("tratamento")
-    String mTreatment;
+    private final String treatment;
 
     @SerializedName("tipo")
-    String mType;
+    private final String type;
 
-    public Long getProductId() {
-        return mProductId;
+    public Product(long productId, String code, String description, float weight,
+            String treatment, String type) {
+        this.productId = productId;
+        this.code = code;
+        this.description = description;
+        this.weight = weight;
+        this.treatment = treatment;
+        this.type = type;
     }
 
-    public Product setProductId(Long productId) {
-        mProductId = productId;
-        return this;
+    public long getProductId() {
+        return productId;
     }
 
     public String getCode() {
-        return mCode;
-    }
-
-    public Product setCode(String code) {
-        mCode = code;
-        return this;
+        return code;
     }
 
     public String getDescription() {
-        return mDescription;
+        return description;
     }
 
-    public Product setDescription(String description) {
-        mDescription = description;
-        return this;
-    }
-
-    public Float getWeight() {
-        return mWeight;
-    }
-
-    public Product setWeight(Float weight) {
-        mWeight = weight;
-        return this;
+    public float getWeight() {
+        return weight;
     }
 
     public String getTreatment() {
-        return mTreatment;
-    }
-
-    public Product setTreatment(String treatment) {
-        mTreatment = treatment;
-        return this;
+        return treatment;
     }
 
     public String getType() {
-        return mType;
+        return type;
     }
 
-    public Product setType(String type) {
-        mType = type;
-        return this;
+    @Override
+    public boolean equals(Object o) {
+        if (o != null && o instanceof Product) {
+            final Product anotherProduct = (Product) o;
+            return getProductId() == anotherProduct.getProductId();
+        }
+        return false;
     }
 }

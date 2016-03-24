@@ -6,91 +6,76 @@ import com.google.gson.annotations.SerializedName;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 03/03/2016
+ * @version 0.1.0, 23/03/2016
  * @since 0.1.0
  */
 public class Item {
     @SerializedName("idItem")
-    Long mItemId;
+    private final long itemId;
 
     @SerializedName("quantidade")
-    Integer mQuantity;
+    private final Integer quantity;
 
     @SerializedName("largura")
-    Float mWidth;
+    private final float width;
 
     @SerializedName("altura")
-    Float mHeight;
+    private final float height;
 
     @SerializedName("peso")
-    Float mWeight;
+    private final float weight;
 
     @SerializedName("tratamento")
-    String mTreatment;
+    private final String treatment;
 
     @SerializedName("Produto")
-    Product mProduct;
+    private final Product product;
 
-    public Long getItemId() {
-        return mItemId;
+    public Item(long itemId, Integer quantity, float width, float height, float weight,
+            String treatment, Product product) {
+        this.itemId = itemId;
+        this.quantity = quantity;
+        this.width = width;
+        this.height = height;
+        this.weight = weight;
+        this.treatment = treatment;
+        this.product = product;
     }
 
-    public Item setItemId(Long itemId) {
-        mItemId = itemId;
-        return this;
+    public long getItemId() {
+        return itemId;
     }
 
     public Integer getQuantity() {
-        return mQuantity;
+        return quantity;
     }
 
-    public Item setQuantity(Integer quantity) {
-        mQuantity = quantity;
-        return this;
+    public float getWidth() {
+        return width;
     }
 
-    public Float getWidth() {
-        return mWidth;
+    public float getHeight() {
+        return height;
     }
 
-    public Item setWidth(Float width) {
-        mWidth = width;
-        return this;
-    }
-
-    public Float getHeight() {
-        return mHeight;
-    }
-
-    public Item setHeight(Float height) {
-        mHeight = height;
-        return this;
-    }
-
-    public Float getWeight() {
-        return mWeight;
-    }
-
-    public Item setWeight(Float weight) {
-        mWeight = weight;
-        return this;
+    public float getWeight() {
+        return weight;
     }
 
     public String getTreatment() {
-        return mTreatment;
-    }
-
-    public Item setTreatment(String treatment) {
-        mTreatment = treatment;
-        return this;
+        return treatment;
     }
 
     public Product getProduct() {
-        return mProduct;
+        return product;
     }
 
-    public Item setProduct(Product product) {
-        mProduct = product;
-        return this;
+    @Override
+    public boolean equals(Object o) {
+        if (o != null && o instanceof Item) {
+            final Item anotherProduct = (Item) o;
+            return getItemId() == anotherProduct.getItemId();
+        }
+        return false;
     }
 }
