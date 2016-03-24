@@ -11,6 +11,9 @@ import com.google.gson.annotations.SerializedName;
  * @since 0.1.0
  */
 public class Work {
+    public static final int STATUS_PENDING = 0;
+    public static final int STATUS_STARTED = 1;
+
     @SerializedName("idObra")
     private final long workId;
 

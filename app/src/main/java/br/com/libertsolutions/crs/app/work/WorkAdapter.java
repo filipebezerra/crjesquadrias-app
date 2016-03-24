@@ -65,12 +65,12 @@ public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder>
         }
 
         switch (work.getStatus()) {
-            case WorkEntity.STATUS_PENDING:
+            case Work.STATUS_PENDING:
                 holder.workStatus.setBackgroundColor(
                         ContextCompat.getColor(mContext, R.color.statusPending));
                 break;
 
-            case WorkEntity.STATUS_STARTED:
+            case Work.STATUS_STARTED:
                 holder.workStatus.setBackgroundColor(
                         ContextCompat.getColor(mContext, R.color.statusStarted));
                 break;
@@ -85,7 +85,7 @@ public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder>
     public int getRunningWorksCount() {
         int count = 0;
         for (Work work : mWorks) {
-            if (work.getStatus() == WorkEntity.STATUS_STARTED) {
+            if (work.getStatus() == Work.STATUS_STARTED) {
                 count++;
             }
         }

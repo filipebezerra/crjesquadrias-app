@@ -1,7 +1,11 @@
 package br.com.libertsolutions.crs.app.work;
 
+import android.support.annotation.IntRange;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
+
+import static br.com.libertsolutions.crs.app.work.Work.STATUS_PENDING;
+import static br.com.libertsolutions.crs.app.work.Work.STATUS_STARTED;
 
 /**
  * Entidade Obra, representa os projetos de construção ou reforma dos interiores de um imóvel.
@@ -12,9 +16,6 @@ import io.realm.annotations.PrimaryKey;
  * @since 0.1.0
  */
 public class WorkEntity extends RealmObject {
-    public static final int STATUS_PENDING = 0;
-    public static final int STATUS_STARTED = 1;
-
     @PrimaryKey
     private Long workId;
 
@@ -72,7 +73,7 @@ public class WorkEntity extends RealmObject {
         return status;
     }
 
-    public void setStatus(Integer status) {
+    public void setStatus(@IntRange(from = STATUS_PENDING, to = STATUS_STARTED) Integer status) {
         this.status = status;
     }
 
