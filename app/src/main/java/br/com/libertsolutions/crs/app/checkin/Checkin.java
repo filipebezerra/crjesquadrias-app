@@ -17,6 +17,9 @@ public class Checkin implements Comparable<Checkin> {
     @SerializedName("idCheckim")
     private final long checkinId;
 
+    @SerializedName("id_fluxo")
+    private final long flowId;
+
     @SerializedName("data")
     private String date;
 
@@ -29,8 +32,10 @@ public class Checkin implements Comparable<Checkin> {
     @SerializedName("Vidros")
     private final OrderGlass orderGlass;
 
-    public Checkin(long checkinId, String date, int status, Item item, OrderGlass orderGlass) {
+    public Checkin(long checkinId, long flowId, String date, int status, Item item,
+            OrderGlass orderGlass) {
         this.checkinId = checkinId;
+        this.flowId = flowId;
         this.date = date;
         this.status = status;
         this.item = item;
@@ -39,6 +44,10 @@ public class Checkin implements Comparable<Checkin> {
 
     public long getCheckinId() {
         return checkinId;
+    }
+
+    public long getFlowId() {
+        return flowId;
     }
 
     public void setDate(String date) {

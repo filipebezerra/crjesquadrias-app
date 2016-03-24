@@ -15,8 +15,12 @@ import static br.com.libertsolutions.crs.app.checkin.Checkin.STATUS_PENDING;
  * @since 0.1.0
  */
 public class CheckinEntity extends RealmObject {
+    public static final String FIELD_FLOW_ID = "flowId";
+
     @PrimaryKey
     private Long checkinId;
+
+    private Long flowId;
 
     private String date;
 
@@ -32,6 +36,14 @@ public class CheckinEntity extends RealmObject {
 
     public void setCheckinId(Long checkinId) {
         this.checkinId = checkinId;
+    }
+
+    public Long getFlowId() {
+        return flowId;
+    }
+
+    public void setFlowId(Long flowId) {
+        this.flowId = flowId;
     }
 
     public String getDate() {
