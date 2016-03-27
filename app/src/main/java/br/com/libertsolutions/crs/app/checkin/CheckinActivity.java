@@ -1,6 +1,7 @@
 package br.com.libertsolutions.crs.app.checkin;
 
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
@@ -10,13 +11,18 @@ import br.com.libertsolutions.crs.app.android.recyclerview.DividerDecoration;
 import br.com.libertsolutions.crs.app.feedback.FeedbackHelper;
 import br.com.libertsolutions.crs.app.login.LoginHelper;
 import br.com.libertsolutions.crs.app.login.User;
+import br.com.libertsolutions.crs.app.navigation.NavigationHelper;
+import br.com.libertsolutions.crs.app.network.NetworkUtil;
 import br.com.libertsolutions.crs.app.retrofit.RetrofitHelper;
+import br.com.libertsolutions.crs.app.settings.SettingsHelper;
 import butterknife.Bind;
 import com.afollestad.materialdialogs.MaterialDialog;
 import java.util.List;
-import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 
 /**
  * .
@@ -28,14 +34,16 @@ import rx.schedulers.Schedulers;
 public class CheckinActivity extends BaseActivity implements CheckinAdapter.CheckinCallback {
 
     public static final String EXTRA_WORK_ID = "workId";
-    public static final String EXTRA_STEP_ID = "stepId";
+    public static final String EXTRA_FLOW_ID = "flowId";
 
     private Long mWorkId;
-    private Long mStepId;
+    private Long mFlowId;
 
     private CheckinAdapter mCheckinAdapter;
 
-    private CheckinService mCheckinService;
+    private CheckinDataService mCheckinDataService;
+
+    private CompositeSubscription mCompositeSubscription;
 
     @Bind(android.R.id.list) RecyclerView mCheckinsView;
 
@@ -59,9 +67,9 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
         super.onCreate(savedInstanceState);
 
         if (getIntent().hasExtra(EXTRA_WORK_ID)
-                && getIntent().hasExtra(EXTRA_STEP_ID)) {
+                && getIntent().hasExtra(EXTRA_FLOW_ID)) {
             mWorkId = getIntent().getLongExtra(EXTRA_WORK_ID, 0);
-            mStepId = getIntent().getLongExtra(EXTRA_STEP_ID, 0);
+            mFlowId = getIntent().getLongExtra(EXTRA_FLOW_ID, 0);
         } else {
             throw new IllegalStateException("You need to use the method "
                     + "CheckinActivity.getLauncherIntent() passing the "
@@ -72,44 +80,83 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
         mCheckinsView.setLayoutManager(new LinearLayoutManager(this));
         mCheckinsView.setHasFixedSize(true);
         mCheckinsView.addItemDecoration(new DividerDecoration(this));
+
+        mCheckinDataService = new CheckinRealmDataService(this);
+
+        mCompositeSubscription = new CompositeSubscription();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        if (mCheckinService == null) {
-            mCheckinService = RetrofitHelper
-                    .createService(CheckinService.class, this);
-        }
+        if (NetworkUtil.isDeviceConnectedToInternet(this)) {
+            CheckinService service = RetrofitHelper.createService(CheckinService.class, this);
 
-        if (mCheckinService != null) {
-            mCheckinService.getAllByStep(mWorkId, mStepId)
+            if (service != null) {
+                final Subscription subscription = service.getAllByStep(mWorkId, mFlowId)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.newThread())
+                        .subscribe(
+                                new Action1<List<Checkin>>() {
+                                    @Override
+                                    public void call(List<Checkin> list) {
+                                        if (list.isEmpty()) {
+                                            // TODO: carregar estado vazio
+                                            // TODO: atualizar o banco de dados
+                                        } else {
+                                            saveAllToLocalStorage(list);
+                                        }
+                                    }
+                                },
+
+                                new Action1<Throwable>() {
+                                    @Override
+                                    public void call(Throwable e) {
+                                        showError(
+                                                R.string.title_dialog_error_loading_data_from_server,
+                                                e);
+                                    }
+                                }
+                        );
+                mCompositeSubscription.add(subscription);
+            } else {
+                validateAppSettings();
+            }
+        } else {
+            final Subscription subscription = mCheckinDataService.list(mFlowId)
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.newThread())
-                    .subscribe(new Subscriber<List<Checkin>>() {
-                        @Override
-                        public void onCompleted() {
-                            updateSubtitle();
-                        }
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(
+                            new Action1<List<Checkin>>() {
+                                @Override
+                                public void call(List<Checkin> list) {
+                                    mCheckinsView.setAdapter(mCheckinAdapter =
+                                            new CheckinAdapter(CheckinActivity.this, list));
+                                    mCheckinAdapter.setCheckinCallback(CheckinActivity.this);
 
-                        @Override
-                        public void onError(Throwable e) {
-                            new MaterialDialog.Builder(CheckinActivity.this)
-                                    .title("Falha ao tentar carregar dados")
-                                    .content(e.getMessage())
-                                    .positiveText("OK")
-                                    .show();
-                        }
+                                    updateSubtitle();
+                                }
+                            },
 
-                        @Override
-                        public void onNext(List<Checkin> checkins) {
-                            mCheckinsView.setAdapter(
-                                    mCheckinAdapter = new CheckinAdapter(CheckinActivity.this,
-                                            checkins));
-                            mCheckinAdapter.setCheckinCallback(CheckinActivity.this);
-                        }
-                    });
+                            new Action1<Throwable>() {
+                                @Override
+                                public void call(Throwable e) {
+                                    showError(R.string.title_dialog_error_loading_data_from_local,
+                                            e);
+                                }
+                            }
+                    );
+            mCompositeSubscription.add(subscription);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if (mCompositeSubscription != null && mCompositeSubscription.hasSubscriptions()) {
+            mCompositeSubscription.unsubscribe();
         }
     }
 
@@ -154,31 +201,96 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
     }
 
     private void postCheckin(Checkin checkin) {
-        if (mCheckinService != null) {
-            final User userLogged = LoginHelper.getUserLogged(this);
-            if (userLogged != null) {
-                mCheckinService.post(userLogged.getCpf(), checkin)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.newThread())
-                        .subscribe(new Subscriber<Checkin>() {
-                            @Override
-                            public void onCompleted() {}
+        if (NetworkUtil.isDeviceConnectedToInternet(this)) {
+            CheckinService service = RetrofitHelper.createService(CheckinService.class, this);
 
-                            @Override
-                            public void onError(Throwable e) {
-                                new MaterialDialog.Builder(CheckinActivity.this)
-                                        .title("Falha ao tentar atualizar os dados")
-                                        .content(e.getMessage())
-                                        .positiveText("OK")
-                                        .show();
-                            }
+            if (service != null) {
+                final User userLogged = LoginHelper.getUserLogged(this);
+                if (userLogged != null) {
+                    final Subscription subscription = service.post(userLogged.getCpf(), checkin)
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribeOn(Schedulers.newThread())
+                            .subscribe(
+                                    new Action1<Checkin>() {
+                                        @Override
+                                        public void call(Checkin checkinUpdated) {
+                                            mCheckinAdapter.updateCheckin(checkinUpdated);
+                                        }
+                                    },
 
-                            @Override
-                            public void onNext(Checkin checkin) {
-                                mCheckinAdapter.updateCheckin(checkin);
-                            }
-                        });
+                                    new Action1<Throwable>() {
+                                        @Override
+                                        public void call(Throwable e) {
+                                            showError(R.string.title_dialog_error_saving_data, e);
+                                        }
+                                    }
+                            );
+                    mCompositeSubscription.add(subscription);
+                }
+            } else {
+                validateUserLogged();
             }
+        } else {
+
         }
+    }
+
+    private void validateUserLogged() {
+        if (!LoginHelper.isUserLogged(this)) {
+            FeedbackHelper.snackbar(mRootView, getString(R.string.msg_user_not_logged), true,
+                    new Snackbar.Callback() {
+                        @Override
+                        public void onDismissed(Snackbar snackbar, int event) {
+                            NavigationHelper.navigateToLoginScreen(CheckinActivity.this);
+                        }
+                    });
+        }
+    }
+
+    private void validateAppSettings() {
+        if (!SettingsHelper.isSettingsApplied(this)) {
+            FeedbackHelper.snackbar(mRootView, getString(R.string.msg_settings_not_applied), true,
+                    new Snackbar.Callback() {
+                        @Override
+                        public void onDismissed(Snackbar snackbar, int event) {
+                            NavigationHelper.navigateToSettingsScreen(CheckinActivity.this);
+                        }
+                    });
+        }
+    }
+
+    private void showError(int titleRes, Throwable e) {
+        //TODO: tratamento de exceção
+        new MaterialDialog.Builder(this)
+                .title(titleRes)
+                .content(e.getMessage())
+                .positiveText(R.string.text_dialog_button_ok)
+                .show();
+    }
+
+    private void saveAllToLocalStorage(List<Checkin> list) {
+        final Subscription subscription = mCheckinDataService.saveAll(mFlowId, list)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        new Action1<List<Checkin>>() {
+                            @Override
+                            public void call(List<Checkin> checkinList) {
+                                mCheckinsView.setAdapter(mCheckinAdapter =
+                                        new CheckinAdapter(CheckinActivity.this, checkinList));
+                                mCheckinAdapter.setCheckinCallback(CheckinActivity.this);
+
+                                updateSubtitle();
+                            }
+                        },
+
+                        new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable e) {
+                                showError(R.string.title_dialog_error_saving_data, e);
+                            }
+                        }
+                );
+        mCompositeSubscription.add(subscription);
     }
 }
