@@ -95,7 +95,7 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
             if (service != null) {
                 final Subscription subscription = service.getAll(mWorkId)
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.newThread())
+                        .subscribeOn(Schedulers.io())
                         .subscribe(
                                 new Action1<List<Flow>>() {
                                     @Override

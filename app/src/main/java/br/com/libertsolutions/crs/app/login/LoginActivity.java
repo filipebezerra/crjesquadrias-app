@@ -157,7 +157,7 @@ public class LoginActivity extends BaseActivity {
 
                     mSubscription = service.authenticateUser(LoginBody.of(cpf, password))
                             .observeOn(AndroidSchedulers.mainThread())
-                            .subscribeOn(Schedulers.newThread())
+                            .subscribeOn(Schedulers.io())
                             .subscribe(
                                     new Action1<User>() {
                                         @Override

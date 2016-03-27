@@ -96,7 +96,7 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
             if (service != null) {
                 final Subscription subscription = service.getAllByStep(mWorkId, mFlowId)
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.newThread())
+                        .subscribeOn(Schedulers.io())
                         .subscribe(
                                 new Action1<List<Checkin>>() {
                                     @Override
@@ -209,7 +209,7 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
                 if (userLogged != null) {
                     final Subscription subscription = service.post(userLogged.getCpf(), checkin)
                             .observeOn(AndroidSchedulers.mainThread())
-                            .subscribeOn(Schedulers.newThread())
+                            .subscribeOn(Schedulers.io())
                             .subscribe(
                                     new Action1<Checkin>() {
                                         @Override
