@@ -83,12 +83,13 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
                 new OnTouchListener(this, mWorkStepsView, this));
 
         mFlowDataService = new FlowRealmDataService(this);
+
+        mCompositeSubscription = new CompositeSubscription();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        mCompositeSubscription = new CompositeSubscription();
 
         if (NetworkUtil.isDeviceConnectedToInternet(this)) {
             final FlowService service = RetrofitHelper.createService(FlowService.class, this);
