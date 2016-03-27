@@ -99,12 +99,12 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
                         .subscribe(
                                 new Action1<List<Flow>>() {
                                     @Override
-                                    public void call(List<Flow> flowList) {
-                                        if (flowList.isEmpty()) {
+                                    public void call(List<Flow> list) {
+                                        if (list.isEmpty()) {
                                             // TODO: carregar estado vazio
                                             // TODO: atualizar o banco de dados
                                         } else {
-                                            saveAllToLocalStorage(flowList);
+                                            saveAllToLocalStorage(list);
                                         }
                                     }
                                 },
@@ -112,7 +112,9 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
                                 new Action1<Throwable>() {
                                     @Override
                                     public void call(Throwable e) {
-                                        showError(R.string.title_dialog_error_loading_data_from_server, e);
+                                        showError(
+                                                R.string.title_dialog_error_loading_data_from_server,
+                                                e);
                                     }
                                 }
                         );
@@ -138,7 +140,8 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
                             new Action1<Throwable>() {
                                 @Override
                                 public void call(Throwable e) {
-                                    showError(R.string.title_dialog_error_loading_data_from_local, e);
+                                    showError(
+                                            R.string.title_dialog_error_loading_data_from_local, e);
                                 }
                             }
                     );
@@ -196,11 +199,11 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
         }
     }
 
-    private void saveAllToLocalStorage(List<Flow> flows) {
-        final Subscription subscription = mFlowDataService.saveAll(mWorkId, flows)
+    private void saveAllToLocalStorage(List<Flow> list) {
+        final Subscription subscription = mFlowDataService.saveAll(mWorkId, list)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io()).
-                        subscribe(
+                .subscribeOn(Schedulers.io())
+                .subscribe(
                                 new Action1<List<Flow>>() {
                                     @Override
                                     public void call(List<Flow> flowList) {
