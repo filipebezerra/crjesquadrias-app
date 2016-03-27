@@ -53,9 +53,9 @@ public class NavigationHelper {
     }
 
     public static void navigateToCheckinScreen(@NonNull Context context, @NonNull Long workId,
-            @NonNull Long stepId) {
+            @NonNull Long flowId) {
         context.startActivity(new Intent(context, CheckinActivity.class)
                 .putExtra(CheckinActivity.EXTRA_WORK_ID, workId)
-                .putExtra(CheckinActivity.EXTRA_STEP_ID, stepId));
+                .putExtra(CheckinActivity.EXTRA_FLOW_ID, flowId));
     }
 }
