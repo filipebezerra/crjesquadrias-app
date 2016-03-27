@@ -45,7 +45,7 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
     private FlowDataService mFlowDataService;
 
     private CompositeSubscription mCompositeSubscription;
-    
+
     @Bind(android.R.id.list) RecyclerView mWorkStepsView;
 
     @Override
@@ -78,8 +78,7 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
         changeListLayout(getResources().getConfiguration());
         mWorkStepsView.setHasFixedSize(true);
         mWorkStepsView.addItemDecoration(new GridDividerDecoration(this));
-        mWorkStepsView.addOnItemTouchListener(
-                new OnTouchListener(this, mWorkStepsView, this));
+        mWorkStepsView.addOnItemTouchListener(new OnTouchListener(this, mWorkStepsView, this));
 
         mFlowDataService = new FlowRealmDataService(this);
 
@@ -91,7 +90,7 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
         super.onStart();
 
         if (NetworkUtil.isDeviceConnectedToInternet(this)) {
-            final FlowService service = RetrofitHelper.createService(FlowService.class, this);
+            FlowService service = RetrofitHelper.createService(FlowService.class, this);
 
             if (service != null) {
                 final Subscription subscription = service.getAll(mWorkId)
@@ -151,7 +150,7 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
     protected void onStop() {
         super.onStop();
 
-        if (mCompositeSubscription != null) {
+        if (mCompositeSubscription != null && mCompositeSubscription.hasSubscriptions()) {
             mCompositeSubscription.unsubscribe();
         }
     }
