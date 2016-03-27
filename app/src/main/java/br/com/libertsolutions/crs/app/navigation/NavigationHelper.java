@@ -2,23 +2,25 @@ package br.com.libertsolutions.crs.app.navigation;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.content.IntentCompat;
 import br.com.libertsolutions.crs.app.application.RequestCodes;
+import br.com.libertsolutions.crs.app.checkin.CheckinActivity;
+import br.com.libertsolutions.crs.app.flow.FlowActivity;
 import br.com.libertsolutions.crs.app.login.LoginActivity;
 import br.com.libertsolutions.crs.app.main.MainActivity;
 import br.com.libertsolutions.crs.app.settings.SettingsActivity;
 import br.com.libertsolutions.crs.app.settings.SettingsActivityCompat;
-import br.com.libertsolutions.crs.app.flow.FlowActivity;
 
 /**
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 21/03/2016
- * @since 0.1.0, 20/03/2016
+ * @version 0.1.0, 27/03/2016
+ * @since 0.1.0
  */
 public class NavigationHelper {
     private NavigationHelper(){}
@@ -48,5 +50,12 @@ public class NavigationHelper {
     public static void navigateToFlowScreen(@NonNull Activity activity , @NonNull Long workId) {
         activity.startActivity(new Intent(activity, FlowActivity.class)
                 .putExtra(FlowActivity.EXTRA_WORK_ID, workId));
+    }
+
+    public static void navigateToCheckinScreen(@NonNull Context context, @NonNull Long workId,
+            @NonNull Long stepId) {
+        context.startActivity(new Intent(context, CheckinActivity.class)
+                .putExtra(CheckinActivity.EXTRA_WORK_ID, workId)
+                .putExtra(CheckinActivity.EXTRA_STEP_ID, stepId));
     }
 }

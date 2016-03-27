@@ -1,9 +1,6 @@
 package br.com.libertsolutions.crs.app.checkin;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
@@ -15,7 +12,6 @@ import br.com.libertsolutions.crs.app.login.LoginHelper;
 import br.com.libertsolutions.crs.app.login.User;
 import br.com.libertsolutions.crs.app.retrofit.RetrofitHelper;
 import butterknife.Bind;
-import butterknife.ButterKnife;
 import com.afollestad.materialdialogs.MaterialDialog;
 import java.util.List;
 import rx.Subscriber;
@@ -26,17 +22,19 @@ import rx.schedulers.Schedulers;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 18/03/2016
+ * @version 0.1.0, 27/03/2016
  * @since 0.1.0
  */
 public class CheckinActivity extends BaseActivity implements CheckinAdapter.CheckinCallback {
 
-    private static final String EXTRA_WORK_ID = "workId";
-    private static final String EXTRA_STEP_ID = "stepId";
+    public static final String EXTRA_WORK_ID = "workId";
+    public static final String EXTRA_STEP_ID = "stepId";
 
     private Long mWorkId;
     private Long mStepId;
+
     private CheckinAdapter mCheckinAdapter;
+
     private CheckinService mCheckinService;
 
     @Bind(android.R.id.list) RecyclerView mCheckinsView;
@@ -56,13 +54,6 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
         return R.menu.menu_checkin;
     }
 
-    public static Intent getLauncherIntent(@NonNull Context context,
-            @NonNull Long workId, @NonNull Long stepId) {
-        return new Intent(context, CheckinActivity.class)
-                .putExtra(EXTRA_WORK_ID, workId)
-                .putExtra(EXTRA_STEP_ID, stepId);
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,11 +69,9 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
                     + "in the third parameter");
         }
 
-        mCheckinsView = ButterKnife.findById(this, android.R.id.list);
         mCheckinsView.setLayoutManager(new LinearLayoutManager(this));
         mCheckinsView.setHasFixedSize(true);
-        mCheckinsView.addItemDecoration(
-                new DividerDecoration(this));
+        mCheckinsView.addItemDecoration(new DividerDecoration(this));
     }
 
     @Override

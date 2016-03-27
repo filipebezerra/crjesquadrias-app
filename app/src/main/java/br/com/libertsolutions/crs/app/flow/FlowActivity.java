@@ -13,7 +13,6 @@ import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
 import br.com.libertsolutions.crs.app.android.recyclerview.GridDividerDecoration;
 import br.com.libertsolutions.crs.app.android.recyclerview.OnClickListener;
 import br.com.libertsolutions.crs.app.android.recyclerview.OnTouchListener;
-import br.com.libertsolutions.crs.app.checkin.CheckinActivity;
 import br.com.libertsolutions.crs.app.feedback.FeedbackHelper;
 import br.com.libertsolutions.crs.app.navigation.NavigationHelper;
 import br.com.libertsolutions.crs.app.network.NetworkUtil;
@@ -32,7 +31,7 @@ import rx.subscriptions.CompositeSubscription;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 20/03/2016
+ * @version 0.1.0, 27/03/2016
  * @since 0.1.0
  */
 public class FlowActivity extends BaseActivity implements OnClickListener {
@@ -163,8 +162,8 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
             final Flow item = mFlowAdapter.getItem(position);
 
             if (item != null) {
-                startActivity(CheckinActivity.getLauncherIntent(this, mWorkId,
-                        item.getStep().getWorkStepId()));
+                NavigationHelper.navigateToCheckinScreen(this, mWorkId,
+                        item.getStep().getWorkStepId());
             }
         }
     }
