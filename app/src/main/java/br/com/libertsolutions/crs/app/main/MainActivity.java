@@ -155,7 +155,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     protected void onStop() {
         super.onStop();
 
-        if (mCompositeSubscription != null) {
+        if (mCompositeSubscription != null && mCompositeSubscription.hasSubscriptions()) {
             mCompositeSubscription.unsubscribe();
         }
     }
