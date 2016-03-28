@@ -90,65 +90,29 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
     protected void onStart() {
         super.onStart();
 
-        if (NetworkUtil.isDeviceConnectedToInternet(this)) {
-            CheckinService service = RetrofitHelper.createService(CheckinService.class, this);
+        final Subscription subscription = mCheckinDataService.list(mFlowId)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        new Action1<List<Checkin>>() {
+                            @Override
+                            public void call(List<Checkin> list) {
+                                mCheckinsView.setAdapter(mCheckinAdapter =
+                                        new CheckinAdapter(CheckinActivity.this, list));
+                                mCheckinAdapter.setCheckinCallback(CheckinActivity.this);
 
-            if (service != null) {
-                final Subscription subscription = service.getByFlowId(mWorkId, mFlowId)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.io())
-                        .subscribe(
-                                new Action1<List<Checkin>>() {
-                                    @Override
-                                    public void call(List<Checkin> list) {
-                                        if (list.isEmpty()) {
-                                            // TODO: carregar estado vazio
-                                            // TODO: atualizar o banco de dados
-                                        } else {
-                                            saveAllToLocalStorage(list);
-                                        }
-                                    }
-                                },
-
-                                new Action1<Throwable>() {
-                                    @Override
-                                    public void call(Throwable e) {
-                                        showError(
-                                                R.string.title_dialog_error_loading_data_from_server,
-                                                e);
-                                    }
-                                }
-                        );
-                mCompositeSubscription.add(subscription);
-            } else {
-                validateAppSettings();
-            }
-        } else {
-            final Subscription subscription = mCheckinDataService.list(mFlowId)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.io())
-                    .subscribe(
-                            new Action1<List<Checkin>>() {
-                                @Override
-                                public void call(List<Checkin> list) {
-                                    mCheckinsView.setAdapter(mCheckinAdapter =
-                                            new CheckinAdapter(CheckinActivity.this, list));
-                                    mCheckinAdapter.setCheckinCallback(CheckinActivity.this);
-
-                                    updateSubtitle();
-                                }
-                            },
-
-                            new Action1<Throwable>() {
-                                @Override
-                                public void call(Throwable e) {
-                                    showError(R.string.title_dialog_error_loading_data_from_local,
-                                            e);
-                                }
+                                updateSubtitle();
                             }
-                    );
-            mCompositeSubscription.add(subscription);
-        }
+                        },
+
+                        new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable e) {
+                                showError(R.string.title_dialog_error_loading_data_from_local, e);
+                            }
+                        }
+                );
+        mCompositeSubscription.add(subscription);
     }
 
     @Override

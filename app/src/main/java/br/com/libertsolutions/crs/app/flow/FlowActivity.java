@@ -15,8 +15,6 @@ import br.com.libertsolutions.crs.app.android.recyclerview.OnClickListener;
 import br.com.libertsolutions.crs.app.android.recyclerview.OnTouchListener;
 import br.com.libertsolutions.crs.app.feedback.FeedbackHelper;
 import br.com.libertsolutions.crs.app.navigation.NavigationHelper;
-import br.com.libertsolutions.crs.app.network.NetworkUtil;
-import br.com.libertsolutions.crs.app.retrofit.RetrofitHelper;
 import br.com.libertsolutions.crs.app.settings.SettingsHelper;
 import butterknife.Bind;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -89,64 +87,28 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
     protected void onStart() {
         super.onStart();
 
-        if (NetworkUtil.isDeviceConnectedToInternet(this)) {
-            FlowService service = RetrofitHelper.createService(FlowService.class, this);
+        final Subscription subscription = mFlowDataService.list(mWorkId)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        new Action1<List<Flow>>() {
+                            @Override
+                            public void call(List<Flow> list) {
+                                mWorkStepsView.setAdapter(mFlowAdapter =
+                                        new FlowAdapter(FlowActivity.this, list));
 
-            if (service != null) {
-                final Subscription subscription = service.getByWorkId(mWorkId)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.io())
-                        .subscribe(
-                                new Action1<List<Flow>>() {
-                                    @Override
-                                    public void call(List<Flow> list) {
-                                        if (list.isEmpty()) {
-                                            // TODO: carregar estado vazio
-                                            // TODO: atualizar o banco de dados
-                                        } else {
-                                            saveAllToLocalStorage(list);
-                                        }
-                                    }
-                                },
-
-                                new Action1<Throwable>() {
-                                    @Override
-                                    public void call(Throwable e) {
-                                        showError(
-                                                R.string.title_dialog_error_loading_data_from_server,
-                                                e);
-                                    }
-                                }
-                        );
-                mCompositeSubscription.add(subscription);
-            } else {
-                validateAppSettings();
-            }
-        } else {
-            final Subscription subscription = mFlowDataService.list(mWorkId)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.io())
-                    .subscribe(
-                            new Action1<List<Flow>>() {
-                                @Override
-                                public void call(List<Flow> list) {
-                                    mWorkStepsView.setAdapter(mFlowAdapter =
-                                            new FlowAdapter(FlowActivity.this, list));
-
-                                    updateSubtitle();
-                                }
-                            },
-
-                            new Action1<Throwable>() {
-                                @Override
-                                public void call(Throwable e) {
-                                    showError(
-                                            R.string.title_dialog_error_loading_data_from_local, e);
-                                }
+                                updateSubtitle();
                             }
-                    );
-            mCompositeSubscription.add(subscription);
-        }
+                        },
+
+                        new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable e) {
+                                showError(R.string.title_dialog_error_loading_data_from_local, e);
+                            }
+                        }
+                );
+        mCompositeSubscription.add(subscription);
     }
 
     @Override
