@@ -44,16 +44,20 @@ public class FlowEntity extends RealmObject {
         this.flowId = flowId;
     }
 
+    public Long getWorkId() {
+        return workId;
+    }
+
+    public void setWorkId(Long workId) {
+        this.workId = workId;
+    }
+
     public Integer getStatus() {
         return status;
     }
 
     public void setStatus(@IntRange(from = STATUS_PENDING, to = STATUS_FINISHED) Integer status) {
         this.status = status;
-    }
-
-    public void setWorkId(Long workId) {
-        this.workId = workId;
     }
 
     @Override

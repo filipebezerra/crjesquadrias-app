@@ -14,7 +14,7 @@ import rx.functions.Func1;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 21/03/2016
+ * @version 0.1.0, 28/03/2016
  * @since 0.1.0
  */
 public class FlowRealmDataService implements FlowDataService {
@@ -45,7 +45,7 @@ public class FlowRealmDataService implements FlowDataService {
     }
 
     @Override
-    public Observable<List<Flow>> saveAll(final long workId, final List<Flow> flowList) {
+    public Observable<List<Flow>> saveAll(final List<Flow> flowList) {
         return RealmObservable.list(mContext, new Func1<Realm, RealmList<FlowEntity>>() {
             @Override
             public RealmList<FlowEntity> call(Realm realm) {
@@ -62,7 +62,7 @@ public class FlowRealmDataService implements FlowDataService {
 
                     FlowEntity flowEntity = new FlowEntity();
                     flowEntity.setFlowId(flow.getFlowId());
-                    flowEntity.setWorkId(workId);
+                    flowEntity.setWorkId(flow.getWorkId());
                     flowEntity.setStep(workStepEntity);
                     flowEntity.setStatus(flow.getStatus());
 
@@ -86,7 +86,11 @@ public class FlowRealmDataService implements FlowDataService {
 
     private static Flow flowFromRealm(FlowEntity flowEntity) {
         final WorkStep workStep = workStepFromRealm(flowEntity.getStep());
-        return new Flow(workStep, flowEntity.getFlowId(), flowEntity.getStatus());
+        final Long flowId = flowEntity.getFlowId();
+        final Long workId = flowEntity.getWorkId();
+        final Integer status = flowEntity.getStatus();
+
+        return new Flow(workStep, flowId, workId, status);
     }
 
     private static WorkStep workStepFromRealm(WorkStepEntity workStepEntity) {
@@ -95,6 +99,7 @@ public class FlowRealmDataService implements FlowDataService {
         final Integer type = workStepEntity.getType();
         final Integer order = workStepEntity.getOrder();
         final Integer goForward = workStepEntity.getGoForward();
+
         return new WorkStep(workStepId, order, name, type, goForward);
     }
 }

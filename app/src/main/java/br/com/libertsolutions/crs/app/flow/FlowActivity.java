@@ -31,7 +31,7 @@ import rx.subscriptions.CompositeSubscription;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 27/03/2016
+ * @version 0.1.0, 28/03/2016
  * @since 0.1.0
  */
 public class FlowActivity extends BaseActivity implements OnClickListener {
@@ -93,7 +93,7 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
             FlowService service = RetrofitHelper.createService(FlowService.class, this);
 
             if (service != null) {
-                final Subscription subscription = service.getAll(mWorkId)
+                final Subscription subscription = service.getByWorkId(mWorkId)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeOn(Schedulers.io())
                         .subscribe(
@@ -171,7 +171,8 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
     }
 
     @Override
-    public void onLongPress(View view, int position) {}
+    public void onLongPress(View view, int position) {
+    }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -200,27 +201,27 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
     }
 
     private void saveAllToLocalStorage(List<Flow> list) {
-        final Subscription subscription = mFlowDataService.saveAll(mWorkId, list)
+        final Subscription subscription = mFlowDataService.saveAll(list)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(
-                                new Action1<List<Flow>>() {
-                                    @Override
-                                    public void call(List<Flow> flowList) {
-                                        mWorkStepsView.setAdapter(mFlowAdapter =
-                                                new FlowAdapter(FlowActivity.this, flowList));
+                        new Action1<List<Flow>>() {
+                            @Override
+                            public void call(List<Flow> flowList) {
+                                mWorkStepsView.setAdapter(mFlowAdapter =
+                                        new FlowAdapter(FlowActivity.this, flowList));
 
-                                        updateSubtitle();
-                                    }
-                                },
+                                updateSubtitle();
+                            }
+                        },
 
-                                new Action1<Throwable>() {
-                                    @Override
-                                    public void call(Throwable e) {
-                                        showError(R.string.title_dialog_error_saving_data, e);
-                                    }
-                                }
-                        );
+                        new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable e) {
+                                showError(R.string.title_dialog_error_saving_data, e);
+                            }
+                        }
+                );
         mCompositeSubscription.add(subscription);
     }
 

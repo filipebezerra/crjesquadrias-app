@@ -14,5 +14,8 @@ import rx.Observable;
  */
 public interface FlowService {
     @GET("FluxoApi/Get")
-    Observable<List<Flow>> getAll(@Query("id_obra") long workId);
+    Observable<List<Flow>> getByWorkId(@Query("id_obra") long workId);
+
+    @GET("FluxoApi/Get")
+    Observable<List<Flow>> getAllWithUpdates(@Query("ultimaAtualizacao") String lastUpdate);
 }
