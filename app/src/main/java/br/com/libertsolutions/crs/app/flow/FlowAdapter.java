@@ -17,7 +17,7 @@ import java.util.List;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 24/03/2016
+ * @version 0.1.0, 28/03/2016
  * @since 0.1.0
  */
 public class FlowAdapter extends RecyclerView.Adapter<FlowAdapter.ViewHolder> {
@@ -83,7 +83,7 @@ public class FlowAdapter extends RecyclerView.Adapter<FlowAdapter.ViewHolder> {
         return count;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.stepStatus) View stepStatus;
         @Bind(R.id.stepName) TextView stepName;
 
