@@ -14,7 +14,7 @@ public class Work {
     public static final int STATUS_PENDING = 0;
     public static final int STATUS_STARTED = 1;
 
-    @SerializedName("idObra")
+    @SerializedName("id_obra")
     private final long workId;
 
     @SerializedName("Cliente")
