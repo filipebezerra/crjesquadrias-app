@@ -126,15 +126,13 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
             final Flow item = mFlowAdapter.getItem(position);
 
             if (item != null) {
-                NavigationHelper.navigateToCheckinScreen(this, mWorkId,
-                        item.getStep().getWorkStepId());
+                NavigationHelper.navigateToCheckinScreen(this, mWorkId, item.getFlowId());
             }
         }
     }
 
     @Override
-    public void onLongPress(View view, int position) {
-    }
+    public void onLongPress(View view, int position) {}
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
