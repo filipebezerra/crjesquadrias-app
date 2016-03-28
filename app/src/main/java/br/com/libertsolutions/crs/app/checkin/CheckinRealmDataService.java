@@ -14,7 +14,7 @@ import rx.functions.Func1;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 24/03/2016
+ * @version 0.1.0, 28/03/2016
  * @since 0.1.0
  */
 public class CheckinRealmDataService implements CheckinDataService {
@@ -49,7 +49,7 @@ public class CheckinRealmDataService implements CheckinDataService {
     }
 
     @Override
-    public Observable<List<Checkin>> saveAll(final long flowId, final List<Checkin> checkinList) {
+    public Observable<List<Checkin>> saveAll(final List<Checkin> checkinList) {
         return RealmObservable.list(mContext, new Func1<Realm, RealmList<CheckinEntity>>() {
             @Override
             public RealmList<CheckinEntity> call(Realm realm) {
@@ -101,7 +101,7 @@ public class CheckinRealmDataService implements CheckinDataService {
 
                     final CheckinEntity checkinEntity = new CheckinEntity();
                     checkinEntity.setCheckinId(checkin.getCheckinId());
-                    checkinEntity.setFlowId(flowId);
+                    checkinEntity.setFlowId(checkin.getFlowId());
                     checkinEntity.setDate(checkin.getDate());
                     checkinEntity.setStatus(checkin.getStatus());
                     checkinEntity.setItem(itemEntity);

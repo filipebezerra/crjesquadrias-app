@@ -28,7 +28,7 @@ import rx.subscriptions.CompositeSubscription;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 27/03/2016
+ * @version 0.1.0, 28/03/2016
  * @since 0.1.0
  */
 public class CheckinActivity extends BaseActivity implements CheckinAdapter.CheckinCallback {
@@ -94,7 +94,7 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
             CheckinService service = RetrofitHelper.createService(CheckinService.class, this);
 
             if (service != null) {
-                final Subscription subscription = service.getAllByStep(mWorkId, mFlowId)
+                final Subscription subscription = service.getByFlowId(mWorkId, mFlowId)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeOn(Schedulers.io())
                         .subscribe(
@@ -269,7 +269,7 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
     }
 
     private void saveAllToLocalStorage(List<Checkin> list) {
-        final Subscription subscription = mCheckinDataService.saveAll(mFlowId, list)
+        final Subscription subscription = mCheckinDataService.saveAll(list)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(

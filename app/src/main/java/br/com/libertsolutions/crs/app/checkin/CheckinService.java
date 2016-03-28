@@ -16,8 +16,11 @@ import rx.Observable;
  */
 public interface CheckinService {
     @GET("CheckinApi/Get")
-    Observable<List<Checkin>> getAllByStep(
-            @Query("id_obra") long workId, @Query("id_etapa") long stepId);
+    Observable<List<Checkin>> getByFlowId(@Query("id_obra") long workId,
+            @Query("id_etapa") long stepId);
+
+    @GET("CheckinApi/Get")
+    Observable<List<Checkin>> getAllWithUpdates(@Query("ultimaAtualizacao") String lastUpdate);
 
     @POST("CheckinApi/Post")
     Observable<Checkin> post(@Query("cpf") String cpf, @Body Checkin checkin);
