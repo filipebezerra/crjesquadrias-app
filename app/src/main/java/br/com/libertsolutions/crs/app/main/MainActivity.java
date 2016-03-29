@@ -119,491 +119,9 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         showUserLoggedInfo();
     }
 
-    private void showProgressDialog(@StringRes int titleRes, @StringRes int contentRes) {
-        if (mProgressDialog == null || !mProgressDialog.isShowing()) {
-            mProgressDialog = new MaterialDialog.Builder(this)
-                    .title(titleRes)
-                    .content(contentRes)
-                    .progress(true, 0)
-                    .progressIndeterminateStyle(true)
-                    .cancelable(false)
-                    .show();
-        }
-    }
-
-    private void hideProgressDialog() {
-        if (mProgressDialog != null) {
-            if (mProgressDialog.isShowing()) {
-                mProgressDialog.dismiss();
-            }
-            mProgressDialog = null;
-        }
-    }
-
-    private void showEmptyState() {
-        // TODO: show empty state
-        // TODO: enable BroadcastReceiver to network events
-    }
-
-    private void showWorkData() {
-        final Subscription subscription = mWorkDataService.list()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(
-                        new Action1<List<Work>>() {
-                            @Override
-                            public void call(List<Work> list) {
-                                mWorksView.setAdapter(mWorkAdapter =
-                                        new WorkAdapter(MainActivity.this, list));
-
-                                updateSubtitle();
-                            }
-                        },
-                        new Action1<Throwable>() {
-                            @Override
-                            public void call(Throwable e) {
-                                showError(R.string.title_dialog_error_loading_data_from_local, e);
-                            }
-                        }
-                );
-        mCompositeSubscription.add(subscription);
-    }
-
     //TODO: save state for activity recreation
     private boolean mIsDataBeingImported;
 
-    // initial + updates => call work service
-    private void callWorkService() {
-        if (mWorkService == null) {
-            mWorkService = RetrofitHelper.createService(WorkService.class, this);
-        }
-
-        if (mWorkService != null) {
-            Subscription subscription;
-
-            if (mIsDataBeingImported) {
-                subscription = mWorkService.getAll()
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.io())
-                        .subscribe(
-                                new Subscriber<List<Work>>() {
-                                    @Override
-                                    public void onStart() {
-                                        showProgressDialog(R.string.title_importing_data,
-                                                R.string.content_please_wait);
-                                    }
-
-                                    @Override
-                                    public void onError(Throwable e) {
-                                        showError(R.string.error_importing_data, e);
-                                    }
-
-                                    @Override
-                                    public void onNext(List<Work> workList) {
-                                        if (workList != null) {
-                                            saveWorkData(workList);
-                                        } else {
-                                            callFlowService();
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onCompleted() {}
-                                }
-                        );
-            } else {
-                subscription = mWorkService
-                        .getAllWithUpdates(ConfigHelper.getLastServerSync(MainActivity.this))
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.io())
-                        .subscribe(
-                                new Subscriber<List<Work>>() {
-                                    @Override
-                                    public void onStart() {
-                                        showProgressDialog(R.string.title_updating_data,
-                                                R.string.content_please_wait);
-                                    }
-
-                                    @Override
-                                    public void onError(Throwable e) {
-                                        showError(R.string.error_updating_data, e);
-                                    }
-
-                                    @Override
-                                    public void onNext(List<Work> workList) {
-                                        if (workList != null) {
-                                            saveWorkData(workList);
-                                        } else {
-                                            callFlowService();
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onCompleted() {}
-                                }
-                        );
-            }
-
-            mCompositeSubscription.add(subscription);
-        } else {
-            validateAppSettings();
-        }
-    }
-
-    // initial + updates => save with work data service
-    // initial => set works as imported
-    private void saveWorkData(@NonNull List<Work> works) {
-        if (mWorkDataService == null) {
-            mWorkDataService = new WorkRealmDataService(this);
-        }
-
-        final Subscription subscription = mWorkDataService.saveAll(works)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(
-                        new Action1<List<Work>>() {
-                            @Override
-                            public void call(List<Work> workList) {
-                                mWorksView.setAdapter(
-                                        mWorkAdapter = new WorkAdapter(MainActivity.this,
-                                                workList));
-
-                                updateSubtitle();
-
-                                if (mIsDataBeingImported) {
-                                    ConfigHelper.setWorkDataAsImported(MainActivity.this);
-                                }
-                            }
-                        },
-
-                        new Action1<Throwable>() {
-                            @Override
-                            public void call(Throwable e) {
-                                showError(R.string.title_dialog_error_saving_data, e);
-                            }
-                        },
-
-                        new Action0() {
-                            @Override
-                            public void call() {
-                                callFlowService();
-                            }
-                        }
-                );
-        mCompositeSubscription.add(subscription);
-    }
-
-    // initial + updates => call flow service
-    private void callFlowService() {
-        if (mFlowService == null) {
-            mFlowService = RetrofitHelper.createService(FlowService.class, this);
-        }
-
-        if (mFlowService != null) {
-            Subscription subscription;
-
-            if (mIsDataBeingImported) {
-                subscription = mFlowService.getAll()
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.io())
-                        .subscribe(
-                                new Action1<List<Flow>>() {
-                                    @Override
-                                    public void call(List<Flow> flows) {
-                                        if (flows != null) {
-                                            saveFlowData(flows);
-                                        } else {
-                                            callCheckinService();
-                                        }
-                                    }
-                                },
-
-                                new Action1<Throwable>() {
-                                    @Override
-                                    public void call(Throwable e) {
-                                        showError(R.string.error_importing_data, e);
-                                    }
-                                }
-                            /*new Subscriber<List<Flow>>() {
-                                @Override
-                                public void onStart() {
-                                    //flowServiceWorking.set(true);
-                                    showProgressDialog(R.string.title_importing_data,
-                                            R.string.content_importing_data);
-                                }
-
-                                @Override
-                                public void onError(Throwable e) {
-                                    //flowServiceWorking.set(false);
-                                    showError(R.string.error_importing_data, e);
-                                }
-
-                                @Override
-                                public void onNext(List<Flow> flowList) {
-                                    if (flowList != null) {
-                                        saveFlowsToLocalStorage(flowList);
-                                    }
-                                }
-
-                                @Override
-                                public void onCompleted() {
-                                    //flowServiceWorking.set(false);
-                                }
-                            }
-                            */
-                        );
-            } else {
-                subscription = mFlowService
-                        .getAllWithUpdates(ConfigHelper.getLastServerSync(MainActivity.this))
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.io())
-                        .subscribe(
-                                new Action1<List<Flow>>() {
-                                    @Override
-                                    public void call(List<Flow> flows) {
-                                        if (flows != null) {
-                                            saveFlowData(flows);
-                                        } else {
-                                            callCheckinService();
-                                        }
-                                    }
-                                },
-
-                                new Action1<Throwable>() {
-                                    @Override
-                                    public void call(Throwable e) {
-                                        showError(R.string.error_updating_data, e);
-                                    }
-                                }
-                        );
-            }
-
-            mCompositeSubscription.add(subscription);
-        } else {
-            validateAppSettings();
-        }
-    }
-
-    // initial + updates => save with flow data service
-    // initial => set flows as imported
-    private void saveFlowData(@NonNull List<Flow> flows) {
-        if (mFlowDataService == null) {
-            mFlowDataService = new FlowRealmDataService(this);
-        }
-
-        final Subscription subscription = mFlowDataService.saveAll(flows)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(
-                        new Action1<List<Flow>>() {
-                            @Override
-                            public void call(List<Flow> flows) {
-                                /*if (!workServiceWorking.get() && !checkinServiceWorking.get()) {
-                                    hideProgressDialog();
-                                }*/
-                                if (mIsDataBeingImported) {
-                                    ConfigHelper.setFlowDataAsImported(MainActivity.this);
-                                }
-                            }
-                        },
-
-                        new Action1<Throwable>() {
-                            @Override
-                            public void call(Throwable e) {
-                                //flowServiceWorking.set(false);
-                                showError(R.string.title_dialog_error_saving_data, e);
-                            }
-                        },
-
-                        new Action0() {
-                            @Override
-                            public void call() {
-                                callCheckinService();
-                            }
-                        }
-                );
-        mCompositeSubscription.add(subscription);
-    }
-
-    // initial + updates => call checkin service
-    private void callCheckinService() {
-        if (mCheckinService == null) {
-            mCheckinService = RetrofitHelper.createService(CheckinService.class, this);
-        }
-
-        if (mCheckinService != null) {
-            Subscription subscription;
-
-            if (mIsDataBeingImported) {
-                subscription = mCheckinService.getAll()
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.io())
-                        .subscribe(
-                                new Action1<List<Checkin>>() {
-                                    @Override
-                                    public void call(List<Checkin> checkins) {
-                                        if (checkins != null) {
-                                            saveCheckinData(checkins);
-                                        } else {
-                                            callConfigService();
-                                        }
-                                    }
-                                },
-
-                                new Action1<Throwable>() {
-                                    @Override
-                                    public void call(Throwable e) {
-                                        showError(R.string.error_importing_data, e);
-                                    }
-                                }
-                            /*
-                            new Subscriber<List<Checkin>>() {
-                                @Override
-                                public void onStart() {
-                                    //checkinServiceWorking.set(true);
-                                    showProgressDialog(R.string.title_importing_data,
-                                            R.string.content_importing_data);
-                                }
-
-                                @Override
-                                public void onError(Throwable e) {
-                                    //checkinServiceWorking.set(false);
-                                    showError(R.string.error_importing_data, e);
-                                }
-
-                                @Override
-                                public void onNext(List<Checkin> checkinList) {
-                                    if (checkinList != null) {
-                                        saveCheckinsToLocalStorage(checkinList);
-                                    }
-                                }
-
-                                @Override
-                                public void onCompleted() {
-                                    //checkinServiceWorking.set(false);
-                                }
-                            }
-                            */
-                        );
-            } else {
-                subscription = mCheckinService
-                        .getAllWithUpdates(ConfigHelper.getLastServerSync(MainActivity.this))
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.io())
-                        .subscribe(
-                                new Action1<List<Checkin>>() {
-                                    @Override
-                                    public void call(List<Checkin> checkins) {
-                                        if (checkins != null) {
-                                            saveCheckinData(checkins);
-                                        } else {
-                                            callConfigService();
-                                        }
-                                    }
-                                },
-
-                                new Action1<Throwable>() {
-                                    @Override
-                                    public void call(Throwable e) {
-                                        showError(R.string.error_updating_data, e);
-                                    }
-                                }
-                        );
-            }
-
-            mCompositeSubscription.add(subscription);
-        } else {
-            validateAppSettings();
-        }
-    }
-
-    // initial + updates => save with checkin data service
-    // initial => set checkins as imported
-    private void saveCheckinData(@NonNull List<Checkin> checkins) {
-        if (mCheckinDataService == null) {
-            mCheckinDataService = new CheckinRealmDataService(this);
-        }
-
-        mCheckinDataService.saveAll(checkins)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(
-                        new Action1<List<Checkin>>() {
-                            @Override
-                            public void call(List<Checkin> checkins) {
-                                /*checkinServiceWorking.set(false);
-
-                                if (!workServiceWorking.get()
-                                        && !flowServiceWorking.get()) {
-                                    hideProgressDialog();
-                                }*/
-                                if (mIsDataBeingImported) {
-                                    ConfigHelper.setCheckinDataAsImported(MainActivity.this);
-                                }
-                            }
-                        },
-
-                        new Action1<Throwable>() {
-                            @Override
-                            public void call(Throwable e) {
-                                //flowServiceWorking.set(false);
-                                showError(R.string.title_dialog_error_saving_data, e);
-                            }
-                        },
-
-                        new Action0() {
-                            @Override
-                            public void call() {
-                                callConfigService();
-                            }
-                        }
-                );
-    }
-
-    // initial + updates => set last update time
-    private void callConfigService() {
-        final ConfigService configService = RetrofitHelper.createService(ConfigService.class, this);
-        if (configService != null) {
-            configService.get()
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.io())
-                    .subscribe(
-                            new Subscriber<Config>() {
-                                @Override
-                                public void onError(Throwable e) {
-                                    if (mIsDataBeingImported) {
-                                        showError(R.string.error_importing_data, e);
-                                    } else {
-                                        showError(R.string.error_updating_data, e);
-                                    }
-                                }
-
-                                @Override
-                                public void onNext(Config config) {
-                                    ConfigHelper.setLastServerSync(MainActivity.this,
-                                            config.getDataAtual());
-                                }
-
-                                @Override
-                                public void onCompleted() {
-                                    hideProgressDialog();
-                                }
-                            }
-                    );
-        } else {
-            validateAppSettings();
-        }
-    }
-
-    private void startImportingData() {
-        mIsDataBeingImported = true;
-        callWorkService();
-    }
-
-    private void startUpdatingData() {
-        mIsDataBeingImported = false;
-        callWorkService();
-    }
 
     @Override
     protected void onStart() {
@@ -717,16 +235,450 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         }
     }
 
-    private void validateAppSettings() {
-        if (!SettingsHelper.isSettingsApplied(this)) {
-            FeedbackHelper.snackbar(mRootView, getString(R.string.msg_settings_not_applied), true,
-                    new Snackbar.Callback() {
-                        @Override
-                        public void onDismissed(Snackbar snackbar, int event) {
-                            NavigationHelper.navigateToSettingsScreen(MainActivity.this);
-                        }
-                    });
+    private void startImportingData() {
+        mIsDataBeingImported = true;
+        callWorkService();
+    }
+
+    private void startUpdatingData() {
+        mIsDataBeingImported = false;
+        callWorkService();
+    }
+
+    /**
+     * Realiza chamada ao Web service das obras para importar ou atualizar os dados,
+     * de acordo com {@link #mIsDataBeingImported}
+     */
+    private void callWorkService() {
+        if (mWorkService == null) {
+            mWorkService = RetrofitHelper.createService(WorkService.class, this);
         }
+
+        if (mWorkService != null) {
+            Subscription subscription;
+
+            if (mIsDataBeingImported) {
+                subscription = mWorkService.getAll()
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(
+                                new Subscriber<List<Work>>() {
+                                    @Override
+                                    public void onStart() {
+                                        showProgressDialog(R.string.title_importing_data,
+                                                R.string.content_please_wait);
+                                    }
+
+                                    @Override
+                                    public void onError(Throwable e) {
+                                        showError(R.string.error_importing_data, e);
+                                    }
+
+                                    @Override
+                                    public void onNext(List<Work> workList) {
+                                        if (workList != null) {
+                                            saveWorkData(workList);
+                                        } else {
+                                            callFlowService();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCompleted() {}
+                                }
+                        );
+            } else {
+                subscription = mWorkService
+                        .getAllWithUpdates(ConfigHelper.getLastServerSync(MainActivity.this))
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(
+                                new Subscriber<List<Work>>() {
+                                    @Override
+                                    public void onStart() {
+                                        showProgressDialog(R.string.title_updating_data,
+                                                R.string.content_please_wait);
+                                    }
+
+                                    @Override
+                                    public void onError(Throwable e) {
+                                        showError(R.string.error_updating_data, e);
+                                    }
+
+                                    @Override
+                                    public void onNext(List<Work> workList) {
+                                        if (workList != null) {
+                                            saveWorkData(workList);
+                                        } else {
+                                            callFlowService();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCompleted() {}
+                                }
+                        );
+            }
+
+            mCompositeSubscription.add(subscription);
+        } else {
+            validateAppSettings();
+        }
+    }
+
+    /**
+     * Envia os dados obtidos do Web service de obras para ser persistido localmente.
+     */
+    private void saveWorkData(@NonNull List<Work> works) {
+        if (works.isEmpty()) {
+            if (mIsDataBeingImported) {
+                showEmptyState();
+            }
+
+            callFlowService();
+            return;
+        }
+
+        if (mWorkDataService == null) {
+            mWorkDataService = new WorkRealmDataService(this);
+        }
+
+        final Subscription subscription = mWorkDataService.saveAll(works)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        new Action1<List<Work>>() {
+                            @Override
+                            public void call(List<Work> workList) {
+                                if (mIsDataBeingImported) {
+                                    ConfigHelper.setWorkDataAsImported(MainActivity.this);
+                                }
+                            }
+                        },
+
+                        new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable e) {
+                                showError(R.string.title_dialog_error_saving_data, e);
+                            }
+                        },
+
+                        new Action0() {
+                            @Override
+                            public void call() {
+                                callFlowService();
+                            }
+                        }
+                );
+        mCompositeSubscription.add(subscription);
+    }
+
+    /**
+     * Realiza chamada ao Web service dos fluxos para importar ou atualizar os dados,
+     * de acordo com {@link #mIsDataBeingImported}
+     */
+    private void callFlowService() {
+        if (mFlowService == null) {
+            mFlowService = RetrofitHelper.createService(FlowService.class, this);
+        }
+
+        if (mFlowService != null) {
+            Subscription subscription;
+
+            if (mIsDataBeingImported) {
+                subscription = mFlowService.getAll()
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(
+                                new Action1<List<Flow>>() {
+                                    @Override
+                                    public void call(List<Flow> flows) {
+                                        if (flows != null) {
+                                            saveFlowData(flows);
+                                        } else {
+                                            callCheckinService();
+                                        }
+                                    }
+                                },
+
+                                new Action1<Throwable>() {
+                                    @Override
+                                    public void call(Throwable e) {
+                                        showError(R.string.error_importing_data, e);
+                                    }
+                                }
+                        );
+            } else {
+                subscription = mFlowService
+                        .getAllWithUpdates(ConfigHelper.getLastServerSync(MainActivity.this))
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(
+                                new Action1<List<Flow>>() {
+                                    @Override
+                                    public void call(List<Flow> flows) {
+                                        if (flows != null) {
+                                            saveFlowData(flows);
+                                        } else {
+                                            callCheckinService();
+                                        }
+                                    }
+                                },
+
+                                new Action1<Throwable>() {
+                                    @Override
+                                    public void call(Throwable e) {
+                                        showError(R.string.error_updating_data, e);
+                                    }
+                                }
+                        );
+            }
+
+            mCompositeSubscription.add(subscription);
+        } else {
+            validateAppSettings();
+        }
+    }
+
+    /**
+     * Envia os dados obtidos do Web service dos fluxos para ser persistido localmente.
+     */
+    private void saveFlowData(@NonNull List<Flow> flows) {
+        if (flows.isEmpty()) {
+            callCheckinService();
+            return;
+        }
+
+        if (mFlowDataService == null) {
+            mFlowDataService = new FlowRealmDataService(this);
+        }
+
+        final Subscription subscription = mFlowDataService.saveAll(flows)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        new Action1<List<Flow>>() {
+                            @Override
+                            public void call(List<Flow> flows) {
+                                if (mIsDataBeingImported) {
+                                    ConfigHelper.setFlowDataAsImported(MainActivity.this);
+                                }
+                            }
+                        },
+
+                        new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable e) {
+                                showError(R.string.title_dialog_error_saving_data, e);
+                            }
+                        },
+
+                        new Action0() {
+                            @Override
+                            public void call() {
+                                callCheckinService();
+                            }
+                        }
+                );
+        mCompositeSubscription.add(subscription);
+    }
+
+    /**
+     * Realiza chamada ao Web service dos check-ins para importar ou atualizar os dados,
+     * de acordo com {@link #mIsDataBeingImported}
+     */
+    private void callCheckinService() {
+        if (mCheckinService == null) {
+            mCheckinService = RetrofitHelper.createService(CheckinService.class, this);
+        }
+
+        if (mCheckinService != null) {
+            Subscription subscription;
+
+            if (mIsDataBeingImported) {
+                subscription = mCheckinService.getAll()
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(
+                                new Action1<List<Checkin>>() {
+                                    @Override
+                                    public void call(List<Checkin> checkins) {
+                                        if (checkins != null) {
+                                            saveCheckinData(checkins);
+                                        } else {
+                                            callConfigService();
+                                        }
+                                    }
+                                },
+
+                                new Action1<Throwable>() {
+                                    @Override
+                                    public void call(Throwable e) {
+                                        showError(R.string.error_importing_data, e);
+                                    }
+                                }
+                        );
+            } else {
+                subscription = mCheckinService
+                        .getAllWithUpdates(ConfigHelper.getLastServerSync(MainActivity.this))
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(
+                                new Action1<List<Checkin>>() {
+                                    @Override
+                                    public void call(List<Checkin> checkins) {
+                                        if (checkins != null) {
+                                            saveCheckinData(checkins);
+                                        } else {
+                                            callConfigService();
+                                        }
+                                    }
+                                },
+
+                                new Action1<Throwable>() {
+                                    @Override
+                                    public void call(Throwable e) {
+                                        showError(R.string.error_updating_data, e);
+                                    }
+                                }
+                        );
+            }
+
+            mCompositeSubscription.add(subscription);
+        } else {
+            validateAppSettings();
+        }
+    }
+
+    /**
+     * Envia os dados obtidos do Web service dos check-ins para ser persistido localmente.
+     */
+    private void saveCheckinData(@NonNull List<Checkin> checkins) {
+        if (checkins.isEmpty()) {
+            callConfigService();
+            return;
+        }
+
+        if (mCheckinDataService == null) {
+            mCheckinDataService = new CheckinRealmDataService(this);
+        }
+
+        mCheckinDataService.saveAll(checkins)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        new Action1<List<Checkin>>() {
+                            @Override
+                            public void call(List<Checkin> checkins) {
+                                if (mIsDataBeingImported) {
+                                    ConfigHelper.setCheckinDataAsImported(MainActivity.this);
+                                }
+                            }
+                        },
+
+                        new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable e) {
+                                showError(R.string.title_dialog_error_saving_data, e);
+                            }
+                        },
+
+                        new Action0() {
+                            @Override
+                            public void call() {
+                                callConfigService();
+                            }
+                        }
+                );
+    }
+
+    /**
+     * Realiza chamada ao Web service da configuração que contém a data e hora atual do
+     * servidor. Esta informação é salva locamente para ser reutilziada posteriormente
+     * para atualização dos dados.
+     */
+    private void callConfigService() {
+        final ConfigService configService = RetrofitHelper.createService(ConfigService.class, this);
+        if (configService != null) {
+            configService.get()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(
+                            new Subscriber<Config>() {
+                                @Override
+                                public void onError(Throwable e) {
+                                    if (mIsDataBeingImported) {
+                                        showError(R.string.error_importing_data, e);
+                                    } else {
+                                        showError(R.string.error_updating_data, e);
+                                    }
+                                }
+
+                                @Override
+                                public void onNext(Config config) {
+                                    ConfigHelper.setLastServerSync(MainActivity.this,
+                                            config.getDataAtual());
+                                }
+
+                                @Override
+                                public void onCompleted() {
+                                    hideProgressDialog();
+                                }
+                            }
+                    );
+        } else {
+            validateAppSettings();
+        }
+    }
+
+    private void showWorkData() {
+        final Subscription subscription = mWorkDataService.list()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        new Action1<List<Work>>() {
+                            @Override
+                            public void call(List<Work> list) {
+                                mWorksView.setAdapter(mWorkAdapter =
+                                        new WorkAdapter(MainActivity.this, list));
+
+                                updateSubtitle();
+                            }
+                        },
+                        new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable e) {
+                                showError(R.string.title_dialog_error_loading_data_from_local, e);
+                            }
+                        }
+                );
+        mCompositeSubscription.add(subscription);
+    }
+
+    private void showProgressDialog(@StringRes int titleRes, @StringRes int contentRes) {
+        if (mProgressDialog == null || !mProgressDialog.isShowing()) {
+            mProgressDialog = new MaterialDialog.Builder(this)
+                    .title(titleRes)
+                    .content(contentRes)
+                    .progress(true, 0)
+                    .progressIndeterminateStyle(true)
+                    .cancelable(false)
+                    .show();
+        }
+    }
+
+    private void hideProgressDialog() {
+        if (mProgressDialog != null) {
+            if (mProgressDialog.isShowing()) {
+                mProgressDialog.dismiss();
+            }
+            mProgressDialog = null;
+        }
+    }
+
+    private void showEmptyState() {
+        // TODO: show empty state
+        // TODO: enable BroadcastReceiver to network events
     }
 
     private void showError(@StringRes int titleRes, Throwable e) {
@@ -738,6 +690,18 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                 .content(e.getMessage())
                 .positiveText(R.string.text_dialog_button_ok)
                 .show();
+    }
+
+    private void validateAppSettings() {
+        if (!SettingsHelper.isSettingsApplied(this)) {
+            FeedbackHelper.snackbar(mRootView, getString(R.string.msg_settings_not_applied), true,
+                    new Snackbar.Callback() {
+                        @Override
+                        public void onDismissed(Snackbar snackbar, int event) {
+                            NavigationHelper.navigateToSettingsScreen(MainActivity.this);
+                        }
+                    });
+        }
     }
 
     private void updateSubtitle() {
