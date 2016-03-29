@@ -11,10 +11,13 @@ import rx.Observable;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 04/03/2016
+ * @version 0.1.0, 29/03/2016
  * @since 0.1.0
  */
 public interface CheckinService {
+    @GET("CheckinApi/Get")
+    Observable<List<Checkin>> getAll();
+
     @GET("CheckinApi/Get")
     Observable<List<Checkin>> getByFlowId(@Query("id_obra") long workId,
             @Query("id_etapa") long stepId);

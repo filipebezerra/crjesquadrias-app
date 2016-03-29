@@ -9,10 +9,13 @@ import rx.Observable;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 03/03/2016
+ * @version 0.1.0, 29/03/2016
  * @since 0.1.0
  */
 public interface FlowService {
+    @GET("FluxoApi/Get")
+    Observable<List<Flow>> getAll();
+
     @GET("FluxoApi/Get")
     Observable<List<Flow>> getByWorkId(@Query("id_obra") long workId);
 
