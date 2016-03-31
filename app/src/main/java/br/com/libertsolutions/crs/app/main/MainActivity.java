@@ -58,7 +58,7 @@ import rx.subscriptions.CompositeSubscription;
  * Tela principal, nesta são listadas as obras cadastradas no servidor.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 29/03/2016
+ * @version 0.1.0, 31/03/2016
  * @since 0.1.0
  */
 public class MainActivity extends BaseActivity implements OnClickListener {
@@ -81,142 +81,9 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
     private MaterialDialog mProgressDialog;
 
-    @Bind(R.id.list) RecyclerView mWorksView;
-
-    @Override
-    protected int provideLayoutResource() {
-        return R.layout.activity_main;
-    }
-
-    @Override
-    protected void onCreate(Bundle inState) {
-        super.onCreate(inState);
-
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(R.string.title_activity_main);
-        }
-
-        changeListLayout(getResources().getConfiguration());
-        mWorksView.addItemDecoration(new GridDividerDecoration(this));
-        mWorksView.setHasFixedSize(true);
-        mWorksView.addOnItemTouchListener(
-                new OnTouchListener(this, mWorksView, this));
-
-        if (mToolbarAsActionBar != null) {
-            final Drawable navigationIcon = DrawableHelper.withContext(this)
-                    .withColor(R.color.white)
-                    .withDrawable(R.drawable.ic_worker)
-                    .tint()
-                    .get();
-
-            mToolbarAsActionBar.setNavigationIcon(navigationIcon);
-        }
-
-        mWorkDataService = new WorkRealmDataService(this);
-
-        mCompositeSubscription = new CompositeSubscription();
-
-        showUserLoggedInfo();
-    }
-
-    //TODO: save state for activity recreation
     private boolean mIsDataBeingImported;
 
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        final boolean isInitialDataImported = ConfigHelper.isInitialDataImported(this);
-        final boolean hasNetworkConnection = NetworkUtil.isDeviceConnectedToInternet(this);
-
-        if (!isInitialDataImported && !hasNetworkConnection) {
-            showEmptyState();
-        } else {
-            if (!isInitialDataImported) {
-                startImportingData();
-            } else {
-                showWorkData();
-
-                if (hasNetworkConnection) {
-                    // Foi atualizado a quanto tempo atras? Qual estrategia usar para não repetir com frequência
-                    startUpdatingData();
-                }
-            }
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        if (mCompositeSubscription.hasSubscriptions()) {
-            mCompositeSubscription.unsubscribe();
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        SearchView searchView = (SearchView) MenuItemCompat
-                .getActionView(menu.findItem(R.id.menu_search));
-        searchView.setQueryHint(getString(R.string.search_query_hint));
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                if (mWorkAdapter != null) {
-                    mWorkAdapter.getFilter().filter(newText);
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        });
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_logout:
-                LoginHelper.logoutUser(this);
-                finish();
-                return true;
-
-            case R.id.action_settings:
-                NavigationHelper.navigateToSettingsScreen(this);
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        changeListLayout(newConfig);
-    }
-
-    @Override
-    public void onSingleTapUp(View view, int position) {
-        if (mWorkAdapter != null) {
-            final Work item = mWorkAdapter.getItem(position);
-
-            if (item != null) {
-                NavigationHelper.navigateToFlowScreen(this, item.getWorkId());
-            }
-        }
-    }
-
-    @Override
-    public void onLongPress(View view, int position) {
-    }
+    @Bind(R.id.list) RecyclerView mWorksView;
 
     private void changeListLayout(Configuration configuration) {
         if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -623,6 +490,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                                 @Override
                                 public void onCompleted() {
                                     hideProgressDialog();
+                                    showWorkData();
                                 }
                             }
                     );
@@ -715,4 +583,128 @@ public class MainActivity extends BaseActivity implements OnClickListener {
             }
         }
     }
+
+    @Override
+    protected int provideLayoutResource() {
+        return R.layout.activity_main;
+    }
+
+    @Override
+    protected void onCreate(Bundle inState) {
+        super.onCreate(inState);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(R.string.title_activity_main);
+        }
+
+        changeListLayout(getResources().getConfiguration());
+        mWorksView.addItemDecoration(new GridDividerDecoration(this));
+        mWorksView.setHasFixedSize(true);
+        mWorksView.addOnItemTouchListener(
+                new OnTouchListener(this, mWorksView, this));
+
+        if (mToolbarAsActionBar != null) {
+            final Drawable navigationIcon = DrawableHelper.withContext(this)
+                    .withColor(R.color.white)
+                    .withDrawable(R.drawable.ic_worker)
+                    .tint()
+                    .get();
+
+            mToolbarAsActionBar.setNavigationIcon(navigationIcon);
+        }
+
+        mWorkDataService = new WorkRealmDataService(this);
+
+        mCompositeSubscription = new CompositeSubscription();
+
+        showUserLoggedInfo();
+
+        final boolean isInitialDataImported = ConfigHelper.isInitialDataImported(this);
+        final boolean hasNetworkConnection = NetworkUtil.isDeviceConnectedToInternet(this);
+
+        if (!isInitialDataImported && !hasNetworkConnection) {
+            showEmptyState();
+        } else {
+            if (!isInitialDataImported) {
+                startImportingData();
+            } else {
+                showWorkData();
+
+                if (hasNetworkConnection) {
+                    startUpdatingData();
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if (mCompositeSubscription.hasSubscriptions()) {
+            mCompositeSubscription.unsubscribe();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        SearchView searchView = (SearchView) MenuItemCompat
+                .getActionView(menu.findItem(R.id.menu_search));
+        searchView.setQueryHint(getString(R.string.search_query_hint));
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (mWorkAdapter != null) {
+                    mWorkAdapter.getFilter().filter(newText);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        });
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_logout:
+                LoginHelper.logoutUser(this);
+                finish();
+                return true;
+
+            case R.id.action_settings:
+                NavigationHelper.navigateToSettingsScreen(this);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        changeListLayout(newConfig);
+    }
+
+    @Override
+    public void onSingleTapUp(View view, int position) {
+        if (mWorkAdapter != null) {
+            final Work item = mWorkAdapter.getItem(position);
+
+            if (item != null) {
+                NavigationHelper.navigateToFlowScreen(this, item.getWorkId());
+            }
+        }
+    }
+
+    @Override
+    public void onLongPress(View view, int position) {}
 }
