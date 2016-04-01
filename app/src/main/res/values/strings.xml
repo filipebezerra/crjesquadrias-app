@@ -63,7 +63,9 @@
     <string name="msg_user_not_logged">Você não está logado. Entre para poder marcar como feito!</string>
     <string name="title_importing_data">Importando todas informações das obras</string>
     <string name="content_please_wait">Por favor aguarde…</string>
-    <string name="error_importing_data">Falha ao importar dados</string>
+    <string name="error_importing_data">Falha ao importar dados do servidor</string>
     <string name="title_updating_data">Atualizando todas informações das obras</string>
-    <string name="error_updating_data">Falha ao atualizar dados</string>
+    <string name="error_updating_data">Falha ao atualizar dados do servidor</string>
+    <string name="error_sending_data">Falha ao enviar dados para servidor</string>
+    <string name="checkins_all_finished">Todos check-ins concluídos</string>
 </resources>

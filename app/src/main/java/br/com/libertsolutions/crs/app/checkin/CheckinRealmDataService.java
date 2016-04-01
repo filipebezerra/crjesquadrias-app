@@ -14,7 +14,7 @@ import rx.functions.Func1;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 28/03/2016
+ * @version 0.1.0, 31/03/2016
  * @since 0.1.0
  */
 public class CheckinRealmDataService implements CheckinDataService {
@@ -22,6 +22,68 @@ public class CheckinRealmDataService implements CheckinDataService {
 
     public CheckinRealmDataService(Context context) {
         mContext = context;
+    }
+
+    private Checkin checkinFromRealm(CheckinEntity checkinEntity) {
+        if (checkinEntity == null) {
+            return null;
+        }
+
+        final Long checkinId = checkinEntity.getCheckinId();
+        final Long flowId = checkinEntity.getFlowId();
+        final String date = checkinEntity.getDate();
+        final Integer status = checkinEntity.getStatus();
+        final ItemEntity item = checkinEntity.getItem();
+        final OrderGlassEntity orderGlass = checkinEntity.getOrderGlass();
+
+        return new Checkin(checkinId, flowId, date, status, itemFromRealm(item),
+                orderGlassFromRealm(orderGlass));
+    }
+
+    private Item itemFromRealm(ItemEntity item) {
+        if (item == null) {
+            return null;
+        }
+
+        final Long itemId = item.getItemId();
+        final Integer quantity = item.getQuantity();
+        final Float width = item.getWidth();
+        final Float height = item.getHeight();
+        final Float weight = item.getWeight();
+        final String treatment = item.getTreatment();
+        final ProductEntity product = item.getProduct();
+
+        return new Item(itemId, quantity, width, height, weight, treatment,
+                productFromRealm(product));
+    }
+
+    private OrderGlass orderGlassFromRealm(OrderGlassEntity orderGlass) {
+        if (orderGlass == null) {
+            return null;
+        }
+
+        final Long orderGlassId = orderGlass.getOrderGlassId();
+        final Integer quantity = orderGlass.getQuantity();
+        final String number = orderGlass.getNumber();
+        final String color = orderGlass.getColor();
+        final Float width = orderGlass.getWidth();
+        final Float height = orderGlass.getHeight();
+        final Float weight = orderGlass.getWeight();
+        final ProductEntity product = orderGlass.getProduct();
+
+        return new OrderGlass(orderGlassId, quantity, number, color, width, height, weight,
+                productFromRealm(product));
+    }
+
+    private Product productFromRealm(ProductEntity product) {
+        final Long productId = product.getProductId();
+        final String code = product.getCode();
+        final String description = product.getDescription();
+        final Float weight = product.getWeight();
+        final String treatment = product.getTreatment();
+        final String type = product.getType();
+
+        return new Product(productId, code, description, weight, treatment, type);
     }
 
     @Override
@@ -126,61 +188,82 @@ public class CheckinRealmDataService implements CheckinDataService {
         });
     }
 
-    private Checkin checkinFromRealm(CheckinEntity workEntity) {
-        final Long checkinId = workEntity.getCheckinId();
-        final Long flowId = workEntity.getFlowId();
-        final String date = workEntity.getDate();
-        final Integer status = workEntity.getStatus();
-        final ItemEntity item = workEntity.getItem();
-        final OrderGlassEntity orderGlass = workEntity.getOrderGlass();
+    @Override
+    public Observable<Checkin> updateStatus(final Checkin checkin, final boolean synchronizeLater) {
+        return RealmObservable.object(mContext, new Func1<Realm, CheckinEntity>() {
+            @Override
+            public CheckinEntity call(Realm realm) {
+                CheckinEntity checkinEntity = realm.where(CheckinEntity.class)
+                        .equalTo(CheckinEntity.FIELD_CHECKIN_ID, checkin.getCheckinId())
+                        .findFirst();
 
-        return new Checkin(checkinId, flowId, date, status, itemFromRealm(item),
-                orderGlassFromRealm(orderGlass));
+                if (checkinEntity != null) {
+                    if (checkinEntity.getStatus() == Checkin.STATUS_PENDING
+                            && checkin.getStatus() == Checkin.STATUS_FINISHED) {
+                        checkinEntity.setStatus(checkin.getStatus());
+
+                        if (checkin.getDate() != null) {
+                            checkinEntity.setDate(checkin.getDate());
+                        }
+
+                        checkinEntity.setPendingSynchronization(synchronizeLater);
+
+                        checkinEntity = realm.copyToRealmOrUpdate(checkinEntity);
+                    }
+                }
+
+                return checkinEntity;
+            }
+        }).map(new Func1<CheckinEntity, Checkin>() {
+            @Override
+            public Checkin call(CheckinEntity checkinEntity) {
+                return checkinFromRealm(checkinEntity);
+            }
+        });
     }
 
-    private Item itemFromRealm(ItemEntity item) {
-        if (item == null) {
-            return null;
-        }
+    @Override
+    public Observable<List<Checkin>> updateStatus(final List<Checkin> checkins,
+            final boolean synchronizeLater) {
+        return RealmObservable.list(mContext, new Func1<Realm, RealmList<CheckinEntity>>() {
+            @Override
+            public RealmList<CheckinEntity> call(Realm realm) {
+                List<CheckinEntity> checkinEntityList = new ArrayList<>(checkins.size());
 
-        final Long itemId = item.getItemId();
-        final Integer quantity = item.getQuantity();
-        final Float width = item.getWidth();
-        final Float height = item.getHeight();
-        final Float weight = item.getWeight();
-        final String treatment = item.getTreatment();
-        final ProductEntity product = item.getProduct();
+                for(Checkin checkin : checkins) {
+                    CheckinEntity checkinEntity = realm.where(CheckinEntity.class)
+                            .equalTo(CheckinEntity.FIELD_CHECKIN_ID, checkin.getCheckinId())
+                            .findFirst();
 
-        return new Item(itemId, quantity, width, height, weight, treatment,
-                productFromRealm(product));
-    }
+                    if (checkinEntity != null) {
+                        if (checkinEntity.getStatus() == Checkin.STATUS_PENDING
+                                && checkin.getStatus() == Checkin.STATUS_FINISHED) {
+                            checkinEntity.setStatus(checkin.getStatus());
 
-    private OrderGlass orderGlassFromRealm(OrderGlassEntity orderGlass) {
-        if (orderGlass == null) {
-            return null;
-        }
+                            if (checkin.getDate() != null) {
+                                checkinEntity.setDate(checkin.getDate());
+                            }
 
-        final Long orderGlassId = orderGlass.getOrderGlassId();
-        final Integer quantity = orderGlass.getQuantity();
-        final String number = orderGlass.getNumber();
-        final String color = orderGlass.getColor();
-        final Float width = orderGlass.getWidth();
-        final Float height = orderGlass.getHeight();
-        final Float weight = orderGlass.getWeight();
-        final ProductEntity product = orderGlass.getProduct();
+                            checkinEntity.setPendingSynchronization(synchronizeLater);
 
-        return new OrderGlass(orderGlassId, quantity, number, color, width, height, weight,
-                productFromRealm(product));
-    }
+                            checkinEntityList.add(realm.copyToRealmOrUpdate(checkinEntity));
+                        }
+                    }
+                }
 
-    private Product productFromRealm(ProductEntity product) {
-        final Long productId = product.getProductId();
-        final String code = product.getCode();
-        final String description = product.getDescription();
-        final Float weight = product.getWeight();
-        final String treatment = product.getTreatment();
-        final String type = product.getType();
+                return new RealmList<>(checkinEntityList.toArray(
+                        new CheckinEntity[checkinEntityList.size()]));
+            }
+        }).map(new Func1<RealmList<CheckinEntity>, List<Checkin>>() {
+            @Override
+            public List<Checkin> call(RealmList<CheckinEntity> checkinEntities) {
+                List<Checkin> list = new ArrayList<>(checkinEntities.size());
+                for (CheckinEntity checkinEntity : checkinEntities) {
+                    list.add(checkinFromRealm(checkinEntity));
+                }
 
-        return new Product(productId, code, description, weight, treatment, type);
+                return list;
+            }
+        });
     }
 }

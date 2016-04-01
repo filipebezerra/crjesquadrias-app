@@ -11,10 +11,11 @@ import static br.com.libertsolutions.crs.app.checkin.Checkin.STATUS_PENDING;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 23/03/2016
+ * @version 0.1.0, 01/04/2016
  * @since 0.1.0
  */
 public class CheckinEntity extends RealmObject {
+    public static final String FIELD_CHECKIN_ID = "checkinId";
     public static final String FIELD_FLOW_ID = "flowId";
 
     @PrimaryKey
@@ -29,6 +30,8 @@ public class CheckinEntity extends RealmObject {
     private ItemEntity item;
 
     private OrderGlassEntity orderGlass;
+
+    private Boolean pendingSynchronization;
 
     public Long getCheckinId() {
         return checkinId;
@@ -76,6 +79,14 @@ public class CheckinEntity extends RealmObject {
 
     public void setOrderGlass(OrderGlassEntity orderGlass) {
         this.orderGlass = orderGlass;
+    }
+
+    public Boolean getPendingSynchronization() {
+        return pendingSynchronization;
+    }
+
+    public void setPendingSynchronization(Boolean pendingSynchronization) {
+        this.pendingSynchronization = pendingSynchronization;
     }
 
     @Override

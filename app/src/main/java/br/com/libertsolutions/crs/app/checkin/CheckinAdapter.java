@@ -12,6 +12,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,7 +25,7 @@ import butterknife.OnClick;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 07/03/2016
+ * @version 0.1.0, 31/03/2016
  * @since 0.1.0
  */
 public class CheckinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -116,19 +117,23 @@ public class CheckinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     public void checkAllDone() {
-        boolean updated = false;
+        List<Checkin> checkinsUpdated = new ArrayList<>();
         for (Checkin checkin : mCheckins) {
             if (checkin.getStatus() != Checkin.STATUS_FINISHED) {
                 checkin.setStatus(Checkin.STATUS_FINISHED);
-                updated = true;
+                checkinsUpdated.add(checkin);
             }
         }
 
-        if (updated) {
-            notifyDataSetChanged();
-
+        if (!checkinsUpdated.isEmpty()) {
             if (mCheckinCallback != null) {
-                mCheckinCallback.onCheckinsAllDone();
+                mCheckinCallback.onCheckinsAllDone(checkinsUpdated);
+            }
+
+            notifyDataSetChanged();
+        } else {
+            if (mCheckinCallback != null) {
+                mCheckinCallback.onCheckinsAlreadyDone();
             }
         }
     }
@@ -147,15 +152,17 @@ public class CheckinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         mCheckinCallback = checkinCallback;
     }
 
-    public List<Checkin> getAll() {
-        return mCheckins;
+    public void updateCheckin(Checkin checkinDone) {
+        final int index = mCheckins.indexOf(checkinDone);
+
+        if (index != -1) {
+            mCheckins.get(index).setDate(checkinDone.getDate());
+        }
     }
 
-    public void updateCheckin(Checkin checkinDone) {
-        for (Checkin checkin : mCheckins) {
-            if (checkin.equals(checkinDone)) {
-                checkin.setDate(checkinDone.getDate());
-            }
+    public void updateCheckin(List<Checkin> checkinsDone) {
+        for (Checkin checkinDone : checkinsDone) {
+            updateCheckin(checkinDone);
         }
     }
 
@@ -195,11 +202,12 @@ public class CheckinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             if (checkin != null) {
                 if (itemDone.isChecked()) {
                     checkin.setStatus(Checkin.STATUS_FINISHED);
-                    notifyItemChanged(getLayoutPosition());
 
                     if (mCheckinCallback != null) {
-                        mCheckinCallback.onStatusChanged(checkin);
+                        mCheckinCallback.onCheckinDone(checkin);
                     }
+
+                    notifyItemChanged(getLayoutPosition());
                 } else {
                     itemDone.setChecked(true);
 
@@ -212,8 +220,13 @@ public class CheckinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     public interface CheckinCallback {
-        void onStatusChanged(Checkin checkin);
-        void onCheckinsAllDone();
+
+        void onCheckinDone(Checkin checkin);
+
+        void onCheckinsAllDone(List<Checkin> checkinsUpdated);
+
+        void onCheckinsAlreadyDone();
+
         void onStatusCannotChange();
     }
 }
