@@ -58,7 +58,7 @@ import rx.subscriptions.CompositeSubscription;
  * Tela principal, nesta são listadas as obras cadastradas no servidor.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 31/03/2016
+ * @version 0.1.0, 01/04/2016
  * @since 0.1.0
  */
 public class MainActivity extends BaseActivity implements OnClickListener {
@@ -83,6 +83,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
     private boolean mIsDataBeingImported;
 
+    private User mUserLogged;
+
     @Bind(R.id.list) RecyclerView mWorksView;
 
     private void changeListLayout(Configuration configuration) {
@@ -93,12 +95,88 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         }
     }
 
+    private void showProgressDialog(@StringRes int titleRes, @StringRes int contentRes) {
+        if (mProgressDialog == null || !mProgressDialog.isShowing()) {
+            mProgressDialog = new MaterialDialog.Builder(this)
+                    .title(titleRes)
+                    .content(contentRes)
+                    .progress(true, 0)
+                    .progressIndeterminateStyle(true)
+                    .cancelable(false)
+                    .show();
+        }
+    }
+
+    private void hideProgressDialog() {
+        if (mProgressDialog != null) {
+            if (mProgressDialog.isShowing()) {
+                mProgressDialog.dismiss();
+            }
+            mProgressDialog = null;
+        }
+    }
+
+    private void showEmptyState() {
+        // TODO: show empty state
+        // TODO: enable BroadcastReceiver to network events
+    }
+
+    private void showError(@StringRes int titleRes, Throwable e) {
+        hideProgressDialog();
+
+        //TODO: tratamento de exceção
+        new MaterialDialog.Builder(MainActivity.this)
+                .title(titleRes)
+                .content(e.getMessage())
+                .positiveText(R.string.text_dialog_button_ok)
+                .show();
+    }
+
+    private void validateAppSettings() {
+        if (!SettingsHelper.isSettingsApplied(this)) {
+            FeedbackHelper.snackbar(mRootView, getString(R.string.msg_settings_not_applied), true,
+                    new Snackbar.Callback() {
+                        @Override
+                        public void onDismissed(Snackbar snackbar, int event) {
+                            NavigationHelper.navigateToSettingsScreen(MainActivity.this);
+                        }
+                    });
+        }
+    }
+
+    private void validateUserLogged() {
+        if (!LoginHelper.isUserLogged(this)) {
+            FeedbackHelper.snackbar(mRootView, getString(R.string.msg_user_not_logged), true,
+                    new Snackbar.Callback() {
+                        @Override
+                        public void onDismissed(Snackbar snackbar, int event) {
+                            NavigationHelper.navigateToLoginScreen(MainActivity.this);
+                        }
+                    });
+        }
+    }
+
+    private void updateSubtitle() {
+        if (mWorkAdapter != null) {
+            final int count = mWorkAdapter.getRunningWorksCount();
+            if (count == 0) {
+                setSubtitle(getString(R.string.no_work_running));
+            } else {
+                setSubtitle(getString(R.string.works_running,
+                        count));
+            }
+        }
+    }
+
     private void showUserLoggedInfo() {
-        final User userLogged = LoginHelper.getUserLogged(this);
-        if (userLogged != null) {
+        if (mUserLogged == null) {
+            mUserLogged = LoginHelper.getUserLogged(this);
+        }
+
+        if (mUserLogged != null) {
             FeedbackHelper
                     .snackbar(mRootView, String.format("Logado como %s.",
-                            LoginHelper.formatCpf(userLogged.getName())), false);
+                            LoginHelper.formatCpf(mUserLogged.getName())), false);
         }
     }
 
@@ -109,7 +187,112 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
     private void startUpdatingData() {
         mIsDataBeingImported = false;
-        callWorkService();
+        listCheckinsPendingSynchronization();
+    }
+
+    /**
+     * Verifica na persistência local, se existem Check-ins pendentes para serem
+     * sincronizados com o servidor.
+     */
+    private void listCheckinsPendingSynchronization() {
+        if (mIsDataBeingImported) {
+            return;
+        }
+
+        if (mCheckinDataService == null) {
+            mCheckinDataService = new CheckinRealmDataService(this);
+        }
+
+        mCheckinDataService.listPendingSynchronization()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        new Subscriber<List<Checkin>>() {
+                            @Override
+                            public void onStart() {
+                                showProgressDialog(R.string.title_looking_for_pending_changes,
+                                        R.string.content_please_wait);
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                showError(R.string.title_dialog_error_retrieving_data, e);
+                            }
+
+                            @Override
+                            public void onNext(List<Checkin> checkinsPending) {
+                                if (checkinsPending != null) {
+                                    synchronizeCheckinsPendingSynchronization(checkinsPending);
+                                } else {
+                                    callWorkService();
+                                }
+                            }
+
+                            @Override
+                            public void onCompleted() {
+                                hideProgressDialog();
+                            }
+                        }
+                );
+    }
+
+    /**
+     * Sincroniza os Check-ins com status alterado para concluídos e pendentes na alteração
+     */
+    private void synchronizeCheckinsPendingSynchronization(@NonNull List<Checkin> checkins) {
+        if (mIsDataBeingImported) {
+            return;
+        }
+
+        if (checkins.isEmpty()) {
+            callWorkService();
+            return;
+        }
+
+        if (mCheckinService == null) {
+            mCheckinService = RetrofitHelper.createService(CheckinService.class, this);
+        }
+
+        if (mCheckinService != null) {
+            if (mUserLogged == null) {
+                mUserLogged = LoginHelper.getUserLogged(this);
+            }
+
+            if (mUserLogged != null) {
+                final Subscription subscription = mCheckinService
+                        .patch(mUserLogged.getCpf(), checkins)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(
+                                new Subscriber<List<Checkin>>() {
+                                    @Override
+                                    public void onStart() {
+                                        showProgressDialog(R.string.title_sending_pending_changes,
+                                                R.string.content_please_wait);
+                                    }
+
+                                    @Override
+                                    public void onError(Throwable e) {
+                                        showError(R.string.error_sending_data, e);
+                                    }
+
+                                    @Override
+                                    public void onNext(List<Checkin> checkins) {}
+
+                                    @Override
+                                    public void onCompleted() {
+                                        hideProgressDialog();
+                                        callWorkService();
+                                    }
+                                }
+                        );
+                mCompositeSubscription.add(subscription);
+            } else {
+                validateUserLogged();
+            }
+        } else {
+            validateAppSettings();
+        }
     }
 
     /**
@@ -521,67 +704,6 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                         }
                 );
         mCompositeSubscription.add(subscription);
-    }
-
-    private void showProgressDialog(@StringRes int titleRes, @StringRes int contentRes) {
-        if (mProgressDialog == null || !mProgressDialog.isShowing()) {
-            mProgressDialog = new MaterialDialog.Builder(this)
-                    .title(titleRes)
-                    .content(contentRes)
-                    .progress(true, 0)
-                    .progressIndeterminateStyle(true)
-                    .cancelable(false)
-                    .show();
-        }
-    }
-
-    private void hideProgressDialog() {
-        if (mProgressDialog != null) {
-            if (mProgressDialog.isShowing()) {
-                mProgressDialog.dismiss();
-            }
-            mProgressDialog = null;
-        }
-    }
-
-    private void showEmptyState() {
-        // TODO: show empty state
-        // TODO: enable BroadcastReceiver to network events
-    }
-
-    private void showError(@StringRes int titleRes, Throwable e) {
-        hideProgressDialog();
-
-        //TODO: tratamento de exceção
-        new MaterialDialog.Builder(MainActivity.this)
-                .title(titleRes)
-                .content(e.getMessage())
-                .positiveText(R.string.text_dialog_button_ok)
-                .show();
-    }
-
-    private void validateAppSettings() {
-        if (!SettingsHelper.isSettingsApplied(this)) {
-            FeedbackHelper.snackbar(mRootView, getString(R.string.msg_settings_not_applied), true,
-                    new Snackbar.Callback() {
-                        @Override
-                        public void onDismissed(Snackbar snackbar, int event) {
-                            NavigationHelper.navigateToSettingsScreen(MainActivity.this);
-                        }
-                    });
-        }
-    }
-
-    private void updateSubtitle() {
-        if (mWorkAdapter != null) {
-            final int count = mWorkAdapter.getRunningWorksCount();
-            if (count == 0) {
-                setSubtitle(getString(R.string.no_work_running));
-            } else {
-                setSubtitle(getString(R.string.works_running,
-                        count));
-            }
-        }
     }
 
     @Override

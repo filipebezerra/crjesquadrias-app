@@ -17,6 +17,7 @@ import static br.com.libertsolutions.crs.app.checkin.Checkin.STATUS_PENDING;
 public class CheckinEntity extends RealmObject {
     public static final String FIELD_CHECKIN_ID = "checkinId";
     public static final String FIELD_FLOW_ID = "flowId";
+    public static final String FIELD_PENDING_SYNCHRONIZATION = "pendingSynchronization";
 
     @PrimaryKey
     private Long checkinId;

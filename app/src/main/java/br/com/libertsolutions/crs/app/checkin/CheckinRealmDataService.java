@@ -266,4 +266,28 @@ public class CheckinRealmDataService implements CheckinDataService {
             }
         });
     }
+
+    @Override
+    public Observable<List<Checkin>> listPendingSynchronization() {
+        return RealmObservable.results(mContext, new Func1<Realm, RealmResults<CheckinEntity>>() {
+            @Override
+            public RealmResults<CheckinEntity> call(Realm realm) {
+                // find all pending synchronization
+                return realm.where(CheckinEntity.class)
+                        .equalTo(CheckinEntity.FIELD_PENDING_SYNCHRONIZATION, true)
+                        .findAll();
+            }
+        }).map(new Func1<RealmResults<CheckinEntity>, List<Checkin>>() {
+            @Override
+            public List<Checkin> call(RealmResults<CheckinEntity> checkinEntities) {
+                // map them to UI objects
+                final List<Checkin> checkinList = new ArrayList<>(checkinEntities.size());
+                for (CheckinEntity checkinEntity : checkinEntities) {
+                    checkinList.add(checkinFromRealm(checkinEntity));
+                }
+
+                return checkinList;
+            }
+        });
+    }
 }

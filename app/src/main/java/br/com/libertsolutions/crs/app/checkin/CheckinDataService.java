@@ -15,4 +15,5 @@ public interface CheckinDataService {
     Observable<List<Checkin>> saveAll(List<Checkin> checkinList);
     Observable<Checkin> updateStatus(Checkin checkin, boolean synchronizeLater);
     Observable<List<Checkin>> updateStatus(List<Checkin> checkins, boolean synchronizeLater);
+    Observable<List<Checkin>> listPendingSynchronization();
 }
