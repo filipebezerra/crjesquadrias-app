@@ -3,7 +3,6 @@ package br.com.libertsolutions.crs.app.flow;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,9 +13,7 @@ import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
 import br.com.libertsolutions.crs.app.android.recyclerview.GridDividerDecoration;
 import br.com.libertsolutions.crs.app.android.recyclerview.OnClickListener;
 import br.com.libertsolutions.crs.app.android.recyclerview.OnTouchListener;
-import br.com.libertsolutions.crs.app.feedback.FeedbackHelper;
 import br.com.libertsolutions.crs.app.navigation.NavigationHelper;
-import br.com.libertsolutions.crs.app.settings.SettingsHelper;
 import butterknife.Bind;
 import com.afollestad.materialdialogs.MaterialDialog;
 import java.util.List;
@@ -46,6 +43,27 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
     private CompositeSubscription mCompositeSubscription;
 
     @Bind(android.R.id.list) RecyclerView mWorkStepsView;
+
+    private void showError(@StringRes int titleRes, Throwable e) {
+        //TODO: tratamento de exceção
+        new MaterialDialog.Builder(FlowActivity.this)
+                .title(titleRes)
+                .content(e.getMessage())
+                .positiveText(R.string.text_dialog_button_ok)
+                .show();
+    }
+
+    private void updateSubtitle() {
+        if (mFlowAdapter != null) {
+            final int count = mFlowAdapter.getRunningFlowsCount();
+            if (count == 0) {
+                setSubtitle(getString(R.string.no_work_step_running));
+            } else {
+                setSubtitle(getString(R.string.work_steps_running,
+                        count));
+            }
+        }
+    }
 
     @Override
     protected int provideLayoutResource() {
@@ -147,64 +165,6 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
             mWorkStepsView.setLayoutManager(new GridLayoutManager(this, 3));
         } else {
             mWorkStepsView.setLayoutManager(new LinearLayoutManager(this));
-        }
-    }
-
-    private void validateAppSettings() {
-        if (!SettingsHelper.isSettingsApplied(this)) {
-            FeedbackHelper.snackbar(mRootView, getString(R.string.msg_settings_not_applied), true,
-                    new Snackbar.Callback() {
-                        @Override
-                        public void onDismissed(Snackbar snackbar, int event) {
-                            NavigationHelper.navigateToSettingsScreen(FlowActivity.this);
-                        }
-                    });
-        }
-    }
-
-    private void saveAllToLocalStorage(List<Flow> list) {
-        final Subscription subscription = mFlowDataService.saveAll(list)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(
-                        new Action1<List<Flow>>() {
-                            @Override
-                            public void call(List<Flow> flowList) {
-                                mWorkStepsView.setAdapter(mFlowAdapter =
-                                        new FlowAdapter(FlowActivity.this, flowList));
-
-                                updateSubtitle();
-                            }
-                        },
-
-                        new Action1<Throwable>() {
-                            @Override
-                            public void call(Throwable e) {
-                                showError(R.string.title_dialog_error_saving_data, e);
-                            }
-                        }
-                );
-        mCompositeSubscription.add(subscription);
-    }
-
-    private void showError(@StringRes int titleRes, Throwable e) {
-        //TODO: tratamento de exceção
-        new MaterialDialog.Builder(FlowActivity.this)
-                .title(titleRes)
-                .content(e.getMessage())
-                .positiveText(R.string.text_dialog_button_ok)
-                .show();
-    }
-
-    private void updateSubtitle() {
-        if (mFlowAdapter != null) {
-            final int count = mFlowAdapter.getRunningFlowsCount();
-            if (count == 0) {
-                setSubtitle(getString(R.string.no_work_step_running));
-            } else {
-                setSubtitle(getString(R.string.work_steps_running,
-                        count));
-            }
         }
     }
 }
