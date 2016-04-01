@@ -34,10 +34,8 @@ import rx.subscriptions.CompositeSubscription;
  */
 public class CheckinActivity extends BaseActivity implements CheckinAdapter.CheckinCallback {
 
-    public static final String EXTRA_WORK_ID = "workId";
     public static final String EXTRA_FLOW_ID = "flowId";
 
-    private Long mWorkId;
     private Long mFlowId;
 
     private CheckinAdapter mCheckinAdapter;
@@ -67,15 +65,12 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getIntent().hasExtra(EXTRA_WORK_ID)
-                && getIntent().hasExtra(EXTRA_FLOW_ID)) {
-            mWorkId = getIntent().getLongExtra(EXTRA_WORK_ID, 0);
+        if (getIntent().hasExtra(EXTRA_FLOW_ID)) {
             mFlowId = getIntent().getLongExtra(EXTRA_FLOW_ID, 0);
         } else {
             Toast.makeText(getApplicationContext(), "Developer, you need to use the method "
                     + "NavigationHelper.navigateToCheckinScreen() passing the "
-                    + "Work ID in the second parameter and the Step ID "
-                    + "in the third parameter", Toast.LENGTH_LONG).show();
+                    + "Flow ID in the second parameter", Toast.LENGTH_LONG).show();
             finish();
         }
 

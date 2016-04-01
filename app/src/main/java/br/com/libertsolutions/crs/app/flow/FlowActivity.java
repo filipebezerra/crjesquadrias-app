@@ -128,7 +128,7 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
             final Flow item = mFlowAdapter.getItem(position);
 
             if (item != null) {
-                NavigationHelper.navigateToCheckinScreen(this, mWorkId, item.getFlowId());
+                NavigationHelper.navigateToCheckinScreen(this, item.getFlowId());
             }
         }
     }
