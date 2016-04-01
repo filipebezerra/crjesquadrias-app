@@ -8,6 +8,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Toast;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
 import br.com.libertsolutions.crs.app.android.recyclerview.GridDividerDecoration;
@@ -68,9 +69,10 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
                         "You need to set a valid workId as long type");
             }
         } else {
-            throw new IllegalStateException("You need to use the method "
-                    + "WorkStepActivity.getLauncherIntent() passing the "
-                    + "Work in the second parameter");
+            Toast.makeText(getApplicationContext(), "Developer, you need to use the method "
+                    + "NavigationHelper.navigateToFlowScreen() passing the "
+                    + "Work ID in the second parameter", Toast.LENGTH_LONG).show();
+            finish();
         }
 
         changeListLayout(getResources().getConfiguration());

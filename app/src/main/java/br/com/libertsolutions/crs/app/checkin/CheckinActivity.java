@@ -5,6 +5,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
+import android.widget.Toast;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
 import br.com.libertsolutions.crs.app.android.recyclerview.DividerDecoration;
@@ -71,10 +72,11 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
             mWorkId = getIntent().getLongExtra(EXTRA_WORK_ID, 0);
             mFlowId = getIntent().getLongExtra(EXTRA_FLOW_ID, 0);
         } else {
-            throw new IllegalStateException("You need to use the method "
-                    + "CheckinActivity.getLauncherIntent() passing the "
+            Toast.makeText(getApplicationContext(), "Developer, you need to use the method "
+                    + "NavigationHelper.navigateToCheckinScreen() passing the "
                     + "Work ID in the second parameter and the Step ID "
-                    + "in the third parameter");
+                    + "in the third parameter", Toast.LENGTH_LONG).show();
+            finish();
         }
 
         mCheckinsView.setLayoutManager(new LinearLayoutManager(this));
