@@ -29,7 +29,7 @@ import rx.subscriptions.CompositeSubscription;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 28/03/2016
+ * @version 0.1.0, 31/03/2016
  * @since 0.1.0
  */
 public class CheckinActivity extends BaseActivity implements CheckinAdapter.CheckinCallback {
