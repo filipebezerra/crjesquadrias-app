@@ -83,8 +83,9 @@ public class CheckinRealmDataService implements CheckinDataService {
         final Float weight = product.getWeight();
         final String treatment = product.getTreatment();
         final String type = product.getType();
+        final String line = product.getLine();
 
-        return new Product(productId, code, description, weight, treatment, type);
+        return new Product(productId, code, description, weight, treatment, type, line);
     }
 
     @Override
@@ -124,12 +125,18 @@ public class CheckinRealmDataService implements CheckinDataService {
                     ProductEntity productEntity = new ProductEntity();
 
                     if (checkin.getItem() != null) {
-                        productEntity.setProductId(checkin.getItem().getProduct().getProductId());
-                        productEntity.setCode(checkin.getItem().getProduct().getCode());
-                        productEntity.setDescription(checkin.getItem().getProduct().getDescription());
-                        productEntity.setWeight(checkin.getItem().getProduct().getWeight());
-                        productEntity.setTreatment(checkin.getItem().getProduct().getTreatment());
+                        productEntity.setProductId(
+                                checkin.getItem().getProduct().getProductId());
+                        productEntity.setCode(
+                                checkin.getItem().getProduct().getCode());
+                        productEntity.setDescription(
+                                checkin.getItem().getProduct().getDescription());
+                        productEntity.setWeight(
+                                checkin.getItem().getProduct().getWeight());
+                        productEntity.setTreatment(
+                                checkin.getItem().getProduct().getTreatment());
                         productEntity.setType(checkin.getItem().getProduct().getType());
+                        productEntity.setLine(checkin.getItem().getProduct().getLine());
                         productEntity = realm.copyToRealmOrUpdate(productEntity);
 
                         itemEntity = new ItemEntity();
@@ -142,12 +149,18 @@ public class CheckinRealmDataService implements CheckinDataService {
                         itemEntity.setProduct(productEntity);
                         itemEntity = realm.copyToRealmOrUpdate(itemEntity);
                     } else {
-                        productEntity.setProductId(checkin.getOrderGlass().getProduct().getProductId());
-                        productEntity.setCode(checkin.getOrderGlass().getProduct().getCode());
-                        productEntity.setDescription(checkin.getOrderGlass().getProduct().getDescription());
-                        productEntity.setWeight(checkin.getOrderGlass().getProduct().getWeight());
-                        productEntity.setTreatment(checkin.getOrderGlass().getProduct().getTreatment());
+                        productEntity.setProductId(
+                                checkin.getOrderGlass().getProduct().getProductId());
+                        productEntity.setCode(
+                                checkin.getOrderGlass().getProduct().getCode());
+                        productEntity.setDescription(
+                                checkin.getOrderGlass().getProduct().getDescription());
+                        productEntity.setWeight(
+                                checkin.getOrderGlass().getProduct().getWeight());
+                        productEntity.setTreatment(
+                                checkin.getOrderGlass().getProduct().getTreatment());
                         productEntity.setType(checkin.getOrderGlass().getProduct().getType());
+                        productEntity.setLine(checkin.getOrderGlass().getProduct().getLine());
                         productEntity = realm.copyToRealmOrUpdate(productEntity);
 
                         orderGlassEntity = new OrderGlassEntity();

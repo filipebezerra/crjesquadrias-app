@@ -23,7 +23,7 @@ import java.util.List;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 31/03/2016
+ * @version 0.1.0, 03/04/2016
  * @since 0.1.0
  */
 public class CheckinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -65,12 +65,10 @@ public class CheckinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             width = checkin.getItem().getWidth();
             height = checkin.getItem().getHeight();
 
-            ((ViewHolderItem) holder).productType.setText(
-                    product.getType());
+            ((ViewHolderItem) holder).productType.setText(product.getType());
             ((ViewHolderItem) holder).itemLocation.setText(checkin.getLocation());
-            ((ViewHolderItem) holder).productLine.setText("-");
-            ((ViewHolderItem) holder).itemTreatment.setText(
-                    product.getTreatment());
+            ((ViewHolderItem) holder).productLine.setText(product.getLine());
+            ((ViewHolderItem) holder).itemTreatment.setText(product.getTreatment());
 
         } else {
             width = checkin.getOrderGlass().getWidth();

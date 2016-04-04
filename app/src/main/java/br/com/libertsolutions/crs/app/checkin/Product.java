@@ -28,14 +28,18 @@ public class Product {
     @SerializedName("tipo")
     private final String type;
 
+    @SerializedName("linha")
+    private final String line;
+
     public Product(long productId, String code, String description, float weight,
-            String treatment, String type) {
+            String treatment, String type, String line) {
         this.productId = productId;
         this.code = code;
         this.description = description;
         this.weight = weight;
         this.treatment = treatment;
         this.type = type;
+        this.line = line;
     }
 
     public long getProductId() {
@@ -60,6 +64,10 @@ public class Product {
 
     public String getType() {
         return type;
+    }
+
+    public String getLine() {
+        return line;
     }
 
     @Override

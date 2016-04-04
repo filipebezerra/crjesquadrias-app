@@ -24,6 +24,8 @@ public class ProductEntity extends RealmObject {
 
     private String type;
 
+    private String line;
+
     public Long getProductId() {
         return productId;
     }
@@ -70,6 +72,14 @@ public class ProductEntity extends RealmObject {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getLine() {
+        return line;
+    }
+
+    public void setLine(String line) {
+        this.line = line;
     }
 
     @Override
