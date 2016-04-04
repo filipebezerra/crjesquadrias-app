@@ -16,6 +16,7 @@ import br.com.libertsolutions.crs.app.android.recyclerview.OnTouchListener;
 import br.com.libertsolutions.crs.app.navigation.NavigationHelper;
 import butterknife.Bind;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.crashlytics.android.Crashlytics;
 import java.util.List;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -45,7 +46,8 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
     @Bind(android.R.id.list) RecyclerView mWorkStepsView;
 
     private void showError(@StringRes int titleRes, Throwable e) {
-        //TODO: tratamento de exceção
+        Crashlytics.logException(e);
+
         new MaterialDialog.Builder(FlowActivity.this)
                 .title(titleRes)
                 .content(e.getMessage())

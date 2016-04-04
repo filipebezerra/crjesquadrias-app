@@ -45,6 +45,7 @@ import br.com.libertsolutions.crs.app.work.WorkRealmDataService;
 import br.com.libertsolutions.crs.app.work.WorkService;
 import butterknife.Bind;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.crashlytics.android.Crashlytics;
 import java.util.List;
 import rx.Subscriber;
 import rx.Subscription;
@@ -124,7 +125,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     private void showError(@StringRes int titleRes, Throwable e) {
         hideProgressDialog();
 
-        //TODO: tratamento de exceção
+        Crashlytics.logException(e);
+
         new MaterialDialog.Builder(MainActivity.this)
                 .title(titleRes)
                 .content(e.getMessage())

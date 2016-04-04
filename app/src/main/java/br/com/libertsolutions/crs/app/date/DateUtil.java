@@ -1,6 +1,7 @@
 package br.com.libertsolutions.crs.app.date;
 
 import android.text.format.DateUtils;
+import com.crashlytics.android.Crashlytics;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -27,7 +28,7 @@ public class DateUtil {
             return DateUtils.getRelativeTimeSpanString(date.getTime(),
                     System.currentTimeMillis(), DateUtils.DAY_IN_MILLIS);
         } catch (ParseException e) {
-            //TODO: adicionar logging
+            Crashlytics.logException(e);
             return null;
         }
     }

@@ -22,6 +22,7 @@ import butterknife.Bind;
 import butterknife.OnEditorAction;
 import butterknife.OnFocusChange;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.crashlytics.android.Crashlytics;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -37,6 +38,7 @@ import rx.schedulers.Schedulers;
  */
 public class LoginActivity extends BaseActivity {
     private FormUtil mFormUtil = new FormUtil();
+
     private Subscription mSubscription;
 
     @Bind(R.id.root_view) FrameLayout mRootView;
@@ -44,82 +46,6 @@ public class LoginActivity extends BaseActivity {
     @Bind(R.id.cpf_helper) TextInputLayout mCpfHelper;
     @Bind(R.id.password) TextInputEditText mPasswordView;
     @Bind(R.id.password_helper) TextInputLayout mPasswordHelper;
-
-    @Override
-    protected int provideLayoutResource() {
-        return R.layout.activity_login;
-    }
-
-    @Override
-    protected int provideUpIndicatorResource() {
-        return R.drawable.ic_clear_24dp;
-    }
-
-    @Override
-    protected int provideMenuResource() {
-        return R.menu.menu_login;
-    }
-
-    @Override
-    protected void onCreate(Bundle inState) {
-        super.onCreate(inState);
-        if (LoginHelper.isUserLogged(this)) {
-            NavigationHelper.navigateToMainScreen(this);
-            finish();
-        } else if (!SettingsHelper.isSettingsApplied(this)) {
-            NavigationHelper.navigateToSettingsScreen(this);
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-
-            case R.id.action_done:
-                doLogin();
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        unsubscribeAuthentication();
-    }
-
-    @OnFocusChange(R.id.cpf)
-    public void onCpfViewFocusChange(boolean focused) {
-        if (focused) {
-            final Object cpf = mCpfView.getTag();
-
-            if (cpf != null) {
-                mCpfView.setText(cpf.toString());
-                mCpfView.selectAll();
-            }
-        } else {
-            if (!TextUtils.isEmpty(mCpfView.getText())
-                    && mCpfView.getText().toString().length() == 11) {
-                final String cpf = mCpfView.getText().toString();
-                mCpfView.setText(LoginHelper.formatCpf(cpf));
-                mCpfView.setTag(cpf);
-            }
-        }
-    }
-
-    @OnEditorAction(R.id.password)
-    public boolean onPasswordEditorAction(int actionId) {
-        if (actionId == getResources().getInteger(R.integer.entrar)) {
-            doLogin();
-            return true;
-        }
-        return false;
-    }
 
     private void doLogin() {
         if (!mFormUtil.enableOrRemoveErrorInView(mCpfHelper,
@@ -207,6 +133,8 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void showAuthenticationError(Throwable e) {
+        Crashlytics.logException(e);
+
         new MaterialDialog.Builder(LoginActivity.this)
                 .title(R.string.title_dialog_sign_in_failed)
                 .content(e.getMessage())
@@ -246,5 +174,81 @@ public class LoginActivity extends BaseActivity {
                         KeyboardUtil.hideKeyboard(LoginActivity.this, currentFocus);
                     }
                 });
+    }
+
+    @Override
+    protected int provideLayoutResource() {
+        return R.layout.activity_login;
+    }
+
+    @Override
+    protected int provideUpIndicatorResource() {
+        return R.drawable.ic_clear_24dp;
+    }
+
+    @Override
+    protected int provideMenuResource() {
+        return R.menu.menu_login;
+    }
+
+    @Override
+    protected void onCreate(Bundle inState) {
+        super.onCreate(inState);
+        if (LoginHelper.isUserLogged(this)) {
+            NavigationHelper.navigateToMainScreen(this);
+            finish();
+        } else if (!SettingsHelper.isSettingsApplied(this)) {
+            NavigationHelper.navigateToSettingsScreen(this);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unsubscribeAuthentication();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+
+            case R.id.action_done:
+                doLogin();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @OnFocusChange(R.id.cpf)
+    void onCpfViewFocusChange(boolean focused) {
+        if (focused) {
+            final Object cpf = mCpfView.getTag();
+
+            if (cpf != null) {
+                mCpfView.setText(cpf.toString());
+                mCpfView.selectAll();
+            }
+        } else {
+            if (!TextUtils.isEmpty(mCpfView.getText())
+                    && mCpfView.getText().toString().length() == 11) {
+                final String cpf = mCpfView.getText().toString();
+                mCpfView.setText(LoginHelper.formatCpf(cpf));
+                mCpfView.setTag(cpf);
+            }
+        }
+    }
+
+    @OnEditorAction(R.id.password)
+    boolean onPasswordEditorAction(int actionId) {
+        if (actionId == getResources().getInteger(R.integer.entrar)) {
+            doLogin();
+            return true;
+        }
+        return false;
     }
 }

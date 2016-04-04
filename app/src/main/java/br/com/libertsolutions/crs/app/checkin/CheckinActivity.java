@@ -18,6 +18,7 @@ import br.com.libertsolutions.crs.app.retrofit.RetrofitHelper;
 import br.com.libertsolutions.crs.app.settings.SettingsHelper;
 import butterknife.Bind;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.crashlytics.android.Crashlytics;
 import java.util.List;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -91,7 +92,8 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
     }
 
     private void showError(int titleRes, Throwable e) {
-        //TODO: tratamento de exceção
+        Crashlytics.logException(e);
+
         new MaterialDialog.Builder(this)
                 .title(titleRes)
                 .content(e.getMessage())

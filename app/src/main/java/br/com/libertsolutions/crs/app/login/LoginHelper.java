@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.content.SharedPreferencesCompat;
 import android.text.TextUtils;
+import com.crashlytics.android.Crashlytics;
 
 /**
  * Utilities methods used in {@link LoginActivity}.
@@ -48,6 +49,10 @@ public class LoginHelper {
                                 .putString(KEY_USER_NAME, user.getName())
                                 .putString(KEY_USER_CPF, user.getCpf())
                                 .putString(KEY_USER_EMAIL, user.getEmail()));
+
+        Crashlytics.setUserIdentifier(user.getCpf());
+        Crashlytics.setUserEmail(user.getEmail());
+        Crashlytics.setUserName(user.getName());
     }
 
     public static User getUserLogged(@NonNull Context context) {
