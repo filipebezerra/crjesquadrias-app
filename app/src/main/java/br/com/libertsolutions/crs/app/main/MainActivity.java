@@ -207,30 +207,21 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(
-                        new Subscriber<List<Checkin>>() {
+                        new Action1<List<Checkin>>() {
                             @Override
-                            public void onStart() {
-                                showProgressDialog(R.string.title_looking_for_pending_changes,
-                                        R.string.content_please_wait);
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                showError(R.string.title_dialog_error_retrieving_data, e);
-                            }
-
-                            @Override
-                            public void onNext(List<Checkin> checkinsPending) {
-                                if (checkinsPending != null) {
-                                    synchronizeCheckinsPendingSynchronization(checkinsPending);
+                            public void call(List<Checkin> pendingCheckins) {
+                                if (pendingCheckins != null) {
+                                    synchronizeCheckinsPendingSynchronization(pendingCheckins);
                                 } else {
                                     callWorkService();
                                 }
                             }
+                        },
 
+                        new Action1<Throwable>() {
                             @Override
-                            public void onCompleted() {
-                                hideProgressDialog();
+                            public void call(Throwable e) {
+                                showError(R.string.title_dialog_error_retrieving_data, e);
                             }
                         }
                 );
@@ -264,25 +255,17 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeOn(Schedulers.io())
                         .subscribe(
-                                new Subscriber<List<Checkin>>() {
+                                new Action1<List<Checkin>>() {
                                     @Override
-                                    public void onStart() {
-                                        showProgressDialog(R.string.title_sending_pending_changes,
-                                                R.string.content_please_wait);
-                                    }
-
-                                    @Override
-                                    public void onError(Throwable e) {
-                                        showError(R.string.error_sending_data, e);
-                                    }
-
-                                    @Override
-                                    public void onNext(List<Checkin> checkins) {}
-
-                                    @Override
-                                    public void onCompleted() {
-                                        hideProgressDialog();
+                                    public void call(List<Checkin> checkins) {
                                         callWorkService();
+                                    }
+                                },
+
+                                new Action1<Throwable>() {
+                                    @Override
+                                    public void call(Throwable e) {
+                                        showError(R.string.error_sending_data, e);
                                     }
                                 }
                         );
@@ -343,29 +326,22 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeOn(Schedulers.io())
                         .subscribe(
-                                new Subscriber<List<Work>>() {
+                                new Action1<List<Work>>() {
                                     @Override
-                                    public void onStart() {
-                                        showProgressDialog(R.string.title_updating_data,
-                                                R.string.content_please_wait);
-                                    }
-
-                                    @Override
-                                    public void onError(Throwable e) {
-                                        showError(R.string.error_updating_data, e);
-                                    }
-
-                                    @Override
-                                    public void onNext(List<Work> workList) {
+                                    public void call(List<Work> workList) {
                                         if (workList != null) {
                                             saveWorkData(workList);
                                         } else {
                                             callFlowService();
                                         }
                                     }
+                                },
 
+                                new Action1<Throwable>() {
                                     @Override
-                                    public void onCompleted() {}
+                                    public void call(Throwable e) {
+                                        showError(R.string.error_updating_data, e);
+                                    }
                                 }
                         );
             }
@@ -672,7 +648,9 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
                                 @Override
                                 public void onCompleted() {
-                                    hideProgressDialog();
+                                    if (mIsDataBeingImported) {
+                                        hideProgressDialog();
+                                    }
                                     showWorkData();
                                 }
                             }

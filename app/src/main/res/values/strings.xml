@@ -64,11 +64,8 @@
     <string name="title_importing_data">Importando todas informações das obras</string>
     <string name="content_please_wait">Por favor aguarde…</string>
     <string name="error_importing_data">Falha ao importar dados do servidor</string>
-    <string name="title_updating_data">Atualizando todas informações das obras</string>
     <string name="error_updating_data">Falha ao atualizar dados do servidor</string>
     <string name="error_sending_data">Falha ao enviar dados para servidor</string>
     <string name="checkins_all_finished">Todos check-ins concluídos</string>
     <string name="title_dialog_error_retrieving_data">Falha ao tentar recuperar dados no banco de dados</string>
-    <string name="title_looking_for_pending_changes">Procurando por alterações pendentes</string>
-    <string name="title_sending_pending_changes">Enviando alterações pendentes</string>
 </resources>
