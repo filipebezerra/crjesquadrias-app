@@ -17,6 +17,11 @@
         tools:ignore="AllowBackup,GoogleAppIndexingWarning,UnusedAttribute"
         >
 
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="88453d956cd483a917c0c313a6a47582a0853bcf"
+            />
+
         <activity
             android:name=".launchscreen.LaunchScreenActivity"
             android:label="@string/app_name"
