@@ -1,17 +1,21 @@
-package br.com.libertsolutions.crs.app.retrofit;
+package br.com.libertsolutions.crs.app.webservice;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import br.com.libertsolutions.crs.app.settings.SettingsHelper;
+
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import io.realm.RealmObject;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+
+import br.com.libertsolutions.crs.app.BuildConfig;
+import br.com.libertsolutions.crs.app.settings.SettingsHelper;
+import io.realm.RealmObject;
 import okhttp3.Cache;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
@@ -25,13 +29,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Classe utilitária para configuração do {@link Retrofit} e instanciação das
- * classes de serviço que fazem chamadas do Web service.
+ * classes de serviço que consomem os recursos http do Web service.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 18/03/2016
+ * @version 0.1.0, 04/04/2016
  * @since 0.1.0
  */
-public class RetrofitHelper {
+public class ServiceGenerator {
     private static final long HTTP_CACHE_SIZE = 10 * 1024 * 1024;
     private static final String HTTP_CACHE_FILE_NAME = "http";
 
@@ -89,14 +93,17 @@ public class RetrofitHelper {
     }
 
     private static Cache createCache(@NonNull Context context) {
-        return new Cache(new File(context.getCacheDir(), HTTP_CACHE_FILE_NAME),
-                HTTP_CACHE_SIZE);
+        return new Cache(new File(context.getCacheDir(), HTTP_CACHE_FILE_NAME), HTTP_CACHE_SIZE);
     }
 
     private static Interceptor createLoggingInterceptor() {
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.HEADERS);
-        return interceptor;
+        HttpLoggingInterceptor.Level level;
+        if (BuildConfig.DEBUG) {
+            level = HttpLoggingInterceptor.Level.BODY;
+        } else {
+            level = HttpLoggingInterceptor.Level.NONE;
+        }
+        return new HttpLoggingInterceptor().setLevel(level);
     }
 
     private static Interceptor createInterceptorWithAuthKey(@NonNull final String authKey) {

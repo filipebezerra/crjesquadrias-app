@@ -16,7 +16,7 @@ import br.com.libertsolutions.crs.app.form.FormUtil;
 import br.com.libertsolutions.crs.app.keyboard.KeyboardUtil;
 import br.com.libertsolutions.crs.app.navigation.NavigationHelper;
 import br.com.libertsolutions.crs.app.network.NetworkUtil;
-import br.com.libertsolutions.crs.app.retrofit.RetrofitHelper;
+import br.com.libertsolutions.crs.app.webservice.ServiceGenerator;
 import br.com.libertsolutions.crs.app.settings.SettingsHelper;
 import butterknife.Bind;
 import butterknife.OnEditorAction;
@@ -63,7 +63,7 @@ public class LoginActivity extends BaseActivity {
             final String password = mPasswordView.getText().toString();
 
             if (NetworkUtil.isDeviceConnectedToInternet(this)) {
-                final UserService service = RetrofitHelper.createService(UserService.class, this);
+                final UserService service = ServiceGenerator.createService(UserService.class, this);
 
                 if (service != null) {
                     final MaterialDialog progressDialog = new MaterialDialog

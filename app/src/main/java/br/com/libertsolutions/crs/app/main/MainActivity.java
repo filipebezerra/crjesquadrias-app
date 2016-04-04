@@ -37,7 +37,7 @@ import br.com.libertsolutions.crs.app.login.LoginHelper;
 import br.com.libertsolutions.crs.app.login.User;
 import br.com.libertsolutions.crs.app.navigation.NavigationHelper;
 import br.com.libertsolutions.crs.app.network.NetworkUtil;
-import br.com.libertsolutions.crs.app.retrofit.RetrofitHelper;
+import br.com.libertsolutions.crs.app.webservice.ServiceGenerator;
 import br.com.libertsolutions.crs.app.settings.SettingsHelper;
 import br.com.libertsolutions.crs.app.work.Work;
 import br.com.libertsolutions.crs.app.work.WorkAdapter;
@@ -246,7 +246,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         }
 
         if (mCheckinService == null) {
-            mCheckinService = RetrofitHelper.createService(CheckinService.class, this);
+            mCheckinService = ServiceGenerator.createService(CheckinService.class, this);
         }
 
         if (mCheckinService != null) {
@@ -289,7 +289,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
      */
     private void callWorkService() {
         if (mWorkService == null) {
-            mWorkService = RetrofitHelper.createService(WorkService.class, this);
+            mWorkService = ServiceGenerator.createService(WorkService.class, this);
         }
 
         if (mWorkService != null) {
@@ -410,7 +410,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
      */
     private void callFlowService() {
         if (mFlowService == null) {
-            mFlowService = RetrofitHelper.createService(FlowService.class, this);
+            mFlowService = ServiceGenerator.createService(FlowService.class, this);
         }
 
         if (mFlowService != null) {
@@ -520,7 +520,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
      */
     private void callCheckinService() {
         if (mCheckinService == null) {
-            mCheckinService = RetrofitHelper.createService(CheckinService.class, this);
+            mCheckinService = ServiceGenerator.createService(CheckinService.class, this);
         }
 
         if (mCheckinService != null) {
@@ -629,7 +629,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
      * para atualização dos dados.
      */
     private void callConfigService() {
-        final ConfigService configService = RetrofitHelper.createService(ConfigService.class, this);
+        final ConfigService configService = ServiceGenerator.createService(ConfigService.class, this);
         if (configService != null) {
             configService.get()
                     .observeOn(AndroidSchedulers.mainThread())

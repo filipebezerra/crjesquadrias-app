@@ -14,7 +14,7 @@ import br.com.libertsolutions.crs.app.login.LoginHelper;
 import br.com.libertsolutions.crs.app.login.User;
 import br.com.libertsolutions.crs.app.navigation.NavigationHelper;
 import br.com.libertsolutions.crs.app.network.NetworkUtil;
-import br.com.libertsolutions.crs.app.retrofit.RetrofitHelper;
+import br.com.libertsolutions.crs.app.webservice.ServiceGenerator;
 import br.com.libertsolutions.crs.app.settings.SettingsHelper;
 import butterknife.Bind;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -110,7 +110,7 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
 
         if (hasInternetConnection) {
             if (mCheckinService == null) {
-                mCheckinService = RetrofitHelper.createService(CheckinService.class, this);
+                mCheckinService = ServiceGenerator.createService(CheckinService.class, this);
             }
 
             if (mCheckinService != null) {
@@ -217,7 +217,7 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
 
         if (hasInternetConnection) {
             if (mCheckinService == null) {
-                mCheckinService = RetrofitHelper.createService(CheckinService.class, this);
+                mCheckinService = ServiceGenerator.createService(CheckinService.class, this);
             }
 
             if (mCheckinService != null) {
