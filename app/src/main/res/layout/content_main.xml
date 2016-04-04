@@ -18,7 +18,7 @@
         android:clipToPadding="false"
         app:layoutManager="LinearLayoutManager"
         tools:listitem="@layout/item_work"
-        android:visibility="gone"
+        tools:visibility="gone"
         />
 
     <LinearLayout
@@ -27,10 +27,10 @@
         android:layout_height="match_parent"
         android:padding="16dp"
         android:orientation="vertical"
-        android:visibility="gone"
         android:gravity="center"
-        tools:visibility="visible"
         android:background="@android:color/white"
+        android:visibility="gone"
+        tools:visibility="visible"
         >
 
         <ImageView
