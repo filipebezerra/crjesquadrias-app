@@ -1,6 +1,5 @@
 package br.com.libertsolutions.crs.app.checkin;
 
-import android.support.annotation.NonNull;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -10,7 +9,7 @@ import com.google.gson.annotations.SerializedName;
  * @version 0.1.0, 03/04/2016
  * @since 0.1.0
  */
-public class Checkin implements Comparable<Checkin> {
+public class Checkin {
     public static final int STATUS_PENDING = 0;
     public static final int STATUS_FINISHED = 2;
 
@@ -89,27 +88,5 @@ public class Checkin implements Comparable<Checkin> {
             return getCheckinId() == anotherCheckin.getCheckinId();
         }
         return false;
-    }
-
-    @Override
-    public int compareTo(@NonNull Checkin another) {
-        Product product;
-        Product anotherProduct;
-
-        if (getOrderGlass() != null && another.getOrderGlass() != null) {
-            product = getOrderGlass().getProduct();
-            anotherProduct = another.getOrderGlass().getProduct();
-        } else {
-            product = getItem().getProduct();
-            anotherProduct = another.getItem().getProduct();
-        }
-
-        int typeComparison = product.getType().compareTo(anotherProduct.getType());
-
-        if (typeComparison == 0) {
-            return getLocation().compareTo(another.getLocation());
-        } else {
-            return typeComparison;
-        }
     }
 }
