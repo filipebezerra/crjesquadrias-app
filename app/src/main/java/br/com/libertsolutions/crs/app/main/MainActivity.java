@@ -14,6 +14,7 @@ import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
 import br.com.libertsolutions.crs.app.android.recyclerview.GridDividerDecoration;
@@ -87,6 +88,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     private User mUserLogged;
 
     @Bind(R.id.list) RecyclerView mWorksView;
+    @Bind(R.id.empty_state) LinearLayout mEmptyStateView;
 
     private void changeListLayout(Configuration configuration) {
         if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -118,7 +120,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     }
 
     private void showEmptyState() {
-        // TODO: show empty state
+        mWorksView.setVisibility(View.GONE);
+        mEmptyStateView.setVisibility(View.VISIBLE);
         // TODO: enable BroadcastReceiver to network events
     }
 
