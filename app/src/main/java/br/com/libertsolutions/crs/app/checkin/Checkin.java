@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 23/03/2016
+ * @version 0.1.0, 03/04/2016
  * @since 0.1.0
  */
 public class Checkin implements Comparable<Checkin> {
@@ -32,14 +32,18 @@ public class Checkin implements Comparable<Checkin> {
     @SerializedName("Vidros")
     private final OrderGlass orderGlass;
 
+    @SerializedName("localizacao")
+    private final String location;
+
     public Checkin(long checkinId, long flowId, String date, int status, Item item,
-            OrderGlass orderGlass) {
+            OrderGlass orderGlass, String location) {
         this.checkinId = checkinId;
         this.flowId = flowId;
         this.date = date;
         this.status = status;
         this.item = item;
         this.orderGlass = orderGlass;
+        this.location = location;
     }
 
     public long getCheckinId() {
@@ -74,6 +78,10 @@ public class Checkin implements Comparable<Checkin> {
         return orderGlass;
     }
 
+    public String getLocation() {
+        return location;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o != null && o instanceof Checkin) {
@@ -91,19 +99,17 @@ public class Checkin implements Comparable<Checkin> {
         if (getOrderGlass() != null && another.getOrderGlass() != null) {
             product = getOrderGlass().getProduct();
             anotherProduct = another.getOrderGlass().getProduct();
-
-            return product.getDescription().compareTo(anotherProduct.getDescription());
         } else {
             product = getItem().getProduct();
             anotherProduct = another.getItem().getProduct();
+        }
 
-            int typeComparison = product.getType().compareTo(anotherProduct.getType());
+        int typeComparison = product.getType().compareTo(anotherProduct.getType());
 
-            if (typeComparison == 0) {
-                return product.getDescription().compareTo(anotherProduct.getDescription());
-            } else {
-                return typeComparison;
-            }
+        if (typeComparison == 0) {
+            return getLocation().compareTo(another.getLocation());
+        } else {
+            return typeComparison;
         }
     }
 }

@@ -69,7 +69,7 @@ public class CheckinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
             ((ViewHolderItem) holder).productType.setText(
                     product.getType());
-            ((ViewHolderItem) holder).itemLocation.setText("-");
+            ((ViewHolderItem) holder).itemLocation.setText(checkin.getLocation());
             ((ViewHolderItem) holder).productLine.setText("-");
             ((ViewHolderItem) holder).itemTreatment.setText(
                     product.getTreatment());

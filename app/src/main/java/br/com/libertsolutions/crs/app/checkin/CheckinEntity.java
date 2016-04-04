@@ -11,7 +11,7 @@ import static br.com.libertsolutions.crs.app.checkin.Checkin.STATUS_PENDING;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 01/04/2016
+ * @version 0.1.0, 03/04/2016
  * @since 0.1.0
  */
 public class CheckinEntity extends RealmObject {
@@ -33,6 +33,8 @@ public class CheckinEntity extends RealmObject {
     private OrderGlassEntity orderGlass;
 
     private Boolean pendingSynchronization;
+
+    private String location;
 
     public Long getCheckinId() {
         return checkinId;
@@ -82,12 +84,20 @@ public class CheckinEntity extends RealmObject {
         this.orderGlass = orderGlass;
     }
 
-    public Boolean getPendingSynchronization() {
+    public Boolean isPendingSynchronization() {
         return pendingSynchronization;
     }
 
     public void setPendingSynchronization(Boolean pendingSynchronization) {
         this.pendingSynchronization = pendingSynchronization;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     @Override

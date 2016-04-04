@@ -14,7 +14,7 @@ import rx.functions.Func1;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 31/03/2016
+ * @version 0.1.0, 03/04/2016
  * @since 0.1.0
  */
 public class CheckinRealmDataService implements CheckinDataService {
@@ -35,9 +35,10 @@ public class CheckinRealmDataService implements CheckinDataService {
         final Integer status = checkinEntity.getStatus();
         final ItemEntity item = checkinEntity.getItem();
         final OrderGlassEntity orderGlass = checkinEntity.getOrderGlass();
+        final String location = checkinEntity.getLocation();
 
         return new Checkin(checkinId, flowId, date, status, itemFromRealm(item),
-                orderGlassFromRealm(orderGlass));
+                orderGlassFromRealm(orderGlass), location);
     }
 
     private Item itemFromRealm(ItemEntity item) {
@@ -168,6 +169,7 @@ public class CheckinRealmDataService implements CheckinDataService {
                     checkinEntity.setStatus(checkin.getStatus());
                     checkinEntity.setItem(itemEntity);
                     checkinEntity.setOrderGlass(orderGlassEntity);
+                    checkinEntity.setLocation(checkin.getLocation());
 
                     checkinEntityList.add(realm.copyToRealmOrUpdate(checkinEntity));
                 }
