@@ -30,24 +30,30 @@ repositories {
 dependencies {
     testCompile 'junit:junit:4.12'
 
-    compile 'com.android.support:appcompat-v7:23.2.1'
-    compile 'com.android.support:design:23.2.1'
-    compile 'com.android.support:recyclerview-v7:23.2.1'
+    compile "com.android.support:appcompat-v7:${supportLibraryVersion}"
+    compile "com.android.support:design:${supportLibraryVersion}"
+    compile "com.android.support:recyclerview-v7:${supportLibraryVersion}"
 
     compile 'com.jakewharton:butterknife:7.0.1'
 
-    compile('com.github.afollestad.material-dialogs:core:0.8.5.7@aar') { transitive = true }
-    compile('com.github.afollestad.material-dialogs:commons:0.8.5.7@aar') { transitive = true }
+    compile("com.github.afollestad.material-dialogs:core:${materialDialogsVersion}") {
+        transitive = true
+    }
+    compile("com.github.afollestad.material-dialogs:commons:${materialDialogsVersion}") {
+        transitive = true
+    }
 
-    compile ('com.squareup.retrofit2:retrofit:2.0.0') { exclude module: 'okhttp' }
-    compile 'com.squareup.retrofit2:adapter-rxjava:2.0.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.0.0'
-    compile 'com.squareup.okhttp3:okhttp:3.0.0'
-    compile 'com.squareup.okhttp3:logging-interceptor:3.0.0'
+    compile ("com.squareup.retrofit2:retrofit:${retrofitVersion}") {
+        exclude module: 'okhttp'
+    }
+    compile "com.squareup.retrofit2:adapter-rxjava:${retrofitVersion}"
+    compile "com.squareup.retrofit2:converter-gson:${retrofitVersion}"
+    compile "com.squareup.okhttp3:okhttp:${okHttpVersion}"
+    compile "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}"
     compile 'io.reactivex:rxandroid:1.1.0'
 
-    compile 'com.hannesdorfmann.parcelableplease:annotation:1.0.2'
-    apt 'com.hannesdorfmann.parcelableplease:processor:1.0.2'
+    compile "com.hannesdorfmann.parcelableplease:annotation:${parcelablepleaseVersion}"
+    apt "com.hannesdorfmann.parcelableplease:processor:${parcelablepleaseVersion}"
 
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
