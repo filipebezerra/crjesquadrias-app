@@ -1,4 +1,4 @@
-package br.com.libertsolutions.crs.app.date;
+package br.com.libertsolutions.crs.app.utils.date;
 
 import android.text.format.DateUtils;
 import com.crashlytics.android.Crashlytics;

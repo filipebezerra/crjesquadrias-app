@@ -1,4 +1,4 @@
-package br.com.libertsolutions.crs.app.keyboard;
+package br.com.libertsolutions.crs.app.utils.keyboard;
 
 import android.content.Context;
 import android.support.annotation.NonNull;

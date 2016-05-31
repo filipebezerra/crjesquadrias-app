@@ -1,7 +1,7 @@
 package br.com.libertsolutions.crs.app.checkin;
 
 import android.content.Context;
-import br.com.libertsolutions.crs.app.rx.RealmObservable;
+import br.com.libertsolutions.crs.app.utils.rx.RealmObservable;
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;

@@ -1,4 +1,4 @@
-package br.com.libertsolutions.crs.app.webservice;
+package br.com.libertsolutions.crs.app.utils.webservice;
 
 import android.content.Context;
 import android.support.annotation.NonNull;

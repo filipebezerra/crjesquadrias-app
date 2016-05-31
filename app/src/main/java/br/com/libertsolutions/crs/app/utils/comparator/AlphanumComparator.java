@@ -1,4 +1,4 @@
-package br.com.libertsolutions.crs.app.comparator;
+package br.com.libertsolutions.crs.app.utils.comparator;
 
 /*
  * The Alphanum Algorithm is an improved sorting algorithm for strings

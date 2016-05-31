@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
-import br.com.libertsolutions.crs.app.navigation.NavigationHelper;
+import br.com.libertsolutions.crs.app.utils.navigation.NavigationHelper;
 
 /**
  * .

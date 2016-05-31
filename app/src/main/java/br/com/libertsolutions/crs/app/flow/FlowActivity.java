@@ -13,7 +13,7 @@ import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
 import br.com.libertsolutions.crs.app.android.recyclerview.GridDividerDecoration;
 import br.com.libertsolutions.crs.app.android.recyclerview.OnClickListener;
 import br.com.libertsolutions.crs.app.android.recyclerview.OnTouchListener;
-import br.com.libertsolutions.crs.app.navigation.NavigationHelper;
+import br.com.libertsolutions.crs.app.utils.navigation.NavigationHelper;
 import butterknife.Bind;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.crashlytics.android.Crashlytics;

@@ -12,7 +12,7 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
 import br.com.libertsolutions.crs.app.R;
-import br.com.libertsolutions.crs.app.date.DateUtil;
+import br.com.libertsolutions.crs.app.utils.date.DateUtil;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import java.util.ArrayList;

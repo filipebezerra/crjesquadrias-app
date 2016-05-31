@@ -1,4 +1,4 @@
-package br.com.libertsolutions.crs.app.network;
+package br.com.libertsolutions.crs.app.utils.network;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

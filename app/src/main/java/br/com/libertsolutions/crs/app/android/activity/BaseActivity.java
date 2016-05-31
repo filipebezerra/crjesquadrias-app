@@ -14,7 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import br.com.libertsolutions.crs.app.R;
-import br.com.libertsolutions.crs.app.drawable.DrawableHelper;
+import br.com.libertsolutions.crs.app.utils.drawable.DrawableHelper;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 

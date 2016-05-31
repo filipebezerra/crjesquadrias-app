@@ -1,4 +1,4 @@
-package br.com.libertsolutions.crs.app.rx;
+package br.com.libertsolutions.crs.app.utils.rx;
 
 import android.content.Context;
 import io.realm.Realm;

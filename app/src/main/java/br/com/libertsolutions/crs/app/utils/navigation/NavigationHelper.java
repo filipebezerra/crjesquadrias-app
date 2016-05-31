@@ -1,4 +1,4 @@
-package br.com.libertsolutions.crs.app.navigation;
+package br.com.libertsolutions.crs.app.utils.navigation;
 
 import android.app.Activity;
 import android.content.ComponentName;
