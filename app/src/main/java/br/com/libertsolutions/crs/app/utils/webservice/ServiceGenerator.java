@@ -26,6 +26,7 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import rx.schedulers.Schedulers;
 
 /**
  * Classe utilitária para configuração do {@link Retrofit} e instanciação das
@@ -81,7 +82,8 @@ public class ServiceGenerator {
             sRetrofit = new Retrofit.Builder()
                     .baseUrl(baseUrl)
                     .addConverterFactory(GsonConverterFactory.create(gson))
-                    .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                    .addCallAdapterFactory(
+                            RxJavaCallAdapterFactory.createWithScheduler(Schedulers.io()))
                     .client(httpClient)
                     .build();
 
