@@ -1,7 +1,6 @@
 package br.com.libertsolutions.crs.app.checkin;
 
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
@@ -10,12 +9,6 @@ import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
 import br.com.libertsolutions.crs.app.android.recyclerview.DividerDecoration;
 import br.com.libertsolutions.crs.app.utils.feedback.FeedbackHelper;
-import br.com.libertsolutions.crs.app.login.LoginHelper;
-import br.com.libertsolutions.crs.app.login.User;
-import br.com.libertsolutions.crs.app.utils.navigation.NavigationHelper;
-import br.com.libertsolutions.crs.app.utils.network.NetworkUtil;
-import br.com.libertsolutions.crs.app.utils.webservice.ServiceGenerator;
-import br.com.libertsolutions.crs.app.settings.SettingsHelper;
 import butterknife.Bind;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.crashlytics.android.Crashlytics;
@@ -23,14 +16,12 @@ import java.util.List;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.schedulers.Schedulers;
-import rx.subscriptions.CompositeSubscription;
 
 /**
- * .
+ * Activity da interface de usuário da lista de {@link Checkin}s.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 31/03/2016
+ * @version 0.1.0, 01/06/2016
  * @since 0.1.0
  */
 public class CheckinActivity extends BaseActivity implements CheckinAdapter.CheckinCallback {
@@ -43,53 +34,9 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
 
     private CheckinDataService mCheckinDataService;
 
-    private CompositeSubscription mCompositeSubscription;
-
-    private User mUserLogged;
-
-    private CheckinService mCheckinService;
+    private Subscription mCheckinDataSubscription;
 
     @Bind(android.R.id.list) RecyclerView mCheckinsView;
-
-    private void updateSubtitle() {
-        final int finishedCount = mCheckinAdapter.getFinishedCheckinsCount();
-        if (finishedCount == 0) {
-            setSubtitle(getString(R.string.no_checkin_finished));
-        } else {
-            final int itemCount = mCheckinAdapter.getItemCount();
-
-            if (itemCount == finishedCount) {
-                setSubtitle(getString(R.string.checkins_all_finished));
-            } else {
-                setSubtitle(getString(R.string.checkins_finished, finishedCount));
-            }
-
-        }
-    }
-
-    private void validateUserLogged() {
-        if (!LoginHelper.isUserLogged(this)) {
-            FeedbackHelper.snackbar(mRootView, getString(R.string.msg_user_not_logged), true,
-                    new Snackbar.Callback() {
-                        @Override
-                        public void onDismissed(Snackbar snackbar, int event) {
-                            NavigationHelper.navigateToLoginScreen(CheckinActivity.this);
-                        }
-                    });
-        }
-    }
-
-    private void validateAppSettings() {
-        if (!SettingsHelper.isSettingsApplied(this)) {
-            FeedbackHelper.snackbar(mRootView, getString(R.string.msg_settings_not_applied), true,
-                    new Snackbar.Callback() {
-                        @Override
-                        public void onDismissed(Snackbar snackbar, int event) {
-                            NavigationHelper.navigateToSettingsScreen(CheckinActivity.this);
-                        }
-                    });
-        }
-    }
 
     private void showError(int titleRes, Throwable e) {
         Crashlytics.logException(e);
@@ -99,224 +46,6 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
                 .content(e.getMessage())
                 .positiveText(R.string.text_dialog_button_ok)
                 .show();
-    }
-
-    private void postCheckin(final Checkin checkin) {
-        if (checkin == null) {
-            return;
-        }
-
-        final boolean hasInternetConnection = NetworkUtil.isDeviceConnectedToInternet(this);
-
-        if (hasInternetConnection) {
-            if (mCheckinService == null) {
-                mCheckinService = ServiceGenerator.createService(CheckinService.class, this);
-            }
-
-            if (mCheckinService != null) {
-                if (mUserLogged == null) {
-                    mUserLogged = LoginHelper.getUserLogged(this);
-                }
-
-                if (mUserLogged != null) {
-                    final Subscription subscription = mCheckinService
-                            .post(mUserLogged.getCpf(), checkin)
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribeOn(Schedulers.io())
-                            .subscribe(
-                                    new Action1<Checkin>() {
-                                        @Override
-                                        public void call(Checkin checkinUpdated) {
-                                            mCheckinAdapter.updateCheckin(checkinUpdated);
-                                            updateCheckinStatus(checkinUpdated);
-                                        }
-                                    },
-
-                                    new Action1<Throwable>() {
-                                        @Override
-                                        public void call(Throwable e) {
-                                            showError(R.string.error_sending_data, e);
-                                            setCheckinToBeSynchronized(checkin);
-                                        }
-                                    }
-                            );
-                    mCompositeSubscription.add(subscription);
-                } else {
-                    validateUserLogged();
-                }
-            } else {
-                validateAppSettings();
-            }
-        }
-
-        if (!hasInternetConnection || mCheckinService == null || mUserLogged == null) {
-            setCheckinToBeSynchronized(checkin);
-        }
-    }
-
-    private void updateCheckinStatus(Checkin checkin) {
-        if (checkin == null) {
-            return;
-        }
-
-        if (mCheckinDataService == null) {
-            mCheckinDataService = new CheckinRealmDataService(this);
-        }
-
-        mCheckinDataService.updateStatus(checkin, false)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(
-                        new Action1<Checkin>() {
-                            @Override
-                            public void call(Checkin checkin) {}
-                        },
-
-                        new Action1<Throwable>() {
-                            @Override
-                            public void call(Throwable e) {
-                                showError(R.string.title_dialog_error_saving_data, e);
-                            }
-                        }
-                );
-    }
-
-    private void setCheckinToBeSynchronized(Checkin checkin) {
-        if (checkin == null) {
-            return;
-        }
-
-        if (mCheckinDataService == null) {
-            mCheckinDataService = new CheckinRealmDataService(this);
-        }
-
-        mCheckinDataService.updateStatus(checkin, true)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(
-                        new Action1<Checkin>() {
-                            @Override
-                            public void call(Checkin checkin) {}
-                        },
-
-                        new Action1<Throwable>() {
-                            @Override
-                            public void call(Throwable e) {
-                                showError(R.string.title_dialog_error_saving_data, e);
-                            }
-                        }
-                );
-    }
-
-    private void patchCheckins(final List<Checkin> checkinsUpdated) {
-        if (checkinsUpdated == null || checkinsUpdated.isEmpty()) {
-            return;
-        }
-
-        final boolean hasInternetConnection = NetworkUtil.isDeviceConnectedToInternet(this);
-
-        if (hasInternetConnection) {
-            if (mCheckinService == null) {
-                mCheckinService = ServiceGenerator.createService(CheckinService.class, this);
-            }
-
-            if (mCheckinService != null) {
-                if (mUserLogged == null) {
-                    mUserLogged = LoginHelper.getUserLogged(this);
-                }
-
-                if (mUserLogged != null) {
-                    final Subscription subscription = mCheckinService
-                            .patch(mUserLogged.getCpf(), checkinsUpdated)
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribeOn(Schedulers.io())
-                            .subscribe(
-                                    new Action1<List<Checkin>>() {
-                                        @Override
-                                        public void call(List<Checkin> checkins) {
-                                            mCheckinAdapter.updateCheckin(checkinsUpdated);
-                                            updateCheckinsStatus(checkins);
-                                        }
-                                    },
-
-                                    new Action1<Throwable>() {
-                                        @Override
-                                        public void call(Throwable e) {
-                                            showError(R.string.error_sending_data, e);
-                                            setCheckinsToBeSynchronized(checkinsUpdated);
-                                        }
-                                    }
-                            );
-                    mCompositeSubscription.add(subscription);
-                } else {
-                    validateUserLogged();
-                }
-            } else {
-                validateAppSettings();
-            }
-        }
-
-        if (!hasInternetConnection || mCheckinService == null || mUserLogged == null) {
-            setCheckinsToBeSynchronized(checkinsUpdated);
-        }
-    }
-
-    private void updateCheckinsStatus(List<Checkin> checkins) {
-        if (checkins == null || checkins.isEmpty()) {
-            return;
-        }
-
-        if (mCheckinDataService == null) {
-            mCheckinDataService = new CheckinRealmDataService(this);
-        }
-
-        mCheckinDataService.updateStatus(checkins, false)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(
-                        new Action1<List<Checkin>>() {
-                            @Override
-                            public void call(List<Checkin> checkins) {
-
-                            }
-                        },
-
-                        new Action1<Throwable>() {
-                            @Override
-                            public void call(Throwable e) {
-                                showError(R.string.title_dialog_error_saving_data, e);
-                            }
-                        }
-                );
-    }
-
-    private void setCheckinsToBeSynchronized(List<Checkin> checkins) {
-        if (checkins == null || checkins.isEmpty()) {
-            return;
-        }
-
-        if (mCheckinDataService == null) {
-            mCheckinDataService = new CheckinRealmDataService(this);
-        }
-
-        mCheckinDataService.updateStatus(checkins, true)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(
-                        new Action1<List<Checkin>>() {
-                            @Override
-                            public void call(List<Checkin> checkins) {
-
-                            }
-                        },
-
-                        new Action1<Throwable>() {
-                            @Override
-                            public void call(Throwable e) {
-                                showError(R.string.title_dialog_error_saving_data, e);
-                            }
-                        }
-                );
     }
 
     @Override
@@ -337,7 +66,12 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        validateExtraFlowId();
+        setupRecyclerView();
+        loadCheckinData();
+    }
 
+    private void validateExtraFlowId() {
         if (getIntent().hasExtra(EXTRA_FLOW_ID)) {
             mFlowId = getIntent().getLongExtra(EXTRA_FLOW_ID, 0);
         } else {
@@ -346,34 +80,22 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
                     + "Flow ID in the second parameter", Toast.LENGTH_LONG).show();
             finish();
         }
+    }
 
+    private void setupRecyclerView() {
         mCheckinsView.setLayoutManager(new LinearLayoutManager(this));
         mCheckinsView.setHasFixedSize(true);
         mCheckinsView.addItemDecoration(new DividerDecoration(this));
-
-        mCompositeSubscription = new CompositeSubscription();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        if (mCheckinDataService == null) {
-            mCheckinDataService = new CheckinRealmDataService(this);
-        }
-
-        final Subscription subscription = mCheckinDataService.list(mFlowId)
+    private void loadCheckinData() {
+        mCheckinDataSubscription = getCheckinDataService().list(mFlowId)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
                 .subscribe(
                         new Action1<List<Checkin>>() {
                             @Override
                             public void call(List<Checkin> list) {
-                                mCheckinsView.setAdapter(mCheckinAdapter =
-                                        new CheckinAdapter(CheckinActivity.this, list));
-                                mCheckinAdapter.setCheckinCallback(CheckinActivity.this);
-
-                                updateSubtitle();
+                                showCheckinData(list);
                             }
                         },
 
@@ -384,15 +106,22 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
                             }
                         }
                 );
-        mCompositeSubscription.add(subscription);
+    }
+
+    private void showCheckinData(List<Checkin> list) {
+        mCheckinsView.setAdapter(mCheckinAdapter =
+                new CheckinAdapter(CheckinActivity.this, list));
+        mCheckinAdapter.setCheckinCallback(CheckinActivity.this);
+
+        updateSubtitle();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
 
-        if (mCompositeSubscription != null && mCompositeSubscription.hasSubscriptions()) {
-            mCompositeSubscription.unsubscribe();
+        if (mCheckinDataSubscription != null && mCheckinDataSubscription.isUnsubscribed()) {
+            mCheckinDataSubscription.unsubscribe();
         }
     }
 
@@ -409,13 +138,57 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
     @Override
     public void onCheckinDone(Checkin checkin) {
         updateSubtitle();
-        postCheckin(checkin);
+        setToBeSynced(checkin);
+    }
+
+    private void setToBeSynced(Checkin checkin) {
+        if (checkin == null) {
+            return;
+        }
+
+        getCheckinDataService().updateSyncState(checkin, true)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Action1<Checkin>() {
+                            @Override
+                            public void call(Checkin ignored) {}
+                        },
+
+                        new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable e) {
+                                showError(R.string.title_dialog_error_saving_data, e);
+                            }
+                        }
+                );
     }
 
     @Override
     public void onCheckinsAllDone(List<Checkin> checkinsUpdated) {
         updateSubtitle();
-        patchCheckins(checkinsUpdated);
+        setAllToBeSynced(checkinsUpdated);
+    }
+
+    private void setAllToBeSynced(List<Checkin> checkins) {
+        if (checkins == null || checkins.isEmpty()) {
+            return;
+        }
+
+        getCheckinDataService().updateSyncState(checkins, true)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Action1<List<Checkin>>() {
+                            @Override
+                            public void call(List<Checkin> ignored) {}
+                        },
+
+                        new Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable e) {
+                                showError(R.string.title_dialog_error_saving_data, e);
+                            }
+                        }
+                );
     }
 
     @Override
@@ -426,5 +199,29 @@ public class CheckinActivity extends BaseActivity implements CheckinAdapter.Chec
     @Override
     public void onStatusCannotChange() {
         FeedbackHelper.snackbar(mRootView, "Não é permitido desfazer o check-in!", true);
+    }
+
+    private void updateSubtitle() {
+        if (mCheckinAdapter != null) {
+            final int finishedCount = mCheckinAdapter.getFinishedCheckinsCount();
+            if (finishedCount == 0) {
+                setSubtitle(getString(R.string.no_checkin_finished));
+            } else {
+                final int itemCount = mCheckinAdapter.getItemCount();
+
+                if (itemCount == finishedCount) {
+                    setSubtitle(getString(R.string.checkins_all_finished));
+                } else {
+                    setSubtitle(getString(R.string.checkins_finished, finishedCount));
+                }
+            }
+        }
+    }
+
+    private CheckinDataService getCheckinDataService() {
+        if (mCheckinDataService == null) {
+            mCheckinDataService = new CheckinRealmDataService(this);
+        }
+        return mCheckinDataService;
     }
 }

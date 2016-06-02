@@ -14,7 +14,7 @@ import rx.functions.Func1;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 03/04/2016
+ * @version 0.1.0, 01/06/2016
  * @since 0.1.0
  */
 public class CheckinRealmDataService implements CheckinDataService {
@@ -204,7 +204,7 @@ public class CheckinRealmDataService implements CheckinDataService {
     }
 
     @Override
-    public Observable<Checkin> updateStatus(final Checkin checkin, final boolean synchronizeLater) {
+    public Observable<Checkin> updateSyncState(final Checkin checkin, final boolean syncPending) {
         return RealmObservable.object(mContext, new Func1<Realm, CheckinEntity>() {
             @Override
             public CheckinEntity call(Realm realm) {
@@ -221,7 +221,7 @@ public class CheckinRealmDataService implements CheckinDataService {
                             checkinEntity.setDate(checkin.getDate());
                         }
 
-                        checkinEntity.setPendingSynchronization(synchronizeLater);
+                        checkinEntity.setPendingSynchronization(syncPending);
 
                         checkinEntity = realm.copyToRealmOrUpdate(checkinEntity);
                     }
@@ -238,8 +238,8 @@ public class CheckinRealmDataService implements CheckinDataService {
     }
 
     @Override
-    public Observable<List<Checkin>> updateStatus(final List<Checkin> checkins,
-            final boolean synchronizeLater) {
+    public Observable<List<Checkin>> updateSyncState(final List<Checkin> checkins,
+            final boolean syncPending) {
         return RealmObservable.list(mContext, new Func1<Realm, RealmList<CheckinEntity>>() {
             @Override
             public RealmList<CheckinEntity> call(Realm realm) {
@@ -259,7 +259,7 @@ public class CheckinRealmDataService implements CheckinDataService {
                                 checkinEntity.setDate(checkin.getDate());
                             }
 
-                            checkinEntity.setPendingSynchronization(synchronizeLater);
+                            checkinEntity.setPendingSynchronization(syncPending);
 
                             checkinEntityList.add(realm.copyToRealmOrUpdate(checkinEntity));
                         }
