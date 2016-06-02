@@ -37,7 +37,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 
 /**
- * Tela principal, nesta são listadas as obras cadastradas no servidor.
+ * Activity da interface de usuário da lista de {@link Work}s.
  *
  * @author Filipe Bezerra
  * @version 0.1.0, 01/06/2016
