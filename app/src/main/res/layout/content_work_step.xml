@@ -17,7 +17,7 @@
         android:scrollbarStyle="outsideOverlay"
         android:clipToPadding="false"
         app:layoutManager="LinearLayoutManager"
-        tools:listitem="@layout/item_stage"
+        tools:listitem="@layout/item_work_step"
         />
 
 </FrameLayout>
