@@ -35,16 +35,16 @@ import java.util.List;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.subscriptions.CompositeSubscription;
 
 /**
  * Tela principal, nesta são listadas as obras cadastradas no servidor.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 01/04/2016
+ * @version 0.1.0, 01/06/2016
  * @since 0.1.0
  */
-public class MainActivity extends BaseActivity implements OnClickListener {
+public class MainActivity extends BaseActivity implements OnClickListener,
+        SearchView.OnQueryTextListener {
 
     private WorkAdapter mWorkAdapter;
 
@@ -57,39 +57,51 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     @Bind(R.id.list) RecyclerView mWorksView;
     @Bind(R.id.empty_state) LinearLayout mEmptyStateView;
 
-    private void changeListLayout(Configuration configuration) {
-        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mWorksView.setLayoutManager(new GridLayoutManager(this, 2));
-        } else {
-            mWorksView.setLayoutManager(new LinearLayoutManager(this));
+    @Override
+    protected int provideLayoutResource() {
+        return R.layout.activity_main;
+    }
+
+    @Override
+    protected void onCreate(Bundle inState) {
+        super.onCreate(inState);
+        setupActionBar();
+        setupRecyclerView();
+        loadViewData();
+    }
+
+    private void setupActionBar() {
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(R.string.title_activity_main);
+        }
+
+        if (mToolbarAsActionBar != null) {
+            final Drawable navigationIcon = DrawableHelper.withContext(this)
+                    .withColor(R.color.white)
+                    .withDrawable(R.drawable.ic_worker)
+                    .tint()
+                    .get();
+
+            mToolbarAsActionBar.setNavigationIcon(navigationIcon);
         }
     }
 
-    private void showEmptyState() {
-        mWorksView.setVisibility(View.GONE);
-        mEmptyStateView.setVisibility(View.VISIBLE);
-        // TODO: enable BroadcastReceiver to network events
+    private void setupRecyclerView() {
+        changeListLayout(getResources().getConfiguration());
+        mWorksView.addItemDecoration(new GridDividerDecoration(this));
+        mWorksView.setHasFixedSize(true);
+        mWorksView.addOnItemTouchListener(new OnTouchListener(this, mWorksView, this));
     }
 
-    private void showError(@StringRes int titleRes, Throwable e) {
-        Crashlytics.logException(e);
+    private void loadViewData() {
+        showUserLoggedInfo();
 
-        new MaterialDialog.Builder(MainActivity.this)
-                .title(titleRes)
-                .content(e.getMessage())
-                .positiveText(R.string.text_dialog_button_ok)
-                .show();
-    }
+        final boolean isInitialDataImported = ConfigHelper.isInitialDataImported(this);
 
-    private void updateSubtitle() {
-        if (mWorkAdapter != null) {
-            final int count = mWorkAdapter.getRunningWorksCount();
-            if (count == 0) {
-                setSubtitle(getString(R.string.no_work_running));
-            } else {
-                setSubtitle(getString(R.string.works_running,
-                        count));
-            }
+        if (!isInitialDataImported) {
+            showEmptyState();
+        } else {
+            loadWorkData();
         }
     }
 
@@ -105,7 +117,17 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         }
     }
 
-    private void retrieveWorkData() {
+    private void showEmptyState() {
+        mWorksView.setVisibility(View.GONE);
+        mEmptyStateView.setVisibility(View.VISIBLE);
+        // TODO: enable BroadcastReceiver to network events
+    }
+
+    private void loadWorkData() {
+        if (mWorkDataService == null) {
+            mWorkDataService = new WorkRealmDataService(this);
+        }
+
         mWorkDataSubscription = mWorkDataService.list()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -124,51 +146,30 @@ public class MainActivity extends BaseActivity implements OnClickListener {
                 );
     }
 
+    private void showError(@StringRes int titleRes, Throwable e) {
+        Crashlytics.logException(e);
+
+        new MaterialDialog.Builder(MainActivity.this)
+                .title(titleRes)
+                .content(e.getMessage())
+                .positiveText(R.string.text_dialog_button_ok)
+                .show();
+    }
+
     private void showWorkData(List<Work> list) {
         mWorksView.setAdapter(mWorkAdapter = new WorkAdapter(MainActivity.this, list));
         updateSubtitle();
     }
 
-    @Override
-    protected int provideLayoutResource() {
-        return R.layout.activity_main;
-    }
-
-    @Override
-    protected void onCreate(Bundle inState) {
-        super.onCreate(inState);
-
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(R.string.title_activity_main);
-        }
-
-        changeListLayout(getResources().getConfiguration());
-        mWorksView.addItemDecoration(new GridDividerDecoration(this));
-        mWorksView.setHasFixedSize(true);
-        mWorksView.addOnItemTouchListener(new OnTouchListener(this, mWorksView, this));
-
-        if (mToolbarAsActionBar != null) {
-            final Drawable navigationIcon = DrawableHelper.withContext(this)
-                    .withColor(R.color.white)
-                    .withDrawable(R.drawable.ic_worker)
-                    .tint()
-                    .get();
-
-            mToolbarAsActionBar.setNavigationIcon(navigationIcon);
-        }
-
-        mWorkDataService = new WorkRealmDataService(this);
-
-        mWorkDataSubscription = new CompositeSubscription();
-
-        showUserLoggedInfo();
-
-        final boolean isInitialDataImported = ConfigHelper.isInitialDataImported(this);
-
-        if (!isInitialDataImported) {
-            showEmptyState();
-        } else {
-            retrieveWorkData();
+    private void updateSubtitle() {
+        if (mWorkAdapter != null) {
+            final int count = mWorkAdapter.getRunningWorksCount();
+            if (count == 0) {
+                setSubtitle(getString(R.string.no_work_running));
+            } else {
+                setSubtitle(getString(R.string.works_running,
+                        count));
+            }
         }
     }
 
@@ -184,26 +185,15 @@ public class MainActivity extends BaseActivity implements OnClickListener {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        setupSearchView(menu);
+        return true;
+    }
+
+    private void setupSearchView(Menu menu) {
         SearchView searchView = (SearchView) MenuItemCompat
                 .getActionView(menu.findItem(R.id.menu_search));
         searchView.setQueryHint(getString(R.string.search_query_hint));
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                if (mWorkAdapter != null) {
-                    mWorkAdapter.getFilter().filter(newText);
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        });
-        return true;
+        searchView.setOnQueryTextListener(this);
     }
 
     @Override
@@ -229,6 +219,14 @@ public class MainActivity extends BaseActivity implements OnClickListener {
         changeListLayout(newConfig);
     }
 
+    private void changeListLayout(Configuration configuration) {
+        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mWorksView.setLayoutManager(new GridLayoutManager(this, 2));
+        } else {
+            mWorksView.setLayoutManager(new LinearLayoutManager(this));
+        }
+    }
+
     @Override
     public void onSingleTapUp(View view, int position) {
         if (mWorkAdapter != null) {
@@ -242,4 +240,19 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
     @Override
     public void onLongPress(View view, int position) {}
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        if (mWorkAdapter != null) {
+            mWorkAdapter.getFilter().filter(newText);
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
