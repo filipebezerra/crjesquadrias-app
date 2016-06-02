@@ -21,14 +21,12 @@ import java.util.List;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.schedulers.Schedulers;
-import rx.subscriptions.CompositeSubscription;
 
 /**
- * .
+ * Activity da interface de usuário da lista de {@link Flow}s.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 31/03/2016
+ * @version 0.1.0, 01/06/2016
  * @since 0.1.0
  */
 public class FlowActivity extends BaseActivity implements OnClickListener {
@@ -41,31 +39,9 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
 
     private FlowDataService mFlowDataService;
 
-    private CompositeSubscription mCompositeSubscription;
+    private Subscription mFlowDataSubscription;
 
     @Bind(android.R.id.list) RecyclerView mWorkStepsView;
-
-    private void showError(@StringRes int titleRes, Throwable e) {
-        Crashlytics.logException(e);
-
-        new MaterialDialog.Builder(FlowActivity.this)
-                .title(titleRes)
-                .content(e.getMessage())
-                .positiveText(R.string.text_dialog_button_ok)
-                .show();
-    }
-
-    private void updateSubtitle() {
-        if (mFlowAdapter != null) {
-            final int count = mFlowAdapter.getRunningFlowsCount();
-            if (count == 0) {
-                setSubtitle(getString(R.string.no_work_step_running));
-            } else {
-                setSubtitle(getString(R.string.work_steps_running,
-                        count));
-            }
-        }
-    }
 
     @Override
     protected int provideLayoutResource() {
@@ -80,7 +56,12 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
     @Override
     protected void onCreate(Bundle inState) {
         super.onCreate(inState);
+        validateExtraWorkId();
+        setupRecyclerView();
+        loadFlowData();
+    }
 
+    private void validateExtraWorkId() {
         if (getIntent().hasExtra(EXTRA_WORK_ID)) {
             mWorkId = getIntent().getLongExtra(EXTRA_WORK_ID, INVALID_EXTRA_ID);
 
@@ -94,32 +75,27 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
                     + "Work ID in the second parameter", Toast.LENGTH_LONG).show();
             finish();
         }
+    }
 
+    private void setupRecyclerView() {
         changeListLayout(getResources().getConfiguration());
         mWorkStepsView.setHasFixedSize(true);
         mWorkStepsView.addItemDecoration(new GridDividerDecoration(this));
         mWorkStepsView.addOnItemTouchListener(new OnTouchListener(this, mWorkStepsView, this));
-
-        mFlowDataService = new FlowRealmDataService(this);
-
-        mCompositeSubscription = new CompositeSubscription();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+    private void loadFlowData() {
+        if (mFlowDataService == null) {
+            mFlowDataService = new FlowRealmDataService(this);
+        }
 
-        final Subscription subscription = mFlowDataService.list(mWorkId)
+        mFlowDataSubscription = mFlowDataService.list(mWorkId)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
                 .subscribe(
                         new Action1<List<Flow>>() {
                             @Override
                             public void call(List<Flow> list) {
-                                mWorkStepsView.setAdapter(mFlowAdapter =
-                                        new FlowAdapter(FlowActivity.this, list));
-
-                                updateSubtitle();
+                                showFlowData(list);
                             }
                         },
 
@@ -130,15 +106,43 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
                             }
                         }
                 );
-        mCompositeSubscription.add(subscription);
+    }
+
+    private void showFlowData(List<Flow> list) {
+        mWorkStepsView.setAdapter(mFlowAdapter =
+                new FlowAdapter(FlowActivity.this, list));
+
+        updateSubtitle();
+    }
+
+    private void updateSubtitle() {
+        if (mFlowAdapter != null) {
+            final int count = mFlowAdapter.getRunningFlowsCount();
+            if (count == 0) {
+                setSubtitle(getString(R.string.no_work_step_running));
+            } else {
+                setSubtitle(getString(R.string.work_steps_running,
+                        count));
+            }
+        }
+    }
+
+    private void showError(@StringRes int titleRes, Throwable e) {
+        Crashlytics.logException(e);
+
+        new MaterialDialog.Builder(FlowActivity.this)
+                .title(titleRes)
+                .content(e.getMessage())
+                .positiveText(R.string.text_dialog_button_ok)
+                .show();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
 
-        if (mCompositeSubscription != null && mCompositeSubscription.hasSubscriptions()) {
-            mCompositeSubscription.unsubscribe();
+        if (mFlowDataSubscription != null && mFlowDataSubscription.isUnsubscribed()) {
+            mFlowDataSubscription.unsubscribe();
         }
     }
 
