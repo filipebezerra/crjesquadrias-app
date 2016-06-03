@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "br.com.libertsolutions.crs.app"
-        minSdkVersion 10
+        minSdkVersion 15
         targetSdkVersion 23
         versionCode 23010
         versionName "0.1.0"
@@ -58,4 +58,6 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }
+
+    compile "com.jakewharton.timber:timber:4.1.2"
 }
