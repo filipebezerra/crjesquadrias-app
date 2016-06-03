@@ -16,7 +16,6 @@
         android:theme="@style/Crs"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning,UnusedAttribute"
         >
-
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="88453d956cd483a917c0c313a6a47582a0853bcf"
@@ -29,14 +28,12 @@
             android:screenOrientation="portrait"
             android:theme="@style/Crs.LaunchScreen"
             >
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".login.LoginActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
@@ -44,7 +41,6 @@
             android:theme="@style/Crs.NoActionBar"
             android:windowSoftInputMode="stateVisible|adjustResize"
             />
-
         <activity
             android:name=".main.MainActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
@@ -53,35 +49,31 @@
             android:theme="@style/Crs.NoActionBar"
             android:windowSoftInputMode="stateHidden"
             />
-
         <activity
             android:name=".settings.SettingsActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             android:label="@string/title_activity_settings"
             android:theme="@style/Crs.NoActionBar"
             />
-
         <activity
             android:name=".settings.SettingsActivityCompat"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             android:label="@string/title_activity_settings"
             android:theme="@style/Crs.NoActionBar"
             />
-
         <activity
             android:name=".flow.FlowActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             android:label="@string/title_activity_stage"
+            android:launchMode="singleTop"
             android:parentActivityName=".main.MainActivity"
             android:theme="@style/Crs.NoActionBar"
-            android:launchMode="singleTop"
             >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="br.com.libertsolutions.crs.app.main.MainActivity"
                 />
         </activity>
-
         <activity
             android:name=".checkin.CheckinActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
@@ -94,6 +86,12 @@
                 android:value=".flow.FlowActivity"
                 />
         </activity>
+
+        <service
+            android:name=".sync.SyncService"
+            android:enabled="true"
+            android:exported="false"
+            />
     </application>
 
 </manifest>

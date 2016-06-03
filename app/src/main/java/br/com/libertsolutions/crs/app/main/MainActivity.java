@@ -3,6 +3,7 @@ package br.com.libertsolutions.crs.app.main;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.StringRes;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.GridLayoutManager;
@@ -12,7 +13,9 @@ import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
 import br.com.libertsolutions.crs.app.android.recyclerview.GridDividerDecoration;
@@ -21,17 +24,26 @@ import br.com.libertsolutions.crs.app.android.recyclerview.OnTouchListener;
 import br.com.libertsolutions.crs.app.config.ConfigHelper;
 import br.com.libertsolutions.crs.app.login.LoginHelper;
 import br.com.libertsolutions.crs.app.login.User;
+import br.com.libertsolutions.crs.app.sync.SyncService;
+import br.com.libertsolutions.crs.app.sync.event.EventBusManager;
+import br.com.libertsolutions.crs.app.sync.event.SyncEvent;
+import br.com.libertsolutions.crs.app.sync.event.SyncStatus;
+import br.com.libertsolutions.crs.app.sync.event.SyncType;
 import br.com.libertsolutions.crs.app.utils.drawable.DrawableHelper;
 import br.com.libertsolutions.crs.app.utils.feedback.FeedbackHelper;
 import br.com.libertsolutions.crs.app.utils.navigation.NavigationHelper;
+import br.com.libertsolutions.crs.app.utils.network.NetworkUtil;
 import br.com.libertsolutions.crs.app.work.Work;
 import br.com.libertsolutions.crs.app.work.WorkAdapter;
 import br.com.libertsolutions.crs.app.work.WorkDataService;
 import br.com.libertsolutions.crs.app.work.WorkRealmDataService;
 import butterknife.Bind;
+import butterknife.ButterKnife;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.crashlytics.android.Crashlytics;
 import java.util.List;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -67,6 +79,7 @@ public class MainActivity extends BaseActivity implements OnClickListener,
         super.onCreate(inState);
         setupActionBar();
         setupRecyclerView();
+        EventBusManager.register(this);
         loadViewData();
     }
 
@@ -98,9 +111,50 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 
         final boolean isInitialDataImported = ConfigHelper.isInitialDataImported(this);
 
-        if (!isInitialDataImported) {
-            showEmptyState();
+        if (isInitialDataImported) {
+            loadWorkData();
+        } else if (NetworkUtil.isDeviceConnectedToInternet(this)) {
+            startImportingData();
         } else {
+            showNoDataAndNetworkState();
+        }
+    }
+
+    private void showEmptyState(@DrawableRes int image, @StringRes int title,
+            @StringRes int tagline) {
+        ButterKnife.<ImageView>findById(mEmptyStateView, R.id.empty_image)
+                .setImageResource(image);
+        ButterKnife.<TextView>findById(mEmptyStateView, R.id.empty_title)
+                .setText(title);
+        ButterKnife.<TextView>findById(mEmptyStateView, R.id.empty_tagline)
+                .setText(tagline);
+        showEmptyView(true);
+    }
+
+    private void showEmptyView(boolean visible) {
+        mWorksView.setVisibility(visible ? View.GONE : View.VISIBLE);
+        mEmptyStateView.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    private void showNoDataAndNetworkState() {
+        showEmptyState(R.drawable.ic_no_connection, R.string.title_no_connection,
+                R.string.tagline_no_connection);
+    }
+
+    private void showImportingDataState() {
+        showEmptyState(R.drawable.ic_import_state, R.string.title_importing_data,
+                R.string.tagline_importing_data);
+    }
+
+    private void startImportingData() {
+        SyncService.request(SyncType.WORKS);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(SyncEvent event) {
+        if (event.getType() == SyncType.WORKS && event.getStatus() == SyncStatus.IN_PROGRESS) {
+            showImportingDataState();
+        } else if (event.getType() == SyncType.WORKS && event.getStatus() == SyncStatus.COMPLETED) {
             loadWorkData();
         }
     }
@@ -115,12 +169,6 @@ public class MainActivity extends BaseActivity implements OnClickListener,
                     .snackbar(mRootView, String.format("Logado como %s.",
                             LoginHelper.formatCpf(mUserLogged.getName())), false);
         }
-    }
-
-    private void showEmptyState() {
-        mWorksView.setVisibility(View.GONE);
-        mEmptyStateView.setVisibility(View.VISIBLE);
-        // TODO: enable BroadcastReceiver to network events
     }
 
     private void loadWorkData() {
@@ -157,20 +205,30 @@ public class MainActivity extends BaseActivity implements OnClickListener,
     }
 
     private void showWorkData(List<Work> list) {
-        mWorksView.setAdapter(mWorkAdapter = new WorkAdapter(MainActivity.this, list));
+        if (!list.isEmpty()) {
+            mWorksView.setAdapter(mWorkAdapter = new WorkAdapter(MainActivity.this, list));
+            showEmptyView(false);
+        } else {
+            showEmptyDataState();
+        }
         updateSubtitle();
     }
 
+    private void showEmptyDataState() {
+        showEmptyState(R.drawable.ic_no_works, R.string.title_no_data,
+                R.string.tagline_no_data);
+        // TODO: enable BroadcastReceiver to network events
+    }
+
     private void updateSubtitle() {
-        if (mWorkAdapter != null) {
-            final int count = mWorkAdapter.getRunningWorksCount();
-            if (count == 0) {
-                setSubtitle(getString(R.string.no_work_running));
-            } else {
-                setSubtitle(getString(R.string.works_running,
-                        count));
-            }
+        final int count = mWorkAdapter != null ? mWorkAdapter.getRunningWorksCount() : 0;
+        if (count == 0) {
+            setSubtitle(getString(R.string.no_work_running));
+        } else {
+            setSubtitle(getString(R.string.works_running,
+                    count));
         }
+        supportInvalidateOptionsMenu();
     }
 
     @Override
@@ -194,6 +252,11 @@ public class MainActivity extends BaseActivity implements OnClickListener,
                 .getActionView(menu.findItem(R.id.menu_search));
         searchView.setQueryHint(getString(R.string.search_query_hint));
         searchView.setOnQueryTextListener(this);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        return mWorkAdapter != null && mWorkAdapter.getItemCount() != 0;
     }
 
     @Override
@@ -254,5 +317,11 @@ public class MainActivity extends BaseActivity implements OnClickListener,
         } else {
             return false;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        EventBusManager.unregister(this);
+        super.onDestroy();
     }
 }

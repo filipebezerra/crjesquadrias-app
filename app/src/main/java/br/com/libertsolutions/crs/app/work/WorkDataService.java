@@ -14,4 +14,5 @@ public interface WorkDataService {
     Observable<List<Work>> list();
     Observable<Work> save(Work work);
     Observable<List<Work>> saveAll(List<Work> workList);
+    void saveAllSync(List<Work> workList);
 }

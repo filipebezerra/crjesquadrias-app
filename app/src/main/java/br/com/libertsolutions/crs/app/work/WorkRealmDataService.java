@@ -1,6 +1,7 @@
 package br.com.libertsolutions.crs.app.work;
 
 import android.content.Context;
+import br.com.libertsolutions.crs.app.utils.realm.RealmUtil;
 import br.com.libertsolutions.crs.app.utils.rx.RealmObservable;
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -113,7 +114,21 @@ public class WorkRealmDataService implements WorkDataService {
         });
     }
 
-    private static Work workFromRealm(WorkEntity workEntity) {
+    @Override
+    public void saveAllSync(final List<Work> workList) {
+        RealmUtil.executeTransaction(mContext, new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                for(Work work : workList) {
+                    final ClientEntity clientEntity = realm.copyToRealmOrUpdate(
+                            toClientEntity(work.getClient()));
+                    realm.copyToRealmOrUpdate(toWorkEntity(work, clientEntity));
+                }
+            }
+        });
+    }
+
+    private Work workFromRealm(WorkEntity workEntity) {
         final Long workId = workEntity.getWorkId();
         final ClientEntity client = workEntity.getClient();
         final String code = workEntity.getCode();
@@ -123,7 +138,24 @@ public class WorkRealmDataService implements WorkDataService {
         return new Work(workId, clientFromRealm(client), code, date, job, status);
     }
 
-    private static Client clientFromRealm(ClientEntity client) {
+    private Client clientFromRealm(ClientEntity client) {
         return new Client(client.getName());
+    }
+
+    private ClientEntity toClientEntity(Client client) {
+        ClientEntity clientEntity = new ClientEntity();
+        clientEntity.setName(client.getName());
+        return clientEntity;
+    }
+
+    private WorkEntity toWorkEntity(Work work, ClientEntity clientEntity) {
+        WorkEntity workEntity = new WorkEntity();
+        workEntity.setWorkId(work.getWorkId());
+        workEntity.setClient(clientEntity);
+        workEntity.setCode(work.getCode());
+        workEntity.setDate(work.getDate());
+        workEntity.setJob(work.getJob());
+        workEntity.setStatus(work.getStatus());
+        return workEntity;
     }
 }
