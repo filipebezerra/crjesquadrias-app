@@ -24,14 +24,15 @@ import timber.log.Timber;
  * @since #
  */
 public class WorksSync extends AbstractSync {
-    private WorkService mWorkService;
 
-    private WorkDataService mWorkDataService;
+    private final WorkService mWorkService;
+
+    private final WorkDataService mWorkDataService;
 
     public WorksSync(Context context) {
         super(context);
-        mWorkService = ServiceGenerator.createService(WorkService.class, context);
         mWorkDataService = new WorkRealmDataService(context);
+        mWorkService = ServiceGenerator.createService(WorkService.class, context);
     }
 
     @Override
