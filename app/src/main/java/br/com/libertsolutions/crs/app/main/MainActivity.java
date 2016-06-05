@@ -33,6 +33,7 @@ import br.com.libertsolutions.crs.app.flow.FlowRealmDataService;
 import br.com.libertsolutions.crs.app.flow.FlowService;
 import br.com.libertsolutions.crs.app.login.LoginHelper;
 import br.com.libertsolutions.crs.app.login.User;
+import br.com.libertsolutions.crs.app.sync.SyncService;
 import br.com.libertsolutions.crs.app.sync.event.EventBusManager;
 import br.com.libertsolutions.crs.app.sync.event.SyncEvent;
 import br.com.libertsolutions.crs.app.sync.event.SyncStatus;
@@ -131,11 +132,18 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 
         if (isInitialDataImported) {
             loadWorkData();
+            requestSync();
         } else if (NetworkUtil.isDeviceConnectedToInternet(this)) {
             startImportingData();
         } else {
             showNoDataAndNetworkState();
         }
+    }
+
+    private void requestSync() {
+        SyncService.request(SyncType.WORKS);
+        //SyncService.request(SyncType.FLOWS);
+        //SyncService.request(SyncType.CHECKINS);
     }
 
     private void showEmptyState(@DrawableRes int image, @StringRes int title,
@@ -173,6 +181,7 @@ public class MainActivity extends BaseActivity implements OnClickListener,
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(SyncEvent event) {
         if (event.getType() == SyncType.WORKS && event.getStatus() == SyncStatus.COMPLETED) {
+            Timber.i("Sync completed");
             loadWorkData();
         }
     }
@@ -221,7 +230,11 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 
     private void showWorkData(List<Work> list) {
         if (!list.isEmpty()) {
-            mWorksView.setAdapter(mWorkAdapter = new WorkAdapter(MainActivity.this, list));
+            if (mWorkAdapter == null) {
+                mWorksView.setAdapter(mWorkAdapter = new WorkAdapter(MainActivity.this, list));
+            } else {
+                mWorkAdapter.swapData(list);
+            }
             showEmptyView(false);
         } else {
             showEmptyDataState();

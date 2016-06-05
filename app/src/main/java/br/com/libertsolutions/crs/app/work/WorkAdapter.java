@@ -23,7 +23,7 @@ import java.util.List;
  * Work adapter.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 20/03/2016
+ * @version 0.1.0, 05/06/2016
  * @since 0.1.0
  */
 public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder>
@@ -103,6 +103,14 @@ public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder>
     @Override
     public Filter getFilter() {
         return new WorkFilter();
+    }
+
+    public void swapData(List<Work> workList) {
+        if (workList != null) {
+            mWorks.clear();
+            mWorks.addAll(workList);
+            notifyDataSetChanged();
+        }
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

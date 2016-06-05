@@ -5,13 +5,12 @@ import android.support.annotation.NonNull;
 import br.com.libertsolutions.crs.app.sync.event.SyncType;
 import java.util.HashMap;
 import java.util.Map;
-import timber.log.Timber;
 
 /**
  * .
  *
  * @author Filipe Bezerra
- * @version #, 02/06/2016
+ * @version #, 05/06/2016
  * @since #
  */
 class SyncManager {
@@ -19,14 +18,12 @@ class SyncManager {
 
     SyncManager(@NonNull Context context) {
         mSyncMap = new HashMap<>();
-        mSyncMap.put(SyncType.ALL, null);
         mSyncMap.put(SyncType.WORKS, new WorksSync(context));
-        mSyncMap.put(SyncType.FLOWS, null);
-        mSyncMap.put(SyncType.CHECKINS, null);
+        mSyncMap.put(SyncType.FLOWS, new FlowsSync(context));
+        mSyncMap.put(SyncType.CHECKINS, new CheckinsSync(context));
     }
 
     void dispatchSync(@NonNull SyncType syncType) {
-        Timber.i("SyncManager dispatchSync");
         mSyncMap.get(syncType).sync();
     }
 }

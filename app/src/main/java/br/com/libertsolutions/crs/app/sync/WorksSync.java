@@ -20,7 +20,7 @@ import timber.log.Timber;
  * .
  *
  * @author Filipe Bezerra
- * @version #, 04/06/2016
+ * @version #, 05/06/2016
  * @since #
  */
 public class WorksSync extends AbstractSync {
@@ -42,31 +42,23 @@ public class WorksSync extends AbstractSync {
 
     @Override
     protected void doSync() {
-        if (!ConfigHelper.isInitialDataImported(mContext)) return;
+        if (!ConfigHelper.isInitialDataImported(mContext)) {
+            return;
+        }
 
         mWorkService
                 .getAllWithUpdates(ConfigHelper.getLastServerSync(mContext))
                 .observeOn(Schedulers.io())
-                .filter(new Func1<List<Work>, Boolean>() {
-                    @Override
-                    public Boolean call(List<Work> works) {
-                        Timber.i("WorksSync is filtering the data received from server");
-                        return !works.isEmpty();
-                    }
-                })
-                .map(new Func1<List<Work>, Void>() {
-                    @Override
-                    public Void call(List<Work> works) {
-                        Timber.i("WorksSync is saving data to the local storage");
-                        mWorkDataService.saveAllSync(works);
-                        return null;
-                    }
-                })
+                .filter(works -> !works.isEmpty())
+                .map((Func1<List<Work>, Void>)
+                        works -> {
+                            mWorkDataService.saveAllSync(works);
+                            return null;
+                        })
                 .subscribe(
                         new Subscriber<Void>() {
                             @Override
                             public void onStart() {
-                                Timber.i("WorksSync just started working");
                                 SyncEvent.send(getSyncType(), SyncStatus.IN_PROGRESS);
                             }
 
@@ -76,11 +68,11 @@ public class WorksSync extends AbstractSync {
                             }
 
                             @Override
-                            public void onNext(Void ignored) {}
+                            public void onNext(Void ignored) {
+                            }
 
                             @Override
                             public void onCompleted() {
-                                Timber.i("WorksSync just completed their work");
                                 SyncEvent.send(getSyncType(), SyncStatus.COMPLETED);
                             }
                         }
