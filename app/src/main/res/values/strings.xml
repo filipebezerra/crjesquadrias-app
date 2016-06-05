@@ -71,6 +71,6 @@
     <string name="title_no_data">Nenhuma obra</string>
     <string name="tagline_no_data">Não há dados disponíveis ou nenhuma obra está em execução</string>
     <string name="title_no_connection">Sem conexão</string>
-    <string name="tagline_no_connection">Não há conexão com a internet e os dados não foram importados</string>
+    <string name="tagline_no_connection">Não há conexão com a internet e não há obras importadas</string>
     <string name="title_importing_data">Importação em andamento…</string>
 </resources>
