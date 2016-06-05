@@ -1,6 +1,7 @@
 package br.com.libertsolutions.crs.app.sync;
 
 import android.content.Context;
+import br.com.libertsolutions.crs.app.config.ConfigHelper;
 import br.com.libertsolutions.crs.app.sync.event.SyncEvent;
 import br.com.libertsolutions.crs.app.sync.event.SyncStatus;
 import br.com.libertsolutions.crs.app.sync.event.SyncType;
@@ -19,7 +20,7 @@ import timber.log.Timber;
  * .
  *
  * @author Filipe Bezerra
- * @version #, 03/06/2016
+ * @version #, 04/06/2016
  * @since #
  */
 public class WorksSync extends AbstractSync {
@@ -40,20 +41,22 @@ public class WorksSync extends AbstractSync {
 
     @Override
     protected void doSync() {
+        if (!ConfigHelper.isInitialDataImported(mContext)) return;
+
         mWorkService
-                .getAll()
+                .getAllWithUpdates(ConfigHelper.getLastServerSync(mContext))
                 .observeOn(Schedulers.newThread())
                 .filter(new Func1<List<Work>, Boolean>() {
                     @Override
                     public Boolean call(List<Work> works) {
-                        Timber.i("WorksSync filtering");
+                        Timber.i("WorksSync is filtering the data received from server");
                         return !works.isEmpty();
                     }
                 })
                 .map(new Func1<List<Work>, Void>() {
                     @Override
                     public Void call(List<Work> works) {
-                        Timber.i("WorksSync saving data");
+                        Timber.i("WorksSync is saving data to the local storage");
                         mWorkDataService.saveAllSync(works);
                         return null;
                     }
@@ -62,13 +65,13 @@ public class WorksSync extends AbstractSync {
                         new Subscriber<Void>() {
                             @Override
                             public void onStart() {
-                                Timber.i("WorksSync onStart");
+                                Timber.i("WorksSync just started working");
                                 SyncEvent.send(getSyncType(), SyncStatus.IN_PROGRESS);
                             }
 
                             @Override
                             public void onError(Throwable e) {
-                                Timber.e(e, "WorksSync onError");
+                                Timber.e(e, "WorksSync encountered a error");
                             }
 
                             @Override
@@ -76,7 +79,7 @@ public class WorksSync extends AbstractSync {
 
                             @Override
                             public void onCompleted() {
-                                Timber.i("WorksSync onCompleted");
+                                Timber.i("WorksSync just completed their work");
                                 SyncEvent.send(getSyncType(), SyncStatus.COMPLETED);
                             }
                         }
