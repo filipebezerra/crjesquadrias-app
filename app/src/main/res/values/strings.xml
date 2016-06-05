@@ -61,7 +61,9 @@
     <string name="title_dialog_error_loading_data_from_local">Falha ao tentar listar dados do banco de dados</string>
     <string name="title_dialog_error_saving_data">Falha ao tentar salvar dados no banco de dados</string>
     <string name="msg_user_not_logged">Você não está logado. Entre para poder marcar como feito!</string>
-    <string name="tagline_importing_data">Importando todas informações das obras</string>
+    <string name="tagline_importing_data">
+        Importando todas informações das obras. Tudo será carregado automaticamente quando for concluída!
+    </string>
     <string name="content_please_wait">Por favor aguarde…</string>
     <string name="error_importing_data">Falha ao importar dados do servidor</string>
     <string name="error_updating_data">Falha ao atualizar dados do servidor</string>
