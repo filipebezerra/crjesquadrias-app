@@ -52,7 +52,7 @@ import rx.functions.Action1;
  * Activity da interface de usuário da lista de {@link Work}s.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 01/06/2016
+ * @version 0.1.0, 04/06/2016
  * @since 0.1.0
  */
 public class MainActivity extends BaseActivity implements OnClickListener,
@@ -147,15 +147,17 @@ public class MainActivity extends BaseActivity implements OnClickListener,
     }
 
     private void startImportingData() {
-        SyncService.request(SyncType.WORKS);
+        SyncService.request(SyncType.IMPORT);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEvent(SyncEvent event) {
-        if (event.getType() == SyncType.WORKS && event.getStatus() == SyncStatus.IN_PROGRESS) {
-            showImportingDataState();
-        } else if (event.getType() == SyncType.WORKS && event.getStatus() == SyncStatus.COMPLETED) {
-            loadWorkData();
+        if (event.getType() == SyncType.IMPORT) {
+            if (event.getStatus() == SyncStatus.IN_PROGRESS) {
+                showImportingDataState();
+            } else if (event.getStatus() == SyncStatus.COMPLETED) {
+                loadWorkData();
+            }
         }
     }
 
