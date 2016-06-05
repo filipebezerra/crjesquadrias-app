@@ -46,7 +46,7 @@ public class WorksSync extends AbstractSync {
 
         mWorkService
                 .getAllWithUpdates(ConfigHelper.getLastServerSync(mContext))
-                .observeOn(Schedulers.newThread())
+                .observeOn(Schedulers.io())
                 .filter(new Func1<List<Work>, Boolean>() {
                     @Override
                     public Boolean call(List<Work> works) {
