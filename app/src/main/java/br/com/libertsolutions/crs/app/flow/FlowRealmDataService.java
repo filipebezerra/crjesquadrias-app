@@ -1,6 +1,7 @@
 package br.com.libertsolutions.crs.app.flow;
 
 import android.content.Context;
+import br.com.libertsolutions.crs.app.utils.realm.RealmUtil;
 import br.com.libertsolutions.crs.app.utils.rx.RealmObservable;
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -14,7 +15,7 @@ import rx.functions.Func1;
  * .
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 28/03/2016
+ * @version 0.1.0, 04/06/2016
  * @since 0.1.0
  */
 public class FlowRealmDataService implements FlowDataService {
@@ -84,7 +85,21 @@ public class FlowRealmDataService implements FlowDataService {
         });
     }
 
-    private static Flow flowFromRealm(FlowEntity flowEntity) {
+    @Override
+    public void saveAllSync(final List<Flow> flowList) {
+        RealmUtil.executeTransaction(mContext, new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                for (Flow flow : flowList){
+                    final WorkStepEntity workStepEntity = realm.copyToRealmOrUpdate(
+                            toWorkStepEntity(flow.getStep()));
+                    realm.copyToRealmOrUpdate(toFlowEntity(flow, workStepEntity));
+                }
+            }
+        });
+    }
+
+    private Flow flowFromRealm(FlowEntity flowEntity) {
         final WorkStep workStep = workStepFromRealm(flowEntity.getStep());
         final Long flowId = flowEntity.getFlowId();
         final Long workId = flowEntity.getWorkId();
@@ -93,7 +108,7 @@ public class FlowRealmDataService implements FlowDataService {
         return new Flow(workStep, flowId, workId, status);
     }
 
-    private static WorkStep workStepFromRealm(WorkStepEntity workStepEntity) {
+    private WorkStep workStepFromRealm(WorkStepEntity workStepEntity) {
         final Long workStepId = workStepEntity.getWorkStepId();
         final String name = workStepEntity.getName();
         final Integer type = workStepEntity.getType();
@@ -101,5 +116,24 @@ public class FlowRealmDataService implements FlowDataService {
         final Integer goForward = workStepEntity.getGoForward();
 
         return new WorkStep(workStepId, order, name, type, goForward);
+    }
+
+    private WorkStepEntity toWorkStepEntity(WorkStep workStep) {
+        final WorkStepEntity workStepEntity = new WorkStepEntity();
+        workStepEntity.setWorkStepId(workStep.getWorkStepId());
+        workStepEntity.setName(workStep.getName());
+        workStepEntity.setType(workStep.getType());
+        workStepEntity.setOrder(workStep.getOrder());
+        workStepEntity.setGoForward(workStep.getGoForward());
+        return workStepEntity;
+    }
+
+    private FlowEntity toFlowEntity(Flow flow, WorkStepEntity workStepEntity) {
+        final FlowEntity flowEntity = new FlowEntity();
+        flowEntity.setFlowId(flow.getFlowId());
+        flowEntity.setWorkId(flow.getWorkId());
+        flowEntity.setStep(workStepEntity);
+        flowEntity.setStatus(flow.getStatus());
+        return flowEntity;
     }
 }
