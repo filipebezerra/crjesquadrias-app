@@ -4,7 +4,7 @@ import java.util.List;
 import rx.Observable;
 
 /**
- * .
+ * Interface que define as operações de acesso e modificação aos dados de {@link Checkin}s.
  *
  * @author Filipe Bezerra
  * @version 0.1.0, 01/06/2016

@@ -11,7 +11,8 @@ import rx.Observable;
 import rx.functions.Func1;
 
 /**
- * .
+ * Implementação do contrato de acesso e modificação à dados dos {@link Checkin}s.
+ * É especializada para executar transações e manipular os dados utilizando a biblioteca Realm.
  *
  * @author Filipe Bezerra
  * @version 0.1.0, 01/06/2016
