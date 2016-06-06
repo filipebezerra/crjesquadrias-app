@@ -132,7 +132,8 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 
         if (isInitialDataImported) {
             loadWorkData();
-            requestSync();
+            Timber.i("Loading view data, requesting complete sync");
+            requestCompleteSync();
         } else if (NetworkUtil.isDeviceConnectedToInternet(this)) {
             startImportingData();
         } else {
@@ -140,10 +141,18 @@ public class MainActivity extends BaseActivity implements OnClickListener,
         }
     }
 
-    private void requestSync() {
-        SyncService.request(SyncType.WORKS);
-        //SyncService.request(SyncType.FLOWS);
-        //SyncService.request(SyncType.CHECKINS);
+    private void requestCompleteSync() {
+        SyncService.requestCompleteSync();
+        Timber.i("Complete sync requested");
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onSyncEvent(SyncEvent event) {
+        Timber.i("Sync event received: type = %s; status = %s", event.getType(), event.getStatus());
+        if (event.getType() == SyncType.WORKS && event.getStatus() == SyncStatus.COMPLETED) {
+            Timber.i("Sync completed");
+            loadWorkData();
+        }
     }
 
     private void showEmptyState(@DrawableRes int image, @StringRes int title,
@@ -176,14 +185,6 @@ public class MainActivity extends BaseActivity implements OnClickListener,
         showEmptyState(R.drawable.ic_import_state, R.string.title_importing_data,
                 R.string.tagline_importing_data);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(SyncEvent event) {
-        if (event.getType() == SyncType.WORKS && event.getStatus() == SyncStatus.COMPLETED) {
-            Timber.i("Sync completed");
-            loadWorkData();
-        }
     }
 
     private void showUserLoggedInfo() {
@@ -359,8 +360,10 @@ public class MainActivity extends BaseActivity implements OnClickListener,
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(
                         e -> showError(R.string.error_importing_data, e))
-                .retryWhen(RxUtil.timeoutException())
-                .retryWhen(RxUtil.exponentialBackoff(3, 5, TimeUnit.SECONDS))
+                .retryWhen(
+                        RxUtil.timeoutException())
+                .retryWhen(
+                        RxUtil.exponentialBackoff(3, 5, TimeUnit.SECONDS))
                 .doOnNext(
                         this::saveWorkData)
                 .subscribe();
@@ -396,8 +399,10 @@ public class MainActivity extends BaseActivity implements OnClickListener,
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(
                         e -> showError(R.string.error_importing_data, e))
-                .retryWhen(RxUtil.timeoutException())
-                .retryWhen(RxUtil.exponentialBackoff(3, 5, TimeUnit.SECONDS))
+                .retryWhen(
+                        RxUtil.timeoutException())
+                .retryWhen(
+                        RxUtil.exponentialBackoff(3, 5, TimeUnit.SECONDS))
                 .doOnNext(
                         this::saveFlowData)
                 .subscribe();
@@ -427,8 +432,10 @@ public class MainActivity extends BaseActivity implements OnClickListener,
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(
                         e -> showError(R.string.error_importing_data, e))
-                .retryWhen(RxUtil.timeoutException())
-                .retryWhen(RxUtil.exponentialBackoff(3, 5, TimeUnit.SECONDS))
+                .retryWhen(
+                        RxUtil.timeoutException())
+                .retryWhen(
+                        RxUtil.exponentialBackoff(3, 5, TimeUnit.SECONDS))
                 .doOnNext(
                         this::saveCheckinData)
                 .subscribe();
@@ -458,10 +465,13 @@ public class MainActivity extends BaseActivity implements OnClickListener,
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(
                         e -> showError(R.string.error_importing_data, e))
-                .retryWhen(RxUtil.timeoutException())
-                .retryWhen(RxUtil.exponentialBackoff(3, 5, TimeUnit.SECONDS))
+                .retryWhen(
+                        RxUtil.timeoutException())
+                .retryWhen(
+                        RxUtil.exponentialBackoff(3, 5, TimeUnit.SECONDS))
                 .doOnNext(
-                        c -> ConfigHelper.setLastServerSync(MainActivity.this, c.getDataAtual()))
+                        c -> ConfigHelper.setDataImportationAsLastSyncDate(
+                                MainActivity.this, c.getDataAtual()))
                 .doOnCompleted(
                         () -> {
                             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);

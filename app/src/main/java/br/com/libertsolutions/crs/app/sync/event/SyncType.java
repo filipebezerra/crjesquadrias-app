@@ -8,5 +8,5 @@ package br.com.libertsolutions.crs.app.sync.event;
  * @since #
  */
 public enum SyncType {
-    WORKS, FLOWS, CHECKINS
+    WORKS, FLOWS, CHECKINS, COMPLETE_SYNC
 }

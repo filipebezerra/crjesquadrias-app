@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import br.com.libertsolutions.crs.app.sync.event.SyncType;
 import java.util.HashMap;
 import java.util.Map;
+import timber.log.Timber;
 
 /**
  * .
@@ -24,6 +25,13 @@ class SyncManager {
     }
 
     void dispatchSync(@NonNull SyncType syncType) {
-        mSyncMap.get(syncType).sync();
+        if (syncType == SyncType.COMPLETE_SYNC) {
+            Timber.i("SyncManager throwing works, flows sync");
+            mSyncMap.get(SyncType.WORKS).sync();
+            mSyncMap.get(SyncType.FLOWS).sync();
+            //mSyncMap.get(SyncType.CHECKINS).sync();
+        } else {
+            mSyncMap.get(syncType).sync();
+        }
     }
 }

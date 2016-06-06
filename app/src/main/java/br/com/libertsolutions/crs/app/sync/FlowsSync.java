@@ -9,8 +9,10 @@ import br.com.libertsolutions.crs.app.flow.FlowService;
 import br.com.libertsolutions.crs.app.sync.event.SyncEvent;
 import br.com.libertsolutions.crs.app.sync.event.SyncStatus;
 import br.com.libertsolutions.crs.app.sync.event.SyncType;
+import br.com.libertsolutions.crs.app.utils.rx.RxUtil;
 import br.com.libertsolutions.crs.app.utils.webservice.ServiceGenerator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import rx.Subscriber;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -20,7 +22,7 @@ import timber.log.Timber;
  * .
  *
  * @author Filipe Bezerra
- * @version #, 04/06/2016
+ * @version #, 05/06/2016
  * @since #
  */
 public class FlowsSync extends AbstractSync {
@@ -45,8 +47,12 @@ public class FlowsSync extends AbstractSync {
         if (!ConfigHelper.isInitialDataImported(mContext)) return;
 
         mFlowService
-                .getAllWithUpdates(ConfigHelper.getLastServerSync(mContext))
+                .getAllWithUpdates(ConfigHelper.getLastFlowsSyncDate(mContext))
                 .observeOn(Schedulers.io())
+                .retryWhen(
+                        RxUtil.timeoutException())
+                .retryWhen(
+                        RxUtil.exponentialBackoff(3, 5, TimeUnit.SECONDS))
                 .filter(new Func1<List<Flow>, Boolean>() {
                     @Override
                     public Boolean call(List<Flow> flows) {
@@ -76,14 +82,13 @@ public class FlowsSync extends AbstractSync {
                             }
 
                             @Override
-                            public void onNext(Void ignored) {
-                                //TODO: ConfigHelper.setLastServerSync(mContext, date);
-                            }
+                            public void onNext(Void ignored) {}
 
                             @Override
                             public void onCompleted() {
                                 Timber.i("FlowsSync just completed their work");
                                 SyncEvent.send(getSyncType(), SyncStatus.COMPLETED);
+                                syncDone();
                             }
                         }
                 );

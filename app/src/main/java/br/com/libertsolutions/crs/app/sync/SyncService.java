@@ -15,7 +15,7 @@ import timber.log.Timber;
  * .
  *
  * @author Filipe Bezerra
- * @version #, 02/06/2016
+ * @version #, 05/06/2016
  * @since #
  */
 public class SyncService extends Service {
@@ -42,8 +42,8 @@ public class SyncService extends Service {
     }
 
     @Subscribe
-    public void onEvent(SyncRequestEvent event) {
-        Timber.i("SyncService onEvent with %s sync type", event.getSyncType());
+    public void onSyncRequestEvent(SyncRequestEvent event) {
+        Timber.i("SyncService onSyncRequestEvent dispatching %s sync type", event.getSyncType());
         mSyncManager.dispatchSync(event.getSyncType());
     }
 
@@ -52,7 +52,11 @@ public class SyncService extends Service {
         context.startService(intent);
     }
 
-    public static void request(@NonNull SyncType syncType) {
+    public static void requestSync(@NonNull SyncType syncType) {
         EventBusManager.send(new SyncRequestEvent(syncType));
+    }
+
+    public static void requestCompleteSync() {
+        EventBusManager.send(new SyncRequestEvent(SyncType.COMPLETE_SYNC));
     }
 }

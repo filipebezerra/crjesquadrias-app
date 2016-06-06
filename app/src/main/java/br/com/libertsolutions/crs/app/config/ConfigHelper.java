@@ -14,24 +14,64 @@ import android.support.v4.content.SharedPreferencesCompat;
  * @since 0.1.0
  */
 public class ConfigHelper {
-    private static final String KEY_LAST_SERVER_SYNC = "lastServerSync";
+    private static final String KEY_LAST_WORKS_SYNC_DATE = "lastWorksSyncDate";
+    private static final String KEY_LAST_FLOWS_SYNC_DATE = "lastFlowsSyncDate";
+    private static final String KEY_LAST_CHECKINS_SYNC_DATE = "lastCheckinsSyncDate";
     private static final String KEY_WORK_DATA_WAS_IMPORTED = "workDataWasImported";
     private static final String KEY_FLOW_DATA_WAS_IMPORTED = "flowDataWasImported";
     private static final String KEY_CHECKIN_DATA_WAS_IMPORTED = "checkinDataWasImported";
 
     private ConfigHelper() {}
 
-    public static String getLastServerSync(@NonNull Context context) {
+    public static String getLastWorksSyncDate(@NonNull Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context)
-                .getString(KEY_LAST_SERVER_SYNC, null);
+                .getString(KEY_LAST_WORKS_SYNC_DATE, null);
     }
 
-    public static void setLastServerSync(@NonNull Context context, String lastSyncDate) {
+    public static void setLastWorksSyncDate(@NonNull Context context, String syncDate) {
         SharedPreferencesCompat.EditorCompat
                 .getInstance()
                 .apply(PreferenceManager.getDefaultSharedPreferences(context)
                         .edit()
-                        .putString(KEY_LAST_SERVER_SYNC, lastSyncDate));
+                        .putString(KEY_LAST_WORKS_SYNC_DATE, syncDate));
+    }
+
+
+    public static String getLastFlowsSyncDate(@NonNull Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(KEY_LAST_FLOWS_SYNC_DATE, null);
+    }
+
+    public static void setLastFlowsSyncDate(@NonNull Context context, String syncDate) {
+        SharedPreferencesCompat.EditorCompat
+                .getInstance()
+                .apply(PreferenceManager.getDefaultSharedPreferences(context)
+                        .edit()
+                        .putString(KEY_LAST_FLOWS_SYNC_DATE, syncDate));
+    }
+
+    public static String getLastCheckinsSyncDate(@NonNull Context context) {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getString(KEY_LAST_CHECKINS_SYNC_DATE, null);
+    }
+
+    public static void setLastCheckinsSyncDate(@NonNull Context context, String syncDate) {
+        SharedPreferencesCompat.EditorCompat
+                .getInstance()
+                .apply(PreferenceManager.getDefaultSharedPreferences(context)
+                        .edit()
+                        .putString(KEY_LAST_CHECKINS_SYNC_DATE, syncDate));
+    }
+
+    public static void setDataImportationAsLastSyncDate(@NonNull Context context,
+            String syncDate) {
+        SharedPreferencesCompat.EditorCompat
+                .getInstance()
+                .apply(PreferenceManager.getDefaultSharedPreferences(context)
+                        .edit()
+                        .putString(KEY_LAST_WORKS_SYNC_DATE, syncDate)
+                        .putString(KEY_LAST_FLOWS_SYNC_DATE, syncDate)
+                        .putString(KEY_LAST_CHECKINS_SYNC_DATE, syncDate));
     }
 
     public static void setWorkDataAsImported(@NonNull Context context) {

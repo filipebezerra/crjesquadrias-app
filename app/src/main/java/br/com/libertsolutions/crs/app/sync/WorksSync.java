@@ -5,12 +5,14 @@ import br.com.libertsolutions.crs.app.config.ConfigHelper;
 import br.com.libertsolutions.crs.app.sync.event.SyncEvent;
 import br.com.libertsolutions.crs.app.sync.event.SyncStatus;
 import br.com.libertsolutions.crs.app.sync.event.SyncType;
+import br.com.libertsolutions.crs.app.utils.rx.RxUtil;
 import br.com.libertsolutions.crs.app.utils.webservice.ServiceGenerator;
 import br.com.libertsolutions.crs.app.work.Work;
 import br.com.libertsolutions.crs.app.work.WorkDataService;
 import br.com.libertsolutions.crs.app.work.WorkRealmDataService;
 import br.com.libertsolutions.crs.app.work.WorkService;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import rx.Subscriber;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -42,16 +44,19 @@ public class WorksSync extends AbstractSync {
 
     @Override
     protected void doSync() {
-        if (!ConfigHelper.isInitialDataImported(mContext)) {
-            return;
-        }
+        if (!ConfigHelper.isInitialDataImported(mContext)) return;
 
         mWorkService
-                .getAllWithUpdates(ConfigHelper.getLastServerSync(mContext))
+                .getAllWithUpdates(ConfigHelper.getLastWorksSyncDate(mContext))
                 .observeOn(Schedulers.io())
-                .filter(works -> !works.isEmpty())
-                .map((Func1<List<Work>, Void>)
-                        works -> {
+                .retryWhen(
+                        RxUtil.timeoutException())
+                .retryWhen(
+                        RxUtil.exponentialBackoff(3, 5, TimeUnit.SECONDS))
+                .filter(
+                        works -> !works.isEmpty())
+                .map(
+                        (Func1<List<Work>, Void>) works -> {
                             mWorkDataService.saveAllSync(works);
                             return null;
                         })
@@ -68,12 +73,12 @@ public class WorksSync extends AbstractSync {
                             }
 
                             @Override
-                            public void onNext(Void ignored) {
-                            }
+                            public void onNext(Void ignored) {}
 
                             @Override
                             public void onCompleted() {
                                 SyncEvent.send(getSyncType(), SyncStatus.COMPLETED);
+                                syncDone();
                             }
                         }
                 );
