@@ -14,15 +14,18 @@ import br.com.libertsolutions.crs.app.work.WorkService;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import rx.Subscriber;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
 /**
- * .
+ * Classe para execução de sincronização das atualizações nos {@link Work}s ou obras.
+ * <br><br>
+ * Todas alterações do servidor são obtidas e salvas localmente. As alterações dos dados
+ * das obras são aplicadas somente no servidor, assim consequentemente replicadas para
+ * o armazenamento local.
  *
  * @author Filipe Bezerra
- * @version #, 05/06/2016
+ * @version #, 06/06/2016
  * @since #
  */
 public class WorksSync extends AbstractSync {
@@ -46,34 +49,32 @@ public class WorksSync extends AbstractSync {
     protected void doSync() {
         if (!ConfigHelper.isInitialDataImported(mContext)) return;
 
+        final String lastSyncDate = ConfigHelper.getLastWorksSyncDate(mContext);
         mWorkService
-                .getAllWithUpdates(ConfigHelper.getLastWorksSyncDate(mContext))
+                .getAllWithUpdates(lastSyncDate)
                 .observeOn(Schedulers.io())
                 .retryWhen(
                         RxUtil.timeoutException())
                 .retryWhen(
                         RxUtil.exponentialBackoff(3, 5, TimeUnit.SECONDS))
                 .filter(
-                        works -> !works.isEmpty())
-                .map(
-                        (Func1<List<Work>, Void>) works -> {
-                            mWorkDataService.saveAllSync(works);
-                            return null;
-                        })
+                        worksUpdated -> !worksUpdated.isEmpty())
+                .flatMap(
+                        mWorkDataService::saveAll)
                 .subscribe(
-                        new Subscriber<Void>() {
+                        new Subscriber<List<Work>>() {
                             @Override
                             public void onStart() {
                                 SyncEvent.send(getSyncType(), SyncStatus.IN_PROGRESS);
                             }
 
                             @Override
-                            public void onError(Throwable e) {
-                                Timber.e(e, "WorksSync encountered a error");
+                            public void onError(Throwable error) {
+                                Timber.e(error, "Erro obtendo atualizações nas obras");
                             }
 
                             @Override
-                            public void onNext(Void ignored) {}
+                            public void onNext(List<Work> worksReceived) {}
 
                             @Override
                             public void onCompleted() {

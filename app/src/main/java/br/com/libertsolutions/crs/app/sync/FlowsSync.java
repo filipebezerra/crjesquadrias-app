@@ -18,7 +18,7 @@ import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
 /**
- * Class para execução de sincronização das atualizações nos {@link Flow}s ou fluxos.
+ * Classe para execução de sincronização das atualizações nos {@link Flow}s ou fluxos.
  * <br><br>
  * Todas alterações do servidor são obtidas e salvas localmente. As alterações dos dados
  * dos fluxos são aplicadas somente no servidor, assim consequentemente replicadas para
