@@ -5,13 +5,12 @@ import android.support.annotation.NonNull;
 import br.com.libertsolutions.crs.app.sync.event.SyncType;
 import java.util.HashMap;
 import java.util.Map;
-import timber.log.Timber;
 
 /**
- * .
+ * Classe para gerenciador os {@link SyncType} e sua execução.
  *
  * @author Filipe Bezerra
- * @version #, 05/06/2016
+ * @version #, 06/06/2016
  * @since #
  */
 class SyncManager {
@@ -25,13 +24,6 @@ class SyncManager {
     }
 
     void dispatchSync(@NonNull SyncType syncType) {
-        if (syncType == SyncType.COMPLETE_SYNC) {
-            Timber.i("SyncManager throwing works, flows sync");
-            mSyncMap.get(SyncType.WORKS).sync();
-            mSyncMap.get(SyncType.FLOWS).sync();
-            //mSyncMap.get(SyncType.CHECKINS).sync();
-        } else {
-            mSyncMap.get(syncType).sync();
-        }
+        mSyncMap.get(syncType).sync();
     }
 }
