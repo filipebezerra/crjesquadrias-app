@@ -14,15 +14,18 @@ import br.com.libertsolutions.crs.app.utils.webservice.ServiceGenerator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import rx.Subscriber;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
 /**
- * .
+ * Class para execução de sincronização das atualizações nos {@link Flow}s ou fluxos.
+ * <br><br>
+ * Todas alterações do servidor são obtidas e salvas localmente. As alterações dos dados
+ * dos fluxos são aplicadas somente no servidor, assim consequentemente replicadas para
+ * o armazenamento local.
  *
  * @author Filipe Bezerra
- * @version #, 05/06/2016
+ * @version #, 06/06/2016
  * @since #
  */
 public class FlowsSync extends AbstractSync {
@@ -46,47 +49,34 @@ public class FlowsSync extends AbstractSync {
     protected void doSync() {
         if (!ConfigHelper.isInitialDataImported(mContext)) return;
 
+        final String lastSyncDate = ConfigHelper.getLastFlowsSyncDate(mContext);
         mFlowService
-                .getAllWithUpdates(ConfigHelper.getLastFlowsSyncDate(mContext))
+                .getAllWithUpdates(lastSyncDate)
                 .observeOn(Schedulers.io())
                 .retryWhen(
                         RxUtil.timeoutException())
                 .retryWhen(
                         RxUtil.exponentialBackoff(3, 5, TimeUnit.SECONDS))
-                .filter(new Func1<List<Flow>, Boolean>() {
-                    @Override
-                    public Boolean call(List<Flow> flows) {
-                        Timber.i("FlowsSync is filtering the data received from server");
-                        return !flows.isEmpty();
-                    }
-                })
-                .map(new Func1<List<Flow>, Void>() {
-                    @Override
-                    public Void call(List<Flow> flows) {
-                        Timber.i("FlowsSync is saving data to the local storage");
-                        mFlowDataService.saveAllSync(flows);
-                        return null;
-                    }
-                })
+                .filter(
+                        flowsUpdate -> !flowsUpdate.isEmpty())
+                .flatMap(
+                        mFlowDataService::saveAll)
                 .subscribe(
-                        new Subscriber<Void>() {
-                            @Override
+                        new Subscriber<List<Flow>>() {
                             public void onStart() {
-                                Timber.i("FlowsSync just started working");
                                 SyncEvent.send(getSyncType(), SyncStatus.IN_PROGRESS);
                             }
 
                             @Override
-                            public void onError(Throwable e) {
-                                Timber.e(e, "FlowsSync encountered a error");
+                            public void onError(Throwable error) {
+                                Timber.e(error, "Erro obtendo atualizações nos fluxos");
                             }
 
                             @Override
-                            public void onNext(Void ignored) {}
+                            public void onNext(List<Flow> flowsReceived) {}
 
                             @Override
                             public void onCompleted() {
-                                Timber.i("FlowsSync just completed their work");
                                 SyncEvent.send(getSyncType(), SyncStatus.COMPLETED);
                                 syncDone();
                             }
