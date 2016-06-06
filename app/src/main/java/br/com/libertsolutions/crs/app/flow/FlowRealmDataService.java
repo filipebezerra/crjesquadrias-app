@@ -1,7 +1,6 @@
 package br.com.libertsolutions.crs.app.flow;
 
 import android.content.Context;
-import br.com.libertsolutions.crs.app.utils.realm.RealmUtil;
 import br.com.libertsolutions.crs.app.utils.rx.RealmObservable;
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -12,11 +11,13 @@ import rx.Observable;
 import rx.functions.Func1;
 
 /**
- * .
+ * Implementação do contrato de acesso e modificação à dados dos {@link Flow}s ou fluxos.
+ * É especializada para executar transações e manipular os dados utilizando a biblioteca Realm.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 04/06/2016
+ * @version 0.1.0, 06/06/2016
  * @since 0.1.0
+ * @see FlowDataService
  */
 public class FlowRealmDataService implements FlowDataService {
     private final Context mContext;
@@ -81,20 +82,6 @@ public class FlowRealmDataService implements FlowDataService {
                     list.add(flowFromRealm(flowEntity));
                 }
                 return list;
-            }
-        });
-    }
-
-    @Override
-    public void saveAllSync(final List<Flow> flowList) {
-        RealmUtil.executeTransaction(mContext, new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                for (Flow flow : flowList){
-                    final WorkStepEntity workStepEntity = realm.copyToRealmOrUpdate(
-                            toWorkStepEntity(flow.getStep()));
-                    realm.copyToRealmOrUpdate(toFlowEntity(flow, workStepEntity));
-                }
             }
         });
     }
