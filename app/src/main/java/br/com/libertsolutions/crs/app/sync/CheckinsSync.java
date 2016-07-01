@@ -1,6 +1,9 @@
 package br.com.libertsolutions.crs.app.sync;
 
 import android.content.Context;
+
+import java.util.concurrent.TimeUnit;
+
 import br.com.libertsolutions.crs.app.checkin.Checkin;
 import br.com.libertsolutions.crs.app.checkin.CheckinDataService;
 import br.com.libertsolutions.crs.app.checkin.CheckinRealmDataService;
@@ -12,7 +15,6 @@ import br.com.libertsolutions.crs.app.sync.event.SyncStatus;
 import br.com.libertsolutions.crs.app.sync.event.SyncType;
 import br.com.libertsolutions.crs.app.utils.rx.RxUtil;
 import br.com.libertsolutions.crs.app.utils.webservice.ServiceGenerator;
-import java.util.concurrent.TimeUnit;
 import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -27,14 +29,17 @@ import timber.log.Timber;
  * obra e do fluxo relacionado no servidor.</b>
  *
  * @author Filipe Bezerra
- * @version #, 06/06/2016
- * @since #
+ * @since 0.1.1
  */
-public class CheckinsSync extends AbstractSync {
+class CheckinsSync extends AbstractSync {
 
     private final CheckinDataService mCheckinDataService;
 
     private final CheckinService mCheckinService;
+
+    static {
+        Timber.tag(SyncService.SYNC_TAG);
+    }
 
     public CheckinsSync(Context context) {
         super(context);
@@ -56,6 +61,7 @@ public class CheckinsSync extends AbstractSync {
     }
 
     private void postUpdates() {
+        Timber.i("Posting checkin updates");
         //noinspection ConstantConditions
         final String userCpf = LoginHelper.getUserLogged(mContext).getCpf();
         mCheckinDataService
@@ -66,7 +72,7 @@ public class CheckinsSync extends AbstractSync {
                 .retryWhen(
                         RxUtil.exponentialBackoff(3, 5, TimeUnit.SECONDS))
                 .filter(
-                        checkinsUpdated -> !checkinsUpdated.isEmpty())
+                        checkinsUpdated -> checkinsUpdated != null && !checkinsUpdated.isEmpty())
                 .flatMap(
                         checkinsUpdated -> mCheckinService.patch(userCpf, checkinsUpdated))
                 .flatMap(
@@ -82,6 +88,7 @@ public class CheckinsSync extends AbstractSync {
 
     private void getUpdates() {
         final String lastSyncDate = ConfigHelper.getLastCheckinsSyncDate(mContext);
+        Timber.i("Getting checkin updates since %s", lastSyncDate);
         mCheckinService
                 .getAllWithUpdates(lastSyncDate)
                 .observeOn(Schedulers.io())
@@ -90,16 +97,18 @@ public class CheckinsSync extends AbstractSync {
                 .retryWhen(
                         RxUtil.exponentialBackoff(3, 5, TimeUnit.SECONDS))
                 .filter(
-                        checkinsUpdated -> !checkinsUpdated.isEmpty())
+                        checkinsUpdated -> checkinsUpdated != null && !checkinsUpdated.isEmpty())
                 .flatMap(
                         mCheckinDataService::saveAll)
                 .subscribe(
-                        checkinsReceived -> {
-                            SyncEvent.send(getSyncType(), SyncStatus.COMPLETED);
-                            syncDone();
-                        },
+                        checkinsReceived -> {},
 
-                        error -> Timber.e(error, "Erro obtendo atualizações nos check-ins")
+                        error -> Timber.e(error, "Erro obtendo atualizações nos check-ins"),
+
+                        () -> {
+                            syncDone();
+                            SyncEvent.send(getSyncType(), SyncStatus.COMPLETED);
+                        }
                 );
     }
 }

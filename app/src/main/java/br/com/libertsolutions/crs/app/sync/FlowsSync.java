@@ -1,6 +1,9 @@
 package br.com.libertsolutions.crs.app.sync;
 
 import android.content.Context;
+
+import java.util.concurrent.TimeUnit;
+
 import br.com.libertsolutions.crs.app.config.ConfigHelper;
 import br.com.libertsolutions.crs.app.flow.Flow;
 import br.com.libertsolutions.crs.app.flow.FlowDataService;
@@ -11,9 +14,6 @@ import br.com.libertsolutions.crs.app.sync.event.SyncStatus;
 import br.com.libertsolutions.crs.app.sync.event.SyncType;
 import br.com.libertsolutions.crs.app.utils.rx.RxUtil;
 import br.com.libertsolutions.crs.app.utils.webservice.ServiceGenerator;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import rx.Subscriber;
 import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -25,14 +25,17 @@ import timber.log.Timber;
  * o armazenamento local.
  *
  * @author Filipe Bezerra
- * @version #, 06/06/2016
- * @since #
+ * @since 0.1.1
  */
-public class FlowsSync extends AbstractSync {
+class FlowsSync extends AbstractSync {
 
     private final FlowDataService mFlowDataService;
 
     private final FlowService mFlowService;
+
+    static {
+        Timber.tag(SyncService.SYNC_TAG);
+    }
 
     public FlowsSync(Context context) {
         super(context);
@@ -49,7 +52,10 @@ public class FlowsSync extends AbstractSync {
     protected void doSync() {
         if (!ConfigHelper.isInitialDataImported(mContext)) return;
 
+        SyncEvent.send(getSyncType(), SyncStatus.IN_PROGRESS);
+
         final String lastSyncDate = ConfigHelper.getLastFlowsSyncDate(mContext);
+        Timber.i("Getting flow updates since %s", lastSyncDate);
         mFlowService
                 .getAllWithUpdates(lastSyncDate)
                 .observeOn(Schedulers.io())
@@ -58,28 +64,17 @@ public class FlowsSync extends AbstractSync {
                 .retryWhen(
                         RxUtil.exponentialBackoff(3, 5, TimeUnit.SECONDS))
                 .filter(
-                        flowsUpdate -> !flowsUpdate.isEmpty())
+                        flowsUpdate -> flowsUpdate != null && !flowsUpdate.isEmpty())
                 .flatMap(
                         mFlowDataService::saveAll)
                 .subscribe(
-                        new Subscriber<List<Flow>>() {
-                            public void onStart() {
-                                SyncEvent.send(getSyncType(), SyncStatus.IN_PROGRESS);
-                            }
+                        flowsReceived -> {},
 
-                            @Override
-                            public void onError(Throwable error) {
-                                Timber.e(error, "Erro obtendo atualizações nos fluxos");
-                            }
+                        e -> Timber.e(e, "Erro obtendo atualizações nos fluxos"),
 
-                            @Override
-                            public void onNext(List<Flow> flowsReceived) {}
-
-                            @Override
-                            public void onCompleted() {
-                                SyncEvent.send(getSyncType(), SyncStatus.COMPLETED);
-                                syncDone();
-                            }
+                        () -> {
+                            syncDone();
+                            SyncEvent.send(getSyncType(), SyncStatus.COMPLETED);
                         }
                 );
     }

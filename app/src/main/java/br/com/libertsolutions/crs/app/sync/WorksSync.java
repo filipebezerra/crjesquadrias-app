@@ -1,6 +1,9 @@
 package br.com.libertsolutions.crs.app.sync;
 
 import android.content.Context;
+
+import java.util.concurrent.TimeUnit;
+
 import br.com.libertsolutions.crs.app.config.ConfigHelper;
 import br.com.libertsolutions.crs.app.sync.event.SyncEvent;
 import br.com.libertsolutions.crs.app.sync.event.SyncStatus;
@@ -11,9 +14,6 @@ import br.com.libertsolutions.crs.app.work.Work;
 import br.com.libertsolutions.crs.app.work.WorkDataService;
 import br.com.libertsolutions.crs.app.work.WorkRealmDataService;
 import br.com.libertsolutions.crs.app.work.WorkService;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import rx.Subscriber;
 import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -25,14 +25,17 @@ import timber.log.Timber;
  * o armazenamento local.
  *
  * @author Filipe Bezerra
- * @version #, 06/06/2016
- * @since #
+ * @since 0.1.1
  */
-public class WorksSync extends AbstractSync {
+class WorksSync extends AbstractSync {
 
     private final WorkService mWorkService;
 
     private final WorkDataService mWorkDataService;
+
+    static {
+        Timber.tag(SyncService.SYNC_TAG);
+    }
 
     public WorksSync(Context context) {
         super(context);
@@ -49,7 +52,10 @@ public class WorksSync extends AbstractSync {
     protected void doSync() {
         if (!ConfigHelper.isInitialDataImported(mContext)) return;
 
+        SyncEvent.send(getSyncType(), SyncStatus.IN_PROGRESS);
+
         final String lastSyncDate = ConfigHelper.getLastWorksSyncDate(mContext);
+        Timber.i("Getting work updates since %s", lastSyncDate);
         mWorkService
                 .getAllWithUpdates(lastSyncDate)
                 .observeOn(Schedulers.io())
@@ -62,25 +68,13 @@ public class WorksSync extends AbstractSync {
                 .flatMap(
                         mWorkDataService::saveAll)
                 .subscribe(
-                        new Subscriber<List<Work>>() {
-                            @Override
-                            public void onStart() {
-                                SyncEvent.send(getSyncType(), SyncStatus.IN_PROGRESS);
-                            }
+                        worksReceived -> {},
 
-                            @Override
-                            public void onError(Throwable error) {
-                                Timber.e(error, "Erro obtendo atualizações nas obras");
-                            }
+                        e -> Timber.e(e, "Erro obtendo atualizações nas obras"),
 
-                            @Override
-                            public void onNext(List<Work> worksReceived) {}
-
-                            @Override
-                            public void onCompleted() {
-                                SyncEvent.send(getSyncType(), SyncStatus.COMPLETED);
-                                syncDone();
-                            }
+                        () -> {
+                            syncDone();
+                            SyncEvent.send(getSyncType(), SyncStatus.COMPLETED);
                         }
                 );
     }

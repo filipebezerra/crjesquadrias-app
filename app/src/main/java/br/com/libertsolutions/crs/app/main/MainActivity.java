@@ -18,6 +18,15 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.afollestad.materialdialogs.MaterialDialog;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
 import br.com.libertsolutions.crs.app.android.recyclerview.GridDividerDecoration;
@@ -51,11 +60,6 @@ import br.com.libertsolutions.crs.app.work.WorkRealmDataService;
 import br.com.libertsolutions.crs.app.work.WorkService;
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import com.afollestad.materialdialogs.MaterialDialog;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -66,8 +70,7 @@ import timber.log.Timber;
  * Activity da interface de usuário da lista de {@link Work}s.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 05/06/2016
- * @since 0.1.0
+ * @since 0.1.1
  */
 public class MainActivity extends BaseActivity implements OnClickListener,
         SearchView.OnQueryTextListener {
@@ -133,7 +136,7 @@ public class MainActivity extends BaseActivity implements OnClickListener,
         if (isInitialDataImported) {
             loadWorkData();
             Timber.i("Loading view data, requesting complete sync");
-            requestCompleteSync();
+                requestCompleteSync();
         } else if (NetworkUtil.isDeviceConnectedToInternet(this)) {
             startImportingData();
         } else {
@@ -148,7 +151,7 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onSyncEvent(SyncEvent event) {
-        Timber.i("Sync event received: type = %s; status = %s", event.getType(), event.getStatus());
+        Timber.i("Sync event with %s in %s", event.getType(), event.getStatus());
         if (event.getType() == SyncType.WORKS && event.getStatus() == SyncStatus.COMPLETED) {
             Timber.i("Sync completed");
             loadWorkData();
