@@ -32,7 +32,7 @@ public class FlowAdapter extends RecyclerView.Adapter<FlowAdapter.ViewHolder> {
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final View itemView = LayoutInflater.from(mContext)
-                .inflate(R.layout.item_work_step, parent, false);
+                .inflate(R.layout.item_flow, parent, false);
         return new ViewHolder(itemView);
     }
 
@@ -81,6 +81,14 @@ public class FlowAdapter extends RecyclerView.Adapter<FlowAdapter.ViewHolder> {
             }
         }
         return count;
+    }
+
+    public void swapData(List<Flow> flowList) {
+        if (flowList != null) {
+            mFlows.clear();
+            mFlows.addAll(flowList);
+            notifyDataSetChanged();
+        }
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

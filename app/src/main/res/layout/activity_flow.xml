@@ -25,6 +25,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_work_step" />
+    <include layout="@layout/content_flow" />
 
 </android.support.design.widget.CoordinatorLayout>

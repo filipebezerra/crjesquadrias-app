@@ -3,6 +3,7 @@ package br.com.libertsolutions.crs.app.flow;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,23 +14,32 @@ import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
 import br.com.libertsolutions.crs.app.android.recyclerview.GridDividerDecoration;
 import br.com.libertsolutions.crs.app.android.recyclerview.OnClickListener;
 import br.com.libertsolutions.crs.app.android.recyclerview.OnTouchListener;
+import br.com.libertsolutions.crs.app.sync.SyncService;
+import br.com.libertsolutions.crs.app.sync.event.EventBusManager;
+import br.com.libertsolutions.crs.app.sync.event.SyncEvent;
+import br.com.libertsolutions.crs.app.sync.event.SyncStatus;
+import br.com.libertsolutions.crs.app.sync.event.SyncType;
+import br.com.libertsolutions.crs.app.utils.feedback.FeedbackHelper;
 import br.com.libertsolutions.crs.app.utils.navigation.NavigationHelper;
+import br.com.libertsolutions.crs.app.utils.network.NetworkUtil;
 import butterknife.Bind;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.crashlytics.android.Crashlytics;
 import java.util.List;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
+import timber.log.Timber;
 
 /**
  * Activity da interface de usuário da lista de {@link Flow}s.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 01/06/2016
- * @since 0.1.0
+ * @version 0.2.0
  */
-public class FlowActivity extends BaseActivity implements OnClickListener {
+public class FlowActivity extends BaseActivity
+        implements OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     public static final String EXTRA_WORK_ID = "workId";
 
@@ -41,7 +51,8 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
 
     private Subscription mFlowDataSubscription;
 
-    @Bind(android.R.id.list) RecyclerView mWorkStepsView;
+    @Bind(R.id.list) RecyclerView mWorkStepsView;
+    @Bind(R.id.swipe_container) SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override
     protected int provideLayoutResource() {
@@ -58,6 +69,7 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
         super.onCreate(inState);
         validateExtraWorkId();
         setupRecyclerView();
+        setupSwipeRefreshLayout();
         loadFlowData();
     }
 
@@ -84,6 +96,12 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
         mWorkStepsView.addOnItemTouchListener(new OnTouchListener(this, mWorkStepsView, this));
     }
 
+    private void setupSwipeRefreshLayout() {
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
+        mSwipeRefreshLayout.setProgressBackgroundColorSchemeResource(android.R.color.white);
+    }
+
     private void loadFlowData() {
         if (mFlowDataService == null) {
             mFlowDataService = new FlowRealmDataService(this);
@@ -92,26 +110,18 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
         mFlowDataSubscription = mFlowDataService.list(mWorkId)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        new Action1<List<Flow>>() {
-                            @Override
-                            public void call(List<Flow> list) {
-                                showFlowData(list);
-                            }
-                        },
+                        this::showFlowData,
 
-                        new Action1<Throwable>() {
-                            @Override
-                            public void call(Throwable e) {
-                                showError(R.string.title_dialog_error_loading_data_from_local, e);
-                            }
-                        }
+                        e -> showError(R.string.title_dialog_error_loading_data_from_local, e)
                 );
     }
 
     private void showFlowData(List<Flow> list) {
-        mWorkStepsView.setAdapter(mFlowAdapter =
-                new FlowAdapter(FlowActivity.this, list));
-
+        if (mFlowAdapter == null) {
+            mWorkStepsView.setAdapter(mFlowAdapter = new FlowAdapter(FlowActivity.this, list));
+        } else {
+            mFlowAdapter.swapData(list);
+        }
         updateSubtitle();
     }
 
@@ -138,9 +148,15 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        EventBusManager.register(this);
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
-
+        EventBusManager.unregister(this);
         if (mFlowDataSubscription != null && mFlowDataSubscription.isUnsubscribed()) {
             mFlowDataSubscription.unsubscribe();
         }
@@ -171,6 +187,32 @@ public class FlowActivity extends BaseActivity implements OnClickListener {
             mWorkStepsView.setLayoutManager(new GridLayoutManager(this, 3));
         } else {
             mWorkStepsView.setLayoutManager(new LinearLayoutManager(this));
+        }
+    }
+
+    @Override
+    public void onRefresh() {
+        if (NetworkUtil.isDeviceConnectedToInternet(this)) {
+            SyncService.requestCompleteSync();
+        } else {
+            FeedbackHelper.toast(this, getString(R.string.no_connection_to_force_update), false);
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onSyncEvent(SyncEvent event) {
+        Timber.i("Sync event with %s in %s", event.getType(), event.getStatus());
+
+        if (event.getStatus() == SyncStatus.IN_PROGRESS) {
+            if (!mSwipeRefreshLayout.isRefreshing())
+                mSwipeRefreshLayout.setRefreshing(true);
+        } else if (event.getType() == SyncType.FLOWS) {
+            Timber.i("Sync completed");
+
+            if (mSwipeRefreshLayout.isRefreshing())
+                mSwipeRefreshLayout.setRefreshing(false);
+
+            loadFlowData();
         }
     }
 }
