@@ -20,10 +20,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * .
- *
  * @author Filipe Bezerra
- * @version 0.1.0, 03/04/2016
+ * @version 0.2.0
  * @since 0.1.0
  */
 public class CheckinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -159,6 +157,14 @@ public class CheckinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public void updateCheckin(List<Checkin> checkinsDone) {
         for (Checkin checkinDone : checkinsDone) {
             updateCheckin(checkinDone);
+        }
+    }
+
+    public void swapData(List<Checkin> checkinList) {
+        if (checkinList != null) {
+            mCheckins.clear();
+            mCheckins.addAll(checkinList);
+            notifyDataSetChanged();
         }
     }
 

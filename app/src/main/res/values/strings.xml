@@ -78,4 +78,6 @@
     <string name="no_connection_to_force_update">
         Não foi possível atualizar. Verifique a conexão de rede e deslize para baixo para tentar novamente.
     </string>
+    <string name="checkins_already_done">Todos check-ins já estão marcados!</string>
+    <string name="checkins_status_cannot_change">Não é permitido desfazer o check-in!</string>
 </resources>
