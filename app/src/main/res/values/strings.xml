@@ -75,4 +75,7 @@
     <string name="title_no_connection">Sem conexão</string>
     <string name="tagline_no_connection">Não há conexão com a internet e não há obras importadas</string>
     <string name="title_importing_data">Importação em andamento…</string>
+    <string name="no_connection_to_force_update">
+        Não foi possível atualizar. Verifique a conexão de rede e deslize para baixo para tentar novamente.
+    </string>
 </resources>

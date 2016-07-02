@@ -21,4 +21,5 @@
     <item name="stepStatus" type="id" />
     <item name="checkinStatus" type="id" />
     <item name="productColor" type="id" />
+    <item name="swipe_container" type="id"/>
 </resources>

@@ -8,6 +8,7 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -70,10 +71,10 @@ import timber.log.Timber;
  * Activity da interface de usuário da lista de {@link Work}s.
  *
  * @author Filipe Bezerra
- * @since 0.1.1
+ * @since 0.2.0
  */
 public class MainActivity extends BaseActivity implements OnClickListener,
-        SearchView.OnQueryTextListener {
+        SearchView.OnQueryTextListener, SwipeRefreshLayout.OnRefreshListener {
 
     private WorkAdapter mWorkAdapter;
 
@@ -85,6 +86,7 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 
     @Bind(R.id.list) RecyclerView mWorksView;
     @Bind(R.id.empty_state) LinearLayout mEmptyStateView;
+    @Bind(R.id.swipe_container) SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override
     protected int provideLayoutResource() {
@@ -96,6 +98,13 @@ public class MainActivity extends BaseActivity implements OnClickListener,
         super.onCreate(inState);
         setupActionBar();
         setupRecyclerView();
+        setupSwipeRefreshLayout();
+    }
+
+    private void setupSwipeRefreshLayout() {
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
+        mSwipeRefreshLayout.setProgressBackgroundColorSchemeResource(android.R.color.white);
     }
 
     @Override
@@ -136,7 +145,7 @@ public class MainActivity extends BaseActivity implements OnClickListener,
         if (isInitialDataImported) {
             loadWorkData();
             Timber.i("Loading view data, requesting complete sync");
-                requestCompleteSync();
+            requestCompleteSync();
         } else if (NetworkUtil.isDeviceConnectedToInternet(this)) {
             startImportingData();
         } else {
@@ -152,9 +161,16 @@ public class MainActivity extends BaseActivity implements OnClickListener,
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onSyncEvent(SyncEvent event) {
         Timber.i("Sync event with %s in %s", event.getType(), event.getStatus());
-        if (event.getType() == SyncType.WORKS && event.getStatus() == SyncStatus.COMPLETED) {
-            Timber.i("Sync completed");
-            loadWorkData();
+
+        if (event.getStatus() == SyncStatus.IN_PROGRESS) {
+            if (!mSwipeRefreshLayout.isRefreshing()) mSwipeRefreshLayout.setRefreshing(true);
+        } else {
+            if (mSwipeRefreshLayout.isRefreshing()) mSwipeRefreshLayout.setRefreshing(false);
+
+            if (event.getType() == SyncType.WORKS) {
+                Timber.i("Sync completed");
+                loadWorkData();
+            }
         }
     }
 
@@ -483,5 +499,14 @@ public class MainActivity extends BaseActivity implements OnClickListener,
                 )
                 .subscribe();
         mCompositeSubscription.add(subscription);
+    }
+
+    @Override
+    public void onRefresh() {
+        if (NetworkUtil.isDeviceConnectedToInternet(this)) {
+            requestCompleteSync();
+        } else {
+            FeedbackHelper.toast(this, getString(R.string.no_connection_to_force_update), false);
+        }
     }
 }
