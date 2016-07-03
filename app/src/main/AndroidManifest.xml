@@ -64,7 +64,6 @@
         <activity
             android:name=".flowscreen.FlowActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
-            android:label="@string/title_activity_stage"
             android:launchMode="singleTop"
             android:parentActivityName=".mainscreen.MainActivity"
             android:theme="@style/Crs.NoActionBar"

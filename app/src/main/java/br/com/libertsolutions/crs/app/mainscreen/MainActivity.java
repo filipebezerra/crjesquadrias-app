@@ -344,7 +344,7 @@ public class MainActivity extends BaseActivity implements OnClickListener,
             final Work item = mWorkAdapter.getItem(position);
 
             if (item != null) {
-                NavigationHelper.navigateToFlowScreen(this, item.getWorkId());
+                NavigationHelper.navigateToFlowScreen(this, item);
             }
         }
     }

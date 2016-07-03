@@ -3,11 +3,14 @@ package br.com.libertsolutions.crs.app.flowscreen;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
@@ -25,6 +28,7 @@ import br.com.libertsolutions.crs.app.sync.event.SyncType;
 import br.com.libertsolutions.crs.app.utils.feedback.FeedbackHelper;
 import br.com.libertsolutions.crs.app.utils.navigation.NavigationHelper;
 import br.com.libertsolutions.crs.app.utils.network.NetworkUtil;
+import br.com.libertsolutions.crs.app.work.Work;
 import butterknife.BindView;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.crashlytics.android.Crashlytics;
@@ -45,9 +49,9 @@ import timber.log.Timber;
 public class FlowActivity extends BaseActivity
         implements OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
-    public static final String EXTRA_WORK_ID = "workId";
+    public static final String EXTRA_WORK = "work";
 
-    private Long mWorkId;
+    private Work mWork;
 
     private FlowAdapter mFlowAdapter;
 
@@ -55,6 +59,10 @@ public class FlowActivity extends BaseActivity
 
     private Subscription mFlowDataSubscription;
 
+    @BindView(R.id.collapsing_toolbar) CollapsingToolbarLayout mCollapsingToolbarLayout;
+    @BindView(R.id.job_title) TextView mJobTitleView;
+    @BindView(R.id.code_subtitle) TextView mCodeSubtitleView;
+    @BindView(R.id.work_steps_running) TextView mWorkStepsRunningView;
     @BindView(R.id.list) RecyclerView mWorkStepsView;
     @BindView(R.id.swipe_container) SwipeRefreshLayout mSwipeRefreshLayout;
 
@@ -72,16 +80,16 @@ public class FlowActivity extends BaseActivity
     protected void onCreate(Bundle inState) {
         super.onCreate(inState);
         validateExtraWorkId();
+        initTitleAppBar();
         setupRecyclerView();
         setupSwipeRefreshLayout();
-        loadFlowData();
     }
 
     private void validateExtraWorkId() {
-        if (getIntent().hasExtra(EXTRA_WORK_ID)) {
-            mWorkId = getIntent().getLongExtra(EXTRA_WORK_ID, INVALID_EXTRA_ID);
+        if (getIntent().hasExtra(EXTRA_WORK)) {
+            mWork = getIntent().getParcelableExtra(EXTRA_WORK);
 
-            if (mWorkId == INVALID_EXTRA_ID) {
+            if (mWork == null) {
                 throw new IllegalArgumentException(
                         "You need to set a valid workId as long type");
             }
@@ -91,6 +99,16 @@ public class FlowActivity extends BaseActivity
                     + "Work ID in the second parameter", Toast.LENGTH_LONG).show();
             finish();
         }
+    }
+
+    private void initTitleAppBar() {
+        setTitle(mWork.getJob());
+
+        mCollapsingToolbarLayout.setExpandedTitleColor(
+                ContextCompat.getColor(this, android.R.color.transparent));
+
+        mJobTitleView.setText(mWork.getJob());
+        mCodeSubtitleView.setText(mWork.getCode());
     }
 
     private void setupRecyclerView() {
@@ -106,12 +124,19 @@ public class FlowActivity extends BaseActivity
         mSwipeRefreshLayout.setProgressBackgroundColorSchemeResource(android.R.color.white);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBusManager.register(this);
+        loadFlowData();
+    }
+
     private void loadFlowData() {
         if (mFlowDataService == null) {
             mFlowDataService = new FlowRealmDataService(this);
         }
 
-        mFlowDataSubscription = mFlowDataService.list(mWorkId)
+        mFlowDataSubscription = mFlowDataService.list(mWork.getWorkId())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         this::showFlowData,
@@ -126,17 +151,16 @@ public class FlowActivity extends BaseActivity
         } else {
             mFlowAdapter.swapData(list);
         }
-        updateSubtitle();
+        updateTitleAppBar();
     }
 
-    private void updateSubtitle() {
+    private void updateTitleAppBar() {
         if (mFlowAdapter != null) {
             final int count = mFlowAdapter.getRunningFlowsCount();
             if (count == 0) {
-                setSubtitle(getString(R.string.no_work_step_running));
+                mWorkStepsRunningView.setText(getString(R.string.no_work_step_running));
             } else {
-                setSubtitle(getString(R.string.work_steps_running,
-                        count));
+                mWorkStepsRunningView.setText(getString(R.string.work_steps_running, count));
             }
         }
     }
@@ -152,17 +176,16 @@ public class FlowActivity extends BaseActivity
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        EventBusManager.register(this);
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        changeListLayout(newConfig);
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        EventBusManager.unregister(this);
-        if (mFlowDataSubscription != null && mFlowDataSubscription.isUnsubscribed()) {
-            mFlowDataSubscription.unsubscribe();
+    private void changeListLayout(Configuration configuration) {
+        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mWorkStepsView.setLayoutManager(new GridLayoutManager(this, 3));
+        } else {
+            mWorkStepsView.setLayoutManager(new LinearLayoutManager(this));
         }
     }
 
@@ -179,20 +202,6 @@ public class FlowActivity extends BaseActivity
 
     @Override
     public void onLongPress(View view, int position) {}
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        changeListLayout(newConfig);
-    }
-
-    private void changeListLayout(Configuration configuration) {
-        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mWorkStepsView.setLayoutManager(new GridLayoutManager(this, 3));
-        } else {
-            mWorkStepsView.setLayoutManager(new LinearLayoutManager(this));
-        }
-    }
 
     @Override
     public void onRefresh() {
@@ -217,6 +226,15 @@ public class FlowActivity extends BaseActivity
                 mSwipeRefreshLayout.setRefreshing(false);
 
             loadFlowData();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBusManager.unregister(this);
+        if (mFlowDataSubscription != null && mFlowDataSubscription.isUnsubscribed()) {
+            mFlowDataSubscription.unsubscribe();
         }
     }
 }

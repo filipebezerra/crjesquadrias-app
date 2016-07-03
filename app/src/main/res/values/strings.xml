@@ -30,7 +30,6 @@
     <string name="work_date_caption">Data</string>
     <string name="action_logout">Sair</string>
     <string name="action_settings">Configurações</string>
-    <string name="title_activity_stage">Etapas</string>
     <string name="title_activity_checkin">Check-ins</string>
     <string name="action_check_all">Marcar todos</string>
     <string name="works_running">%1$d obra(s) em execução</string>

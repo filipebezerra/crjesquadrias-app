@@ -14,6 +14,7 @@ import br.com.libertsolutions.crs.app.loginscreen.LoginActivity;
 import br.com.libertsolutions.crs.app.mainscreen.MainActivity;
 import br.com.libertsolutions.crs.app.settingscreen.SettingsActivity;
 import br.com.libertsolutions.crs.app.settingscreen.SettingsActivityCompat;
+import br.com.libertsolutions.crs.app.work.Work;
 
 /**
  * .
@@ -47,9 +48,9 @@ public class NavigationHelper {
         }
     }
 
-    public static void navigateToFlowScreen(@NonNull Activity activity , @NonNull Long workId) {
+    public static void navigateToFlowScreen(@NonNull Activity activity, @NonNull Work work) {
         activity.startActivity(new Intent(activity, FlowActivity.class)
-                .putExtra(FlowActivity.EXTRA_WORK_ID, workId));
+                .putExtra(FlowActivity.EXTRA_WORK, work));
     }
 
     public static void navigateToCheckinScreen(@NonNull Context context, @NonNull Long flowId) {
