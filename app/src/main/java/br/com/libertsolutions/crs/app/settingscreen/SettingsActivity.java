@@ -1,4 +1,4 @@
-package br.com.libertsolutions.crs.app.settings;
+package br.com.libertsolutions.crs.app.settingscreen;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -15,8 +15,8 @@ import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
  * Application settings screen.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 20/03/2016
- * @since 0.1.0, 22/01/2016
+ * @version 0.1.0
+ * @since 0.1.0
  */
 @SuppressLint("NewApi")
 public class SettingsActivity extends BaseActivity {

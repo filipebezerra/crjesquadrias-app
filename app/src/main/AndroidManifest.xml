@@ -50,13 +50,13 @@
             android:windowSoftInputMode="stateHidden"
             />
         <activity
-            android:name=".settings.SettingsActivity"
+            android:name=".settingscreen.SettingsActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             android:label="@string/title_activity_settings"
             android:theme="@style/Crs.NoActionBar"
             />
         <activity
-            android:name=".settings.SettingsActivityCompat"
+            android:name=".settingscreen.SettingsActivityCompat"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             android:label="@string/title_activity_settings"
             android:theme="@style/Crs.NoActionBar"

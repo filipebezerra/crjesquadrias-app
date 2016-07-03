@@ -12,8 +12,8 @@ import br.com.libertsolutions.crs.app.checkinscreen.CheckinActivity;
 import br.com.libertsolutions.crs.app.flowscreen.FlowActivity;
 import br.com.libertsolutions.crs.app.loginscreen.LoginActivity;
 import br.com.libertsolutions.crs.app.mainscreen.MainActivity;
-import br.com.libertsolutions.crs.app.settings.SettingsActivity;
-import br.com.libertsolutions.crs.app.settings.SettingsActivityCompat;
+import br.com.libertsolutions.crs.app.settingscreen.SettingsActivity;
+import br.com.libertsolutions.crs.app.settingscreen.SettingsActivityCompat;
 
 /**
  * .

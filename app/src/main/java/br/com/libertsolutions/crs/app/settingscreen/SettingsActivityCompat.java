@@ -1,4 +1,4 @@
-package br.com.libertsolutions.crs.app.settings;
+package br.com.libertsolutions.crs.app.settingscreen;
 
 import android.annotation.TargetApi;
 import android.os.Build;
@@ -10,8 +10,8 @@ import br.com.libertsolutions.crs.app.R;
  * Application settings screen for compatibility with old Android versions.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 30/03/2016
- * @since 0.1.0, 22/01/2016
+ * @version 0.1.0
+ * @since 0.1.0
  */
 @TargetApi(Build.VERSION_CODES.GINGERBREAD_MR1)
 public class SettingsActivityCompat extends android.preference.PreferenceActivity {

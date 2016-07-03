@@ -1,15 +1,15 @@
 package br.com.libertsolutions.crs.app.application;
 
 import br.com.libertsolutions.crs.app.launchscreen.LaunchScreenActivity;
-import br.com.libertsolutions.crs.app.login.LoginActivity;
-import br.com.libertsolutions.crs.app.settings.SettingsActivity;
-import br.com.libertsolutions.crs.app.settings.SettingsActivityCompat;
+import br.com.libertsolutions.crs.app.loginscreen.LoginActivity;
+import br.com.libertsolutions.crs.app.settingscreen.SettingsActivity;
+import br.com.libertsolutions.crs.app.settingscreen.SettingsActivityCompat;
 
 /**
  * Request codes used in global application.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 22/01/2016
+ * @version 0.1.0
  * @since 0.1.0
  */
 public interface RequestCodes {

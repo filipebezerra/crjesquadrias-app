@@ -4,12 +4,14 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import br.com.libertsolutions.crs.app.settingscreen.SettingsActivity;
+import br.com.libertsolutions.crs.app.settingscreen.SettingsActivityCompat;
 
 /**
  * Utilities methods used in {@link SettingsActivity} or {@link SettingsActivityCompat}.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 22/01/2016
+ * @version 0.1.0
  * @since 0.1.0
  */
 public class SettingsHelper {
