@@ -1,4 +1,4 @@
-package br.com.libertsolutions.crs.app.checkin;
+package br.com.libertsolutions.crs.app.checkinscreen;
 
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
@@ -12,6 +12,9 @@ import android.widget.Toast;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
 import br.com.libertsolutions.crs.app.android.recyclerview.DividerDecoration;
+import br.com.libertsolutions.crs.app.checkin.Checkin;
+import br.com.libertsolutions.crs.app.checkin.CheckinDataService;
+import br.com.libertsolutions.crs.app.checkin.CheckinRealmDataService;
 import br.com.libertsolutions.crs.app.sync.SyncService;
 import br.com.libertsolutions.crs.app.sync.event.EventBusManager;
 import br.com.libertsolutions.crs.app.sync.event.SyncEvent;

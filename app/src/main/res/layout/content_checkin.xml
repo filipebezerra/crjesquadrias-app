@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_checkin"
-    tools:context=".checkin.CheckinActivity"
+    tools:context=".checkinscreen.CheckinActivity"
     >
 
     <android.support.v4.widget.SwipeRefreshLayout

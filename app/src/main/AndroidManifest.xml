@@ -75,7 +75,7 @@
                 />
         </activity>
         <activity
-            android:name=".checkin.CheckinActivity"
+            android:name=".checkinscreen.CheckinActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             android:label="@string/title_activity_checkin"
             android:parentActivityName=".flow.FlowActivity"

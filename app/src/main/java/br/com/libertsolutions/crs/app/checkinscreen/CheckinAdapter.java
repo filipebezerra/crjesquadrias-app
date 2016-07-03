@@ -1,4 +1,4 @@
-package br.com.libertsolutions.crs.app.checkin;
+package br.com.libertsolutions.crs.app.checkinscreen;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -14,6 +14,11 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
 import br.com.libertsolutions.crs.app.R;
+import br.com.libertsolutions.crs.app.checkin.Checkin;
+import br.com.libertsolutions.crs.app.checkin.CheckinComparator;
+import br.com.libertsolutions.crs.app.checkin.Item;
+import br.com.libertsolutions.crs.app.checkin.OrderGlass;
+import br.com.libertsolutions.crs.app.checkin.Product;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
