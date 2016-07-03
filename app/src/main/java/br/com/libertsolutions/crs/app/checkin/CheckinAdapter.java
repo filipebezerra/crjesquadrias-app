@@ -5,10 +5,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 import br.com.libertsolutions.crs.app.R;
 import butterknife.Bind;
@@ -24,15 +27,24 @@ import java.util.List;
  * @version 0.2.0
  * @since 0.1.0
  */
-public class CheckinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class CheckinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
+        implements Filterable {
+
     private static final NumberFormat NUMBER_FORMAT = NumberFormat.getNumberInstance();
 
     private static final int VIEW_TYPE_ITEM = 0;
+
     private static final int VIEW_TYPE_ORDER_GLASS = 1;
 
     @NonNull private List<Checkin> mCheckins;
+
     @NonNull private Context mContext;
+
     @Nullable private CheckinCallback mCheckinCallback;
+
+    private List<Checkin> mOriginalCheckins;
+
+    private CheckinFilter mCheckinFilter;
 
     public CheckinAdapter(@NonNull Context context, @NonNull List<Checkin> checkins) {
         mContext = context;
@@ -160,10 +172,65 @@ public class CheckinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
-    public void swapData(List<Checkin> checkinList) {
-        if (checkinList != null) {
-            mCheckins.clear();
-            mCheckins.addAll(checkinList);
+    @Override
+    public Filter getFilter() {
+        if (mCheckinFilter == null) {
+            mCheckinFilter = new CheckinFilter();
+        }
+        return mCheckinFilter;
+    }
+
+    class CheckinFilter extends Filter {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            FilterResults results = new FilterResults();
+
+            if (mOriginalCheckins == null) {
+                mOriginalCheckins = new ArrayList<>(mCheckins);
+            }
+
+            if (TextUtils.isEmpty(constraint)) {
+                results.count = mOriginalCheckins.size();
+                results.values = mOriginalCheckins;
+            } else {
+                final String filterText = constraint.toString().trim().toLowerCase();
+                final List<Checkin> newList = new ArrayList<>();
+
+                for (Checkin checkin : mOriginalCheckins) {
+                    if (!TextUtils.isEmpty(checkin.getLocation())) {
+                        if (checkin.getLocation().toLowerCase().contains(filterText)) {
+                            newList.add(checkin);
+                            continue;
+                        }
+                    }
+
+                    if (checkin.getOrderGlass() != null) {
+                        OrderGlass orderGlass = checkin.getOrderGlass();
+
+                        if (String.valueOf(orderGlass.getHeight()).startsWith(filterText)
+                                || String.valueOf(orderGlass.getWidth()).startsWith(filterText)) {
+                            newList.add(checkin);
+                        }
+                    } else {
+                        Item item = checkin.getItem();
+                        if (String.valueOf(item.getHeight()).startsWith(filterText)
+                                || String.valueOf(item.getWidth()).startsWith(filterText)) {
+                            newList.add(checkin);
+                        }
+                    }
+                }
+
+                results.count = newList.size();
+                results.values = newList;
+            }
+
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            //noinspection unchecked
+            mCheckins = (List<Checkin>) results.values;
             notifyDataSetChanged();
         }
     }

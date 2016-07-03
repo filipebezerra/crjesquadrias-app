@@ -1,9 +1,12 @@
 package br.com.libertsolutions.crs.app.checkin;
 
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 import br.com.libertsolutions.crs.app.R;
@@ -34,7 +37,8 @@ import timber.log.Timber;
  * @since 0.1.0
  */
 public class CheckinActivity extends BaseActivity
-        implements CheckinAdapter.CheckinCallback, SwipeRefreshLayout.OnRefreshListener {
+        implements CheckinAdapter.CheckinCallback, SwipeRefreshLayout.OnRefreshListener,
+        SearchView.OnQueryTextListener {
 
     public static final String EXTRA_FLOW_ID = "flowId";
 
@@ -45,6 +49,8 @@ public class CheckinActivity extends BaseActivity
     private CheckinDataService mCheckinDataService;
 
     private Subscription mCheckinDataSubscription;
+
+    private MenuItem mSearchMenuItem;
 
     @Bind(R.id.list) RecyclerView mCheckinsView;
     @Bind(R.id.swipe_container) SwipeRefreshLayout mSwipeRefreshLayout;
@@ -117,14 +123,31 @@ public class CheckinActivity extends BaseActivity
     }
 
     private void showCheckinData(List<Checkin> list) {
-        if (mCheckinAdapter == null) {
-            mCheckinsView.setAdapter(
-                    mCheckinAdapter = new CheckinAdapter(CheckinActivity.this, list));
-            mCheckinAdapter.setCheckinCallback(CheckinActivity.this);
-        } else {
-            mCheckinAdapter.swapData(list);
-        }
+        mCheckinsView.setAdapter(
+                mCheckinAdapter = new CheckinAdapter(CheckinActivity.this, list));
+        mCheckinAdapter.setCheckinCallback(CheckinActivity.this);
         updateSubtitle();
+        collapseSearchView();
+    }
+
+    private void collapseSearchView() {
+        if (mSearchMenuItem != null && mSearchMenuItem.isActionViewExpanded()) {
+            mSearchMenuItem.collapseActionView();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        boolean hasOptionsMenu = super.onCreateOptionsMenu(menu);
+        setupSearchView(menu);
+        return hasOptionsMenu;
+    }
+
+    private void setupSearchView(Menu menu) {
+        mSearchMenuItem = menu.findItem(R.id.menu_search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(mSearchMenuItem);
+        searchView.setQueryHint(getString(R.string.checkin_search_query_hint));
+        searchView.setOnQueryTextListener(this);
     }
 
     @Override
@@ -253,6 +276,21 @@ public class CheckinActivity extends BaseActivity
             if (event.getType() == SyncType.CHECKINS) {
                 loadCheckinData();
             }
+        }
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        if (mCheckinAdapter != null) {
+            mCheckinAdapter.getFilter().filter(newText);
+            return true;
+        } else {
+            return false;
         }
     }
 }

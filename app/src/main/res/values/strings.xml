@@ -80,4 +80,5 @@
     </string>
     <string name="checkins_already_done">Todos check-ins já estão marcados!</string>
     <string name="checkins_status_cannot_change">Não é permitido desfazer o check-in!</string>
+    <string name="checkin_search_query_hint">Por local ou dimensão</string>
 </resources>
