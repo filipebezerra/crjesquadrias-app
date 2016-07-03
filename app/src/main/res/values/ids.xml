@@ -8,11 +8,11 @@
     <item name="customerName" type="id" />
     <item name="workDate" type="id" />
     <item name="list" type="id" />
-    <item name="stepName" type="id" />
+    <item name="flow_name" type="id" />
     <item name="appbar" type="id" />
     <item name="spinner" type="id" />
     <item name="container" type="id" />
-    <item name="stepStatus" type="id" />
+    <item name="flow_status" type="id" />
     <item name="swipe_container" type="id"/>
 
     <item name="product_measures_caption" type="id"/>

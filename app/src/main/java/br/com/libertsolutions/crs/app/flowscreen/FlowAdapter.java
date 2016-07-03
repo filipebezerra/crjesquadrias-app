@@ -88,8 +88,8 @@ public class FlowAdapter extends RecyclerView.Adapter<FlowAdapter.ViewHolder> {
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.stepStatus) View stepStatus;
-        @BindView(R.id.stepName) TextView stepName;
+        @BindView(R.id.flow_status) View stepStatus;
+        @BindView(R.id.flow_name) TextView stepName;
 
         public ViewHolder(View itemView) {
             super(itemView);

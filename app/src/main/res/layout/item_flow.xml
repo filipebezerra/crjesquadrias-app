@@ -23,31 +23,47 @@
         app:cardPreventCornerOverlap="false"
         >
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:gravity="center_vertical"
             >
 
             <View
-                android:id="@id/stepStatus"
+                android:id="@id/flow_status"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:background="@drawable/circle_status_pending"
                 />
 
             <TextView
-                android:id="@id/stepName"
+                android:id="@id/flow_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="32dp"
                 android:paddingStart="32dp"
+                android:paddingRight="24dp"
+                android:paddingEnd="24dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/chevron"
+                android:layout_toRightOf="@id/flow_status"
+                android:layout_toEndOf="@id/flow_status"
                 tools:text="Expedição/Checagem"
                 />
 
-        </LinearLayout>
+            <ImageView
+                android:id="@+id/chevron"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:src="@drawable/ic_chevron_right"
+                />
+
+        </RelativeLayout>
 
     </android.support.v7.widget.CardView>
 
