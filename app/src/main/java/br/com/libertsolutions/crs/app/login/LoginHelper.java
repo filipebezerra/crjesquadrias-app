@@ -6,13 +6,14 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.content.SharedPreferencesCompat;
 import android.text.TextUtils;
+import br.com.libertsolutions.crs.app.loginscreen.LoginActivity;
 import com.crashlytics.android.Crashlytics;
 
 /**
  * Utilities methods used in {@link LoginActivity}.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 17/03/2016
+ * @version 0.1.0
  * @since 0.1.0
  */
 public class LoginHelper {

@@ -1,4 +1,4 @@
-package br.com.libertsolutions.crs.app.login;
+package br.com.libertsolutions.crs.app.loginscreen;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -11,6 +11,10 @@ import android.view.View;
 import android.widget.FrameLayout;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
+import br.com.libertsolutions.crs.app.login.LoginBody;
+import br.com.libertsolutions.crs.app.login.LoginHelper;
+import br.com.libertsolutions.crs.app.login.User;
+import br.com.libertsolutions.crs.app.login.UserService;
 import br.com.libertsolutions.crs.app.utils.feedback.FeedbackHelper;
 import br.com.libertsolutions.crs.app.utils.form.FormUtil;
 import br.com.libertsolutions.crs.app.utils.keyboard.KeyboardUtil;
@@ -33,7 +37,7 @@ import rx.schedulers.Schedulers;
  * servidor.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 20/03/2016
+ * @version 0.1.0
  * @since 0.1.0
  */
 public class LoginActivity extends BaseActivity {

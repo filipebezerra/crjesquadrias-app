@@ -35,7 +35,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".login.LoginActivity"
+            android:name=".loginscreen.LoginActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             android:label="@string/title_login_activity"
             android:theme="@style/Crs.NoActionBar"

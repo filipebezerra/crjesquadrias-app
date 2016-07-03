@@ -10,7 +10,7 @@ import android.support.v4.content.IntentCompat;
 import br.com.libertsolutions.crs.app.application.RequestCodes;
 import br.com.libertsolutions.crs.app.checkinscreen.CheckinActivity;
 import br.com.libertsolutions.crs.app.flowscreen.FlowActivity;
-import br.com.libertsolutions.crs.app.login.LoginActivity;
+import br.com.libertsolutions.crs.app.loginscreen.LoginActivity;
 import br.com.libertsolutions.crs.app.mainscreen.MainActivity;
 import br.com.libertsolutions.crs.app.settings.SettingsActivity;
 import br.com.libertsolutions.crs.app.settings.SettingsActivityCompat;
