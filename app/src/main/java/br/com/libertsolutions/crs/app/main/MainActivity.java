@@ -72,6 +72,7 @@ import timber.log.Timber;
  *
  * @author Filipe Bezerra
  * @since 0.2.0
+ * @since 0.1.0
  */
 public class MainActivity extends BaseActivity implements OnClickListener,
         SearchView.OnQueryTextListener, SwipeRefreshLayout.OnRefreshListener {
@@ -250,11 +251,7 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 
     private void showWorkData(List<Work> list) {
         if (!list.isEmpty()) {
-            if (mWorkAdapter == null) {
-                mWorksView.setAdapter(mWorkAdapter = new WorkAdapter(MainActivity.this, list));
-            } else {
-                mWorkAdapter.swapData(list);
-            }
+            mWorksView.setAdapter(mWorkAdapter = new WorkAdapter(MainActivity.this, list));
             showEmptyView(false);
         } else {
             showEmptyDataState();

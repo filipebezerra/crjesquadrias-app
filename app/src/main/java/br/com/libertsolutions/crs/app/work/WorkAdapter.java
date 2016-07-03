@@ -16,14 +16,13 @@ import br.com.libertsolutions.crs.app.utils.date.DateUtil;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * Work adapter.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 05/06/2016
+ * @version 0.2.0
  * @since 0.1.0
  */
 public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder>
@@ -33,14 +32,13 @@ public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder>
 
     @NonNull private Context mContext;
 
-    @NonNull private final List<Work> mOriginalWorks;
+    private List<Work> mOriginalWorks;
 
     private WorkFilter mWorkFilter;
 
     public WorkAdapter(@NonNull Context context, @NonNull List<Work> workList) {
         mContext = context;
         mWorks = workList;
-        mOriginalWorks = Collections.unmodifiableList(mWorks);
     }
 
     @Override
@@ -110,14 +108,6 @@ public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder>
         return mWorkFilter;
     }
 
-    public void swapData(List<Work> workList) {
-        if (workList != null) {
-            mWorks.clear();
-            mWorks.addAll(workList);
-            notifyDataSetChanged();
-        }
-    }
-
     class ViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.workStatus) View workStatus;
         @Bind(R.id.workCode) TextView workCode;
@@ -134,6 +124,10 @@ public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder>
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             FilterResults results = new FilterResults();
+
+            if (mOriginalWorks == null) {
+                mOriginalWorks = new ArrayList<>(mWorks);
+            }
 
             if (TextUtils.isEmpty(constraint)) {
                 results.count = mOriginalWorks.size();
