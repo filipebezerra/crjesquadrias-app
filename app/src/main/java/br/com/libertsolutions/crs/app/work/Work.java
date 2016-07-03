@@ -1,5 +1,7 @@
 package br.com.libertsolutions.crs.app.work;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -7,10 +9,10 @@ import com.google.gson.annotations.SerializedName;
  * dos interiores de um imóvel. Esta classe é o modelo da camada da API
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 20/03/2016
+ * @version 0.2.0
  * @since 0.1.0
  */
-public class Work {
+public class Work implements Parcelable {
     public static final int STATUS_PENDING = 0;
     public static final int STATUS_STARTED = 1;
 
@@ -41,6 +43,15 @@ public class Work {
         this.status = status;
     }
 
+    protected Work(Parcel source) {
+        workId = source.readLong();
+        client = source.readParcelable(getClass().getClassLoader());
+        code = source.readString();
+        date = source.readString();
+        job = source.readString();
+        status = source.readInt();
+    }
+
     public long getWorkId() {
         return workId;
     }
@@ -64,4 +75,29 @@ public class Work {
     public int getStatus() {
         return status;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeLong(workId);
+        out.writeParcelable(client, 0);
+        out.writeString(code);
+        out.writeString(date);
+        out.writeString(job);
+        out.writeInt(status);
+    }
+
+    public static final Creator<Work> CREATOR = new Creator<Work>() {
+        public Work createFromParcel(Parcel source) {
+            return new Work(source);
+        }
+
+        public Work[] newArray(int size) {
+            return new Work[size];
+        }
+    };
 }
