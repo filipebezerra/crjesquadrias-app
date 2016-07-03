@@ -2,7 +2,6 @@ package br.com.libertsolutions.crs.app.flowscreen;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,18 +43,15 @@ public class FlowAdapter extends RecyclerView.Adapter<FlowAdapter.ViewHolder> {
 
         switch (flow.getStatus()) {
             case Flow.STATUS_PENDING:
-                holder.stepStatus.setBackgroundColor(
-                        ContextCompat.getColor(mContext, R.color.statusPending));
+                holder.stepStatus.setBackgroundResource(R.drawable.circle_status_pending);
                 break;
 
             case Flow.STATUS_STARTED:
-                holder.stepStatus.setBackgroundColor(
-                        ContextCompat.getColor(mContext, R.color.statusStarted));
+                holder.stepStatus.setBackgroundResource(R.drawable.circle_status_started);
                 break;
 
             case Flow.STATUS_FINISHED:
-                holder.stepStatus.setBackgroundColor(
-                        ContextCompat.getColor(mContext, R.color.statusFinished));
+                holder.stepStatus.setBackgroundResource(R.drawable.circle_status_finished);
                 break;
         }
     }

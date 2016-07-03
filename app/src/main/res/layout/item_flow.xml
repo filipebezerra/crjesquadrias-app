@@ -1,32 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="?attr/listPreferredItemHeightSmall"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="?attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true"
     android:focusableInTouchMode="true"
-    android:orientation="horizontal"
     >
 
-    <View
-        android:id="@id/stepStatus"
-        android:layout_width="10dp"
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/statusPending"
-        />
+        android:layout_margin="5dp"
+        android:elevation="3dp"
+        app:contentPadding="16dp"
+        app:cardUseCompatPadding="false"
+        app:cardPreventCornerOverlap="true"
+        >
 
-    <TextView
-        android:id="@id/stepName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-        android:layout_gravity="center_vertical"
-        tools:text="Expedição/Checagem"
-        />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            >
 
-</LinearLayout>
+            <View
+                android:id="@id/stepStatus"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="@drawable/circle_status_pending"
+                />
+
+            <TextView
+                android:id="@id/stepName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="32dp"
+                android:paddingStart="32dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                tools:text="Expedição/Checagem"
+                />
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
+</FrameLayout>

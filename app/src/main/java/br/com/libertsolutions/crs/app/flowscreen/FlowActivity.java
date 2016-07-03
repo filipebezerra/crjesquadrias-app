@@ -14,7 +14,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
-import br.com.libertsolutions.crs.app.android.recyclerview.GridDividerDecoration;
 import br.com.libertsolutions.crs.app.android.recyclerview.OnClickListener;
 import br.com.libertsolutions.crs.app.android.recyclerview.OnTouchListener;
 import br.com.libertsolutions.crs.app.flow.Flow;
@@ -114,7 +113,6 @@ public class FlowActivity extends BaseActivity
     private void setupRecyclerView() {
         changeListLayout(getResources().getConfiguration());
         mWorkStepsView.setHasFixedSize(true);
-        mWorkStepsView.addItemDecoration(new GridDividerDecoration(this));
         mWorkStepsView.addOnItemTouchListener(new OnTouchListener(this, mWorkStepsView, this));
     }
 
