@@ -4,15 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@id/root_view"
-    android:padding="16dp"
-    android:background="@drawable/launch_screen_bg"
-    tools:context="br.com.libertsolutions.crs.app.launchscreen.LaunchScreenActivity"
+    android:padding="64dp"
+    android:background="@drawable/bg_launch_screen"
+    tools:context=".launchscreen.LaunchScreenActivity"
     >
 
     <ImageView
-        android:layout_width="150dp"
-        android:layout_height="125dp"
-        android:background="@drawable/launch_screen_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/launch_screen_logo"
         android:layout_gravity="center"
         />
 </FrameLayout>
