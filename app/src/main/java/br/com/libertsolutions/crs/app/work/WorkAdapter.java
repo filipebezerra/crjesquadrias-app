@@ -35,6 +35,8 @@ public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder>
 
     @NonNull private final List<Work> mOriginalWorks;
 
+    private WorkFilter mWorkFilter;
+
     public WorkAdapter(@NonNull Context context, @NonNull List<Work> workList) {
         mContext = context;
         mWorks = workList;
@@ -102,7 +104,10 @@ public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder>
 
     @Override
     public Filter getFilter() {
-        return new WorkFilter();
+        if (mWorkFilter == null) {
+            mWorkFilter = new WorkFilter();
+        }
+        return mWorkFilter;
     }
 
     public void swapData(List<Work> workList) {
