@@ -11,7 +11,7 @@ import android.widget.TextView;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.flow.Flow;
 import br.com.libertsolutions.crs.app.flow.WorkStep;
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import java.util.List;
 
@@ -92,8 +92,8 @@ public class FlowAdapter extends RecyclerView.Adapter<FlowAdapter.ViewHolder> {
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        @Bind(R.id.stepStatus) View stepStatus;
-        @Bind(R.id.stepName) TextView stepName;
+        @BindView(R.id.stepStatus) View stepStatus;
+        @BindView(R.id.stepName) TextView stepName;
 
         public ViewHolder(View itemView) {
             super(itemView);

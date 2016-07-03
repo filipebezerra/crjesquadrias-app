@@ -22,7 +22,7 @@ import br.com.libertsolutions.crs.app.sync.event.SyncStatus;
 import br.com.libertsolutions.crs.app.sync.event.SyncType;
 import br.com.libertsolutions.crs.app.utils.feedback.FeedbackHelper;
 import br.com.libertsolutions.crs.app.utils.network.NetworkUtil;
-import butterknife.Bind;
+import butterknife.BindView;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.crashlytics.android.Crashlytics;
 import java.util.List;
@@ -55,8 +55,8 @@ public class CheckinActivity extends BaseActivity
 
     private MenuItem mSearchMenuItem;
 
-    @Bind(R.id.list) RecyclerView mCheckinsView;
-    @Bind(R.id.swipe_container) SwipeRefreshLayout mSwipeRefreshLayout;
+    @BindView(R.id.list) RecyclerView mCheckinsView;
+    @BindView(R.id.swipe_container) SwipeRefreshLayout mSwipeRefreshLayout;
 
     private void showError(int titleRes, Throwable e) {
         Crashlytics.logException(e);

@@ -15,14 +15,14 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.utils.drawable.DrawableHelper;
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
  * Abstração base de {@code Activity} para todas {@code Activity}es deste projeto.
  *
  * @author Filipe Bezerra
- * @version 0.1.0, 17/01/2016
+ * @version 0.2.0
  * @since 0.1.0
  */
 public abstract class BaseActivity extends AppCompatActivity {
@@ -30,8 +30,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected static final int NO_MENU = -1;
     protected static final long INVALID_EXTRA_ID = -1;
 
-    @Bind(R.id.root_view) protected ViewGroup mRootView;
-    @Nullable @Bind(R.id.toolbar) protected Toolbar mToolbarAsActionBar;
+    @BindView(R.id.root_view) protected ViewGroup mRootView;
+    @Nullable @BindView(R.id.toolbar) protected Toolbar mToolbarAsActionBar;
 
     @Override
     protected void onCreate(Bundle inState) {

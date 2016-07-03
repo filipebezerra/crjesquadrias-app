@@ -22,7 +22,7 @@ import br.com.libertsolutions.crs.app.utils.navigation.NavigationHelper;
 import br.com.libertsolutions.crs.app.utils.network.NetworkUtil;
 import br.com.libertsolutions.crs.app.utils.webservice.ServiceGenerator;
 import br.com.libertsolutions.crs.app.settings.SettingsHelper;
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.OnEditorAction;
 import butterknife.OnFocusChange;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -45,11 +45,11 @@ public class LoginActivity extends BaseActivity {
 
     private Subscription mSubscription;
 
-    @Bind(R.id.root_view) FrameLayout mRootView;
-    @Bind(R.id.cpf) TextInputEditText mCpfView;
-    @Bind(R.id.cpf_helper) TextInputLayout mCpfHelper;
-    @Bind(R.id.password) TextInputEditText mPasswordView;
-    @Bind(R.id.password_helper) TextInputLayout mPasswordHelper;
+    @BindView(R.id.root_view) FrameLayout mRootView;
+    @BindView(R.id.cpf) TextInputEditText mCpfView;
+    @BindView(R.id.cpf_helper) TextInputLayout mCpfHelper;
+    @BindView(R.id.password) TextInputEditText mPasswordView;
+    @BindView(R.id.password_helper) TextInputLayout mPasswordHelper;
 
     private void doLogin() {
         if (!mFormUtil.enableOrRemoveErrorInView(mCpfHelper,

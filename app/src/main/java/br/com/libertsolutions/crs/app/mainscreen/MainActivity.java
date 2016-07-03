@@ -58,7 +58,7 @@ import br.com.libertsolutions.crs.app.work.Work;
 import br.com.libertsolutions.crs.app.work.WorkDataService;
 import br.com.libertsolutions.crs.app.work.WorkRealmDataService;
 import br.com.libertsolutions.crs.app.work.WorkService;
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -84,9 +84,9 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 
     private User mUserLogged;
 
-    @Bind(R.id.list) RecyclerView mWorksView;
-    @Bind(R.id.empty_state) LinearLayout mEmptyStateView;
-    @Bind(R.id.swipe_container) SwipeRefreshLayout mSwipeRefreshLayout;
+    @BindView(R.id.list) RecyclerView mWorksView;
+    @BindView(R.id.empty_state) LinearLayout mEmptyStateView;
+    @BindView(R.id.swipe_container) SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override
     protected int provideLayoutResource() {

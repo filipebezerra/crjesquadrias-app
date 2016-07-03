@@ -14,7 +14,7 @@ import android.widget.TextView;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.utils.date.DateUtil;
 import br.com.libertsolutions.crs.app.work.Work;
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import java.util.ArrayList;
 import java.util.List;
@@ -110,10 +110,10 @@ public class MainWorkAdapter extends RecyclerView.Adapter<MainWorkAdapter.ViewHo
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        @Bind(R.id.workStatus) View workStatus;
-        @Bind(R.id.workCode) TextView workCode;
-        @Bind(R.id.customerName) TextView customerName;
-        @Bind(R.id.workDate) TextView workDate;
+        @BindView(R.id.workStatus) View workStatus;
+        @BindView(R.id.workCode) TextView workCode;
+        @BindView(R.id.customerName) TextView customerName;
+        @BindView(R.id.workDate) TextView workDate;
 
         public ViewHolder(View itemView) {
             super(itemView);

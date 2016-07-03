@@ -19,7 +19,7 @@ import br.com.libertsolutions.crs.app.checkin.CheckinComparator;
 import br.com.libertsolutions.crs.app.checkin.Item;
 import br.com.libertsolutions.crs.app.checkin.OrderGlass;
 import br.com.libertsolutions.crs.app.checkin.Product;
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import java.text.NumberFormat;
@@ -241,10 +241,10 @@ public class CheckinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     class ViewHolderItem extends BaseViewHolder {
-        @Bind(R.id.productType) TextView productType;
-        @Bind(R.id.itemLocation) TextView itemLocation;
-        @Bind(R.id.productLine) TextView productLine;
-        @Bind(R.id.itemTreatment) TextView itemTreatment;
+        @BindView(R.id.productType) TextView productType;
+        @BindView(R.id.itemLocation) TextView itemLocation;
+        @BindView(R.id.productLine) TextView productLine;
+        @BindView(R.id.itemTreatment) TextView itemTreatment;
 
         public ViewHolderItem(View itemView) {
             super(itemView);
@@ -252,7 +252,7 @@ public class CheckinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     class ViewHolderOrderGlass extends BaseViewHolder {
-        @Bind(R.id.productColor) TextView productColor;
+        @BindView(R.id.productColor) TextView productColor;
 
         public ViewHolderOrderGlass(View itemView) {
             super(itemView);
@@ -260,9 +260,9 @@ public class CheckinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     abstract class BaseViewHolder extends RecyclerView.ViewHolder {
-        @Bind(R.id.checkinStatus) View checkinStatus;
-        @Bind(R.id.productMeasures) TextView productMeasures;
-        @Bind(R.id.itemDone) CheckBox itemDone;
+        @BindView(R.id.checkinStatus) View checkinStatus;
+        @BindView(R.id.productMeasures) TextView productMeasures;
+        @BindView(R.id.itemDone) CheckBox itemDone;
 
         public BaseViewHolder(View itemView) {
             super(itemView);
