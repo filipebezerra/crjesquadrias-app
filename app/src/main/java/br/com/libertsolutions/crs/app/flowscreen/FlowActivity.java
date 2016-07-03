@@ -1,4 +1,4 @@
-package br.com.libertsolutions.crs.app.flow;
+package br.com.libertsolutions.crs.app.flowscreen;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -14,6 +14,9 @@ import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
 import br.com.libertsolutions.crs.app.android.recyclerview.GridDividerDecoration;
 import br.com.libertsolutions.crs.app.android.recyclerview.OnClickListener;
 import br.com.libertsolutions.crs.app.android.recyclerview.OnTouchListener;
+import br.com.libertsolutions.crs.app.flow.Flow;
+import br.com.libertsolutions.crs.app.flow.FlowDataService;
+import br.com.libertsolutions.crs.app.flow.FlowRealmDataService;
 import br.com.libertsolutions.crs.app.sync.SyncService;
 import br.com.libertsolutions.crs.app.sync.event.EventBusManager;
 import br.com.libertsolutions.crs.app.sync.event.SyncEvent;
@@ -37,6 +40,7 @@ import timber.log.Timber;
  *
  * @author Filipe Bezerra
  * @version 0.2.0
+ * @since 0.1.0
  */
 public class FlowActivity extends BaseActivity
         implements OnClickListener, SwipeRefreshLayout.OnRefreshListener {

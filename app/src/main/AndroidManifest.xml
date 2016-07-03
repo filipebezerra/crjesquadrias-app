@@ -62,7 +62,7 @@
             android:theme="@style/Crs.NoActionBar"
             />
         <activity
-            android:name=".flow.FlowActivity"
+            android:name=".flowscreen.FlowActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             android:label="@string/title_activity_stage"
             android:launchMode="singleTop"
@@ -78,12 +78,12 @@
             android:name=".checkinscreen.CheckinActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             android:label="@string/title_activity_checkin"
-            android:parentActivityName=".flow.FlowActivity"
+            android:parentActivityName=".flowscreen.FlowActivity"
             android:theme="@style/Crs.NoActionBar"
             >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".flow.FlowActivity"
+                android:value=".flowscreen.FlowActivity"
                 />
         </activity>
 

@@ -1,4 +1,4 @@
-package br.com.libertsolutions.crs.app.flow;
+package br.com.libertsolutions.crs.app.flowscreen;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -9,15 +9,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import br.com.libertsolutions.crs.app.R;
+import br.com.libertsolutions.crs.app.flow.Flow;
+import br.com.libertsolutions.crs.app.flow.WorkStep;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import java.util.List;
 
 /**
- * .
- *
  * @author Filipe Bezerra
- * @version 0.1.0, 28/03/2016
+ * @version 0.1.0
  * @since 0.1.0
  */
 public class FlowAdapter extends RecyclerView.Adapter<FlowAdapter.ViewHolder> {
