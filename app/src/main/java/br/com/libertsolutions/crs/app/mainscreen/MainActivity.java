@@ -1,4 +1,4 @@
-package br.com.libertsolutions.crs.app.main;
+package br.com.libertsolutions.crs.app.mainscreen;
 
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -55,7 +55,6 @@ import br.com.libertsolutions.crs.app.utils.network.NetworkUtil;
 import br.com.libertsolutions.crs.app.utils.rx.RxUtil;
 import br.com.libertsolutions.crs.app.utils.webservice.ServiceGenerator;
 import br.com.libertsolutions.crs.app.work.Work;
-import br.com.libertsolutions.crs.app.work.WorkAdapter;
 import br.com.libertsolutions.crs.app.work.WorkDataService;
 import br.com.libertsolutions.crs.app.work.WorkRealmDataService;
 import br.com.libertsolutions.crs.app.work.WorkService;
@@ -77,7 +76,7 @@ import timber.log.Timber;
 public class MainActivity extends BaseActivity implements OnClickListener,
         SearchView.OnQueryTextListener, SwipeRefreshLayout.OnRefreshListener {
 
-    private WorkAdapter mWorkAdapter;
+    private MainWorkAdapter mWorkAdapter;
 
     private WorkDataService mWorkDataService;
 
@@ -251,7 +250,7 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 
     private void showWorkData(List<Work> list) {
         if (!list.isEmpty()) {
-            mWorksView.setAdapter(mWorkAdapter = new WorkAdapter(MainActivity.this, list));
+            mWorksView.setAdapter(mWorkAdapter = new MainWorkAdapter(MainActivity.this, list));
             showEmptyView(false);
         } else {
             showEmptyDataState();

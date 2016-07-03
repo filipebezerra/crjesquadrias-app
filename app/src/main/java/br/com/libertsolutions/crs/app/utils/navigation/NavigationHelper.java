@@ -11,7 +11,7 @@ import br.com.libertsolutions.crs.app.application.RequestCodes;
 import br.com.libertsolutions.crs.app.checkin.CheckinActivity;
 import br.com.libertsolutions.crs.app.flow.FlowActivity;
 import br.com.libertsolutions.crs.app.login.LoginActivity;
-import br.com.libertsolutions.crs.app.main.MainActivity;
+import br.com.libertsolutions.crs.app.mainscreen.MainActivity;
 import br.com.libertsolutions.crs.app.settings.SettingsActivity;
 import br.com.libertsolutions.crs.app.settings.SettingsActivityCompat;
 

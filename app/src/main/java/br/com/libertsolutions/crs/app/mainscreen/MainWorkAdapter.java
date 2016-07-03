@@ -1,4 +1,4 @@
-package br.com.libertsolutions.crs.app.work;
+package br.com.libertsolutions.crs.app.mainscreen;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -13,6 +13,7 @@ import android.widget.Filterable;
 import android.widget.TextView;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.utils.date.DateUtil;
+import br.com.libertsolutions.crs.app.work.Work;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ import java.util.List;
  * @version 0.2.0
  * @since 0.1.0
  */
-public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder>
+public class MainWorkAdapter extends RecyclerView.Adapter<MainWorkAdapter.ViewHolder>
     implements Filterable {
 
     @NonNull private List<Work> mWorks;
@@ -36,7 +37,7 @@ public class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder>
 
     private WorkFilter mWorkFilter;
 
-    public WorkAdapter(@NonNull Context context, @NonNull List<Work> workList) {
+    public MainWorkAdapter(@NonNull Context context, @NonNull List<Work> workList) {
         mContext = context;
         mWorks = workList;
     }
