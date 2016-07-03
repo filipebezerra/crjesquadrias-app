@@ -302,7 +302,7 @@ public class MainActivity extends BaseActivity implements OnClickListener,
     private void setupSearchView(Menu menu) {
         SearchView searchView = (SearchView) MenuItemCompat
                 .getActionView(menu.findItem(R.id.menu_search));
-        searchView.setQueryHint(getString(R.string.search_query_hint));
+        searchView.setQueryHint(getString(R.string.work_search_query_hint));
         searchView.setOnQueryTextListener(this);
     }
 

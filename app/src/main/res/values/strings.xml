@@ -40,7 +40,7 @@
     <string name="checkins_finished">%1$d check-in(s) concluído(s)</string>
     <string name="no_checkin_finished">Nenhum check-in concluído</string>
     <string name="menu_search">Buscar</string>
-    <string name="search_query_hint">Por cliente ou código</string>
+    <string name="work_search_query_hint">Por cliente ou código</string>
     <string name="msg_unable_to_sign_in_no_network">
         Não foi possível entrar. Verifique sua conexão com a internet
     </string>
