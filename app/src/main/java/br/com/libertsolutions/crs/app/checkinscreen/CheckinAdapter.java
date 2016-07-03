@@ -3,16 +3,15 @@ package br.com.libertsolutions.crs.app.checkinscreen;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.checkin.Checkin;
 import br.com.libertsolutions.crs.app.checkin.CheckinComparator;
@@ -83,14 +82,11 @@ public class CheckinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             ((ViewHolderItem) holder).productType.setText(product.getType());
             ((ViewHolderItem) holder).itemLocation.setText(checkin.getLocation());
             ((ViewHolderItem) holder).productLine.setText(product.getLine());
-            ((ViewHolderItem) holder).itemTreatment.setText(product.getTreatment());
+            ((ViewHolderItem) holder).itemProcessing.setText(product.getTreatment());
 
         } else {
             width = checkin.getOrderGlass().getWidth();
             height = checkin.getOrderGlass().getHeight();
-
-            ((ViewHolderOrderGlass) holder).productColor.setText(
-                    checkin.getOrderGlass().getColor());
         }
 
         ((BaseViewHolder) holder).productMeasures.setText(
@@ -100,13 +96,13 @@ public class CheckinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         switch (checkin.getStatus()) {
             case Checkin.STATUS_PENDING:
-                ((BaseViewHolder) holder).checkinStatus.setBackgroundColor(
-                        ContextCompat.getColor(mContext, R.color.statusPending));
+                ((BaseViewHolder) holder).checkinStatus
+                        .setBackgroundResource(R.drawable.circle_status_pending);
                 break;
 
             case Checkin.STATUS_FINISHED:
-                ((BaseViewHolder) holder).checkinStatus.setBackgroundColor(
-                        ContextCompat.getColor(mContext, R.color.statusFinished));
+                ((BaseViewHolder) holder).checkinStatus
+                        .setBackgroundResource(R.drawable.circle_status_finished);
                 break;
         }
     }
@@ -241,10 +237,10 @@ public class CheckinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     class ViewHolderItem extends BaseViewHolder {
-        @BindView(R.id.productType) TextView productType;
-        @BindView(R.id.itemLocation) TextView itemLocation;
-        @BindView(R.id.productLine) TextView productLine;
-        @BindView(R.id.itemTreatment) TextView itemTreatment;
+        @BindView(R.id.product_type) TextView productType;
+        @BindView(R.id.checkin_location) TextView itemLocation;
+        @BindView(R.id.product_line) TextView productLine;
+        @BindView(R.id.product_processing) TextView itemProcessing;
 
         public ViewHolderItem(View itemView) {
             super(itemView);
@@ -252,24 +248,22 @@ public class CheckinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     class ViewHolderOrderGlass extends BaseViewHolder {
-        @BindView(R.id.productColor) TextView productColor;
-
         public ViewHolderOrderGlass(View itemView) {
             super(itemView);
         }
     }
 
     abstract class BaseViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.checkinStatus) View checkinStatus;
-        @BindView(R.id.productMeasures) TextView productMeasures;
-        @BindView(R.id.itemDone) CheckBox itemDone;
+        @BindView(R.id.checkin_status) View checkinStatus;
+        @BindView(R.id.product_measures) TextView productMeasures;
+        @BindView(R.id.checkin_toggle_action) ToggleButton itemDone;
 
         public BaseViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
-        @OnClick(R.id.itemDone)
+        @OnClick(R.id.checkin_toggle_action)
         public void onClickItemDone() {
             final Checkin checkin = mCheckins.get(getLayoutPosition());
 

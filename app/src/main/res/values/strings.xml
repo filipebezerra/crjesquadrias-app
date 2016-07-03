@@ -80,4 +80,11 @@
     <string name="checkins_already_done">Todos check-ins já estão marcados!</string>
     <string name="checkins_status_cannot_change">Não é permitido desfazer o check-in!</string>
     <string name="checkin_search_query_hint">Por local ou dimensão</string>
+    <string name="checkin_measures_caption">Medidas</string>
+    <string name="product_type_caption">Tipo</string>
+    <string name="checkin_location_caption">Localização</string>
+    <string name="product_line_caption">Linha</string>
+    <string name="product_processing_caption">Tratamento</string>
+    <string name="checkin_done">Já está feito</string>
+    <string name="checkin_not_done">Marcar como feito</string>
 </resources>

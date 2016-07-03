@@ -12,14 +12,19 @@
     <item name="appbar" type="id" />
     <item name="spinner" type="id" />
     <item name="container" type="id" />
-    <item name="productType" type="id" />
-    <item name="productMeasures" type="id" />
-    <item name="itemLocation" type="id" />
-    <item name="itemDone" type="id" />
-    <item name="productLine" type="id" />
-    <item name="itemTreatment" type="id" />
     <item name="stepStatus" type="id" />
-    <item name="checkinStatus" type="id" />
-    <item name="productColor" type="id" />
     <item name="swipe_container" type="id"/>
+
+    <item name="product_measures_caption" type="id"/>
+    <item name="product_measures" type="id"/>
+    <item name="checkin_toggle_action" type="id"/>
+    <item name="checkin_status" type="id"/>
+    <item name="product_type_caption" type="id"/>
+    <item name="product_type" type="id"/>
+    <item name="checkin_location_caption" type="id" />
+    <item name="checkin_location" type="id" />
+    <item name="product_line_caption" type="id" />
+    <item name="product_line" type="id" />
+    <item name="product_processing_caption" type="id" />
+    <item name="product_processing" type="id" />
 </resources>

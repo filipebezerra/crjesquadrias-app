@@ -11,7 +11,6 @@ import android.view.MenuItem;
 import android.widget.Toast;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
-import br.com.libertsolutions.crs.app.android.recyclerview.DividerDecoration;
 import br.com.libertsolutions.crs.app.checkin.Checkin;
 import br.com.libertsolutions.crs.app.checkin.CheckinDataService;
 import br.com.libertsolutions.crs.app.checkin.CheckinRealmDataService;
@@ -106,7 +105,6 @@ public class CheckinActivity extends BaseActivity
     private void setupRecyclerView() {
         mCheckinsView.setLayoutManager(new LinearLayoutManager(this));
         mCheckinsView.setHasFixedSize(true);
-        mCheckinsView.addItemDecoration(new DividerDecoration(this));
     }
 
     private void setupSwipeRefreshLayout() {

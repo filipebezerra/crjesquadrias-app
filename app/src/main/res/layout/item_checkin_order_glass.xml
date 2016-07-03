@@ -1,99 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="horizontal"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="?attr/listPreferredItemHeightSmall"
-    android:background="?attr/selectableItemBackground"
-    android:clickable="true"
-    android:focusable="true"
-    android:focusableInTouchMode="true"
-    android:gravity="center_vertical"
     >
 
-    <View
-        android:id="@id/checkinStatus"
-        android:layout_width="10dp"
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/statusPending"
-        />
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_weight="3"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:orientation="vertical"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="0dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:elevation="3dp"
+        app:contentPadding="16dp"
+        app:cardUseCompatPadding="true"
+        app:cardPreventCornerOverlap="false"
         >
 
         <LinearLayout
-            android:id="@+id/firstLineContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:baselineAligned="false"
+            android:gravity="center_vertical"
             >
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
+            <View
+                android:id="@id/checkin_status"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/circle_status_pending"
+                />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:paddingLeft="32dp"
+                android:paddingStart="32dp"
                 >
 
                 <TextView
+                    android:id="@id/product_measures_caption"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                    android:text="Cor"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:text="@string/checkin_measures_caption"
                     />
 
                 <TextView
-                    android:id="@id/productColor"
-                    android:layout_width="wrap_content"
+                    android:id="@id/product_measures"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
+                    android:paddingLeft="8dp"
                     android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                    tools:text="Incolor"
+                    android:maxLines="1"
+                    android:ellipsize="middle"
+                    android:layout_toRightOf="@id/product_measures_caption"
+                    android:layout_toEndOf="@id/product_measures_caption"
+                    android:layout_alignBaseline="@id/product_measures_caption"
+                    tools:text="601x712"
                     />
-            </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                >
-
-                <TextView
+                <ToggleButton
+                    android:id="@id/checkin_toggle_action"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                    android:text="Medidas"
+                    android:layout_marginTop="8dp"
+                    android:layout_below="@id/product_measures_caption"
+                    android:layout_centerHorizontal="true"
+                    android:textOn="@string/checkin_done"
+                    android:textOff="@string/checkin_not_done"
                     />
 
-                <TextView
-                    android:id="@id/productMeasures"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                    tools:text="2900x2700"
-                    />
-            </LinearLayout>
+            </RelativeLayout>
 
         </LinearLayout>
 
-    </LinearLayout>
+    </android.support.v7.widget.CardView>
 
-    <CheckBox
-        android:id="@id/itemDone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
-
-</LinearLayout>
+</FrameLayout>

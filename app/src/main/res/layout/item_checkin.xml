@@ -1,205 +1,177 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="horizontal"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="?attr/listPreferredItemHeightLarge"
-    android:background="?attr/selectableItemBackground"
-    android:clickable="true"
-    android:focusable="true"
-    android:focusableInTouchMode="true"
-    android:gravity="center_vertical"
     >
 
-    <View
-        android:id="@id/checkinStatus"
-        android:layout_width="10dp"
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/statusPending"
-        />
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_weight="3"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:orientation="vertical"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="0dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:elevation="3dp"
+        app:contentPadding="16dp"
+        app:cardUseCompatPadding="true"
+        app:cardPreventCornerOverlap="false"
         >
 
         <LinearLayout
-            android:id="@+id/firstLineContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:baselineAligned="false"
+            android:gravity="center_vertical"
             >
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
+            <View
+                android:id="@id/checkin_status"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/circle_status_pending"
+                />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:paddingLeft="32dp"
+                android:paddingStart="32dp"
                 >
 
                 <TextView
+                    android:id="@id/product_type_caption"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                    android:text="Tipo"
+                    android:layout_marginBottom="8dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:text="@string/product_type_caption"
                     />
 
                 <TextView
-                    android:id="@id/productType"
-                    android:layout_width="wrap_content"
+                    android:id="@id/product_type"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
+                    android:paddingLeft="8dp"
+                    android:layout_toRightOf="@id/product_type_caption"
+                    android:layout_toEndOf="@id/product_type_caption"
+                    android:layout_alignBaseline="@id/product_type_caption"
                     android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                    tools:text="Tipo"
-                    />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                >
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                    android:text="Medidas"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    tools:text="J1"
                     />
 
                 <TextView
-                    android:id="@id/productMeasures"
+                    android:id="@id/product_measures_caption"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_below="@id/product_type_caption"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:text="@string/checkin_measures_caption"
+                    />
+
+                <TextView
+                    android:id="@id/product_measures"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="8dp"
+                    android:layout_toRightOf="@id/product_measures_caption"
+                    android:layout_toEndOf="@id/product_measures_caption"
+                    android:layout_alignBaseline="@id/product_measures_caption"
                     android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                    tools:text="2900x2700"
+                    android:maxLines="1"
+                    android:ellipsize="middle"
+                    tools:text="601x712"
                     />
-            </LinearLayout>
+
+                <TextView
+                    android:id="@id/checkin_location_caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_below="@id/product_measures_caption"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:text="@string/checkin_location_caption"
+                    />
+
+                <TextView
+                    android:id="@id/checkin_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="8dp"
+                    android:layout_toRightOf="@id/checkin_location_caption"
+                    android:layout_toEndOf="@id/checkin_location_caption"
+                    android:layout_alignBaseline="@id/checkin_location_caption"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    tools:text="HOME"
+                    />
+
+                <TextView
+                    android:id="@id/product_line_caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_below="@id/checkin_location_caption"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:text="@string/product_line_caption"
+                    />
+
+                <TextView
+                    android:id="@id/product_line"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="8dp"
+                    android:layout_toRightOf="@id/product_line_caption"
+                    android:layout_toEndOf="@id/product_line_caption"
+                    android:layout_alignBaseline="@id/product_line_caption"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    tools:text="SUPREMA"
+                    />
+
+                <TextView
+                    android:id="@id/product_processing_caption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/product_line_caption"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                    android:text="@string/product_processing_caption"
+                    />
+
+                <TextView
+                    android:id="@id/product_processing"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_below="@id/product_processing_caption"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    tools:text="PINTURA MARROM FOSCO - RAL8014"
+                    />
+
+                <ToggleButton
+                    android:id="@id/checkin_toggle_action"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_below="@id/product_processing"
+                    android:layout_centerHorizontal="true"
+                    android:textOn="@string/checkin_done"
+                    android:textOff="@string/checkin_not_done"
+                    />
+
+            </RelativeLayout>
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/secondLineContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:orientation="horizontal"
-            android:baselineAligned="false"
-            >
+    </android.support.v7.widget.CardView>
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                >
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                    android:text="Localização"
-                    />
-
-                <TextView
-                    android:id="@id/itemLocation"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                    tools:text="Quarto"
-                    />
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/thirdLineContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:orientation="horizontal"
-            android:baselineAligned="false"
-            >
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                >
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                    android:text="Linha"
-                    />
-
-                <TextView
-                    android:id="@id/productLine"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                    tools:text="Suprema"
-                    />
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/fourthLineContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:orientation="horizontal"
-            android:baselineAligned="false"
-            >
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                tools:ignore="UselessParent"
-                >
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                    android:text="Tratamento"
-                    />
-
-                <TextView
-                    android:id="@id/itemTreatment"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                    tools:text="PINTURA MARROM FOSCO"
-                    />
-            </LinearLayout>
-
-        </LinearLayout>
-    </LinearLayout>
-
-    <CheckBox
-        android:id="@id/itemDone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
-
-</LinearLayout>
+</FrameLayout>
