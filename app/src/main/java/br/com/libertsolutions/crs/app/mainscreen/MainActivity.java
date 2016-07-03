@@ -19,18 +19,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.afollestad.materialdialogs.MaterialDialog;
-
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
-import br.com.libertsolutions.crs.app.android.recyclerview.GridDividerDecoration;
 import br.com.libertsolutions.crs.app.android.recyclerview.OnClickListener;
 import br.com.libertsolutions.crs.app.android.recyclerview.OnTouchListener;
 import br.com.libertsolutions.crs.app.checkin.Checkin;
@@ -60,6 +50,11 @@ import br.com.libertsolutions.crs.app.work.WorkRealmDataService;
 import br.com.libertsolutions.crs.app.work.WorkService;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import com.afollestad.materialdialogs.MaterialDialog;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -132,7 +127,6 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 
     private void setupRecyclerView() {
         changeListLayout(getResources().getConfiguration());
-        mWorksView.addItemDecoration(new GridDividerDecoration(this));
         mWorksView.setHasFixedSize(true);
         mWorksView.addOnItemTouchListener(new OnTouchListener(this, mWorksView, this));
     }

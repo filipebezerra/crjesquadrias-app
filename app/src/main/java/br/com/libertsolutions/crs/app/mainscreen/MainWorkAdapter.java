@@ -2,7 +2,6 @@ package br.com.libertsolutions.crs.app.mainscreen;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -67,13 +66,11 @@ public class MainWorkAdapter extends RecyclerView.Adapter<MainWorkAdapter.ViewHo
 
         switch (work.getStatus()) {
             case Work.STATUS_PENDING:
-                holder.workStatus.setBackgroundColor(
-                        ContextCompat.getColor(mContext, R.color.statusPending));
+                holder.workStatus.setBackgroundResource(R.drawable.circle_status_pending);
                 break;
 
             case Work.STATUS_STARTED:
-                holder.workStatus.setBackgroundColor(
-                        ContextCompat.getColor(mContext, R.color.statusStarted));
+                holder.workStatus.setBackgroundResource(R.drawable.circle_status_started);
                 break;
         }
     }

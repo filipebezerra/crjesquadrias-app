@@ -27,7 +27,7 @@
     </string>
     <string name="project_id_caption">Código</string>
     <string name="customer_name_caption">Cliente</string>
-    <string name="work_date_caption">Data</string>
+    <string name="work_date_caption">Em</string>
     <string name="action_logout">Sair</string>
     <string name="action_settings">Configurações</string>
     <string name="title_activity_checkin">Check-ins</string>
