@@ -77,10 +77,29 @@ public class CheckinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             width = checkin.getItem().getWidth();
             height = checkin.getItem().getHeight();
 
-            ((ViewHolderItem) holder).productType.setText(product.getType());
-            ((ViewHolderItem) holder).itemLocation.setText(checkin.getLocation());
-            ((ViewHolderItem) holder).productLine.setText(product.getLine());
-            ((ViewHolderItem) holder).itemProcessing.setText(product.getTreatment());
+            if (!TextUtils.isEmpty(product.getType())) {
+                ((ViewHolderItem) holder).productType.setText(product.getType());
+            } else {
+                ((ViewHolderItem) holder).productType.setText("N/A");
+            }
+
+            if (!TextUtils.isEmpty(checkin.getLocation())) {
+                ((ViewHolderItem) holder).itemLocation.setText(checkin.getLocation());
+            } else {
+                ((ViewHolderItem) holder).itemLocation.setText("N/A");
+            }
+
+            if (!TextUtils.isEmpty(product.getLine())) {
+                ((ViewHolderItem) holder).productLine.setText(product.getLine());
+            } else {
+                ((ViewHolderItem) holder).productLine.setText("N/A");
+            }
+
+            if (!TextUtils.isEmpty(product.getTreatment())) {
+                ((ViewHolderItem) holder).itemProcessing.setText(product.getTreatment());
+            } else {
+                ((ViewHolderItem) holder).itemProcessing.setText("N/A");
+            }
 
         } else {
             width = checkin.getOrderGlass().getWidth();
