@@ -1,15 +1,15 @@
 package br.com.libertsolutions.crs.app.flow;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * .
- *
  * @author Filipe Bezerra
- * @version 0.1.0, 28/03/2016
+ * @version 0.2.0
  * @since 0.1.0
  */
-public class Flow {
+public class Flow implements Parcelable {
     public static final int STATUS_PENDING = 0;
     public static final int STATUS_STARTED = 1;
     public static final int STATUS_FINISHED = 2;
@@ -33,6 +33,13 @@ public class Flow {
         this.status = status;
     }
 
+    protected Flow(Parcel source) {
+        step = source.readParcelable(getClass().getClassLoader());
+        flowId = source.readLong();
+        workId = source.readLong();
+        status = source.readInt();
+    }
+
     public WorkStep getStep() {
         return step;
     }
@@ -48,4 +55,27 @@ public class Flow {
     public int getStatus() {
         return status;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeParcelable(step, 0);
+        out.writeLong(flowId);
+        out.writeLong(workId);
+        out.writeInt(status);
+    }
+
+    public static final Creator<Flow> CREATOR = new Creator<Flow>() {
+        public Flow createFromParcel(Parcel source) {
+            return new Flow(source);
+        }
+
+        public Flow[] newArray(int size) {
+            return new Flow[size];
+        }
+    };
 }

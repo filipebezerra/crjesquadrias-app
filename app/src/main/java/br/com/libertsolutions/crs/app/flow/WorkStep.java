@@ -1,16 +1,16 @@
 package br.com.libertsolutions.crs.app.flow;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * .
- *
  * @author Filipe Bezerra
- * @version 0.1.0, 20/03/2016
+ * @version 0.2.0
  * @since 0.1.0
  */
-public class WorkStep implements Comparable<WorkStep> {
+public class WorkStep implements Comparable<WorkStep>, Parcelable {
     @SerializedName("idEtapa")
     private final long workStepId;
 
@@ -32,6 +32,14 @@ public class WorkStep implements Comparable<WorkStep> {
         this.name = name;
         this.type = type;
         this.goForward = goForward;
+    }
+
+    protected WorkStep(Parcel source) {
+        workStepId = source.readLong();
+        order = source.readInt();
+        name = source.readString();
+        type = source.readInt();
+        goForward = source.readInt();
     }
 
     public long getWorkStepId() {
@@ -62,4 +70,28 @@ public class WorkStep implements Comparable<WorkStep> {
 
         return getOrder() < another.getOrder() ? -1 : 1;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeLong(workStepId);
+        out.writeInt(order);
+        out.writeString(name);
+        out.writeInt(type);
+        out.writeInt(goForward);
+    }
+
+    public static final Creator<WorkStep> CREATOR = new Creator<WorkStep>() {
+        public WorkStep createFromParcel(Parcel source) {
+            return new WorkStep(source);
+        }
+
+        public WorkStep[] newArray(int size) {
+            return new WorkStep[size];
+        }
+    };
 }
