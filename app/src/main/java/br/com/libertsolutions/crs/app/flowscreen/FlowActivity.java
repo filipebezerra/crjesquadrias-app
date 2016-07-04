@@ -116,10 +116,50 @@ public class FlowActivity extends BaseActivity
         mWorkStepsView.addOnItemTouchListener(new OnTouchListener(this, mWorkStepsView, this));
     }
 
+    @Override
+    public void onSingleTapUp(View view, int position) {
+        if (mFlowAdapter != null) {
+            final Flow item = mFlowAdapter.getItem(position);
+
+            if (item != null) {
+                NavigationHelper.navigateToCheckinScreen(this, item.getFlowId());
+            }
+        }
+    }
+
+    @Override
+    public void onLongPress(View view, int position) {}
+
     private void setupSwipeRefreshLayout() {
         mSwipeRefreshLayout.setOnRefreshListener(this);
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
         mSwipeRefreshLayout.setProgressBackgroundColorSchemeResource(android.R.color.white);
+    }
+
+    @Override
+    public void onRefresh() {
+        if (NetworkUtil.isDeviceConnectedToInternet(this)) {
+            SyncService.requestCompleteSync();
+        } else {
+            FeedbackHelper.toast(this, getString(R.string.no_connection_to_force_update), false);
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onSyncEvent(SyncEvent event) {
+        Timber.i("Sync event with %s in %s", event.getType(), event.getStatus());
+
+        if (event.getStatus() == SyncStatus.IN_PROGRESS) {
+            if (!mSwipeRefreshLayout.isRefreshing())
+                mSwipeRefreshLayout.setRefreshing(true);
+        } else if (event.getType() == SyncType.FLOWS) {
+            Timber.i("Sync completed");
+
+            if (mSwipeRefreshLayout.isRefreshing())
+                mSwipeRefreshLayout.setRefreshing(false);
+
+            loadFlowData();
+        }
     }
 
     @Override
@@ -184,46 +224,6 @@ public class FlowActivity extends BaseActivity
             mWorkStepsView.setLayoutManager(new GridLayoutManager(this, 3));
         } else {
             mWorkStepsView.setLayoutManager(new LinearLayoutManager(this));
-        }
-    }
-
-    @Override
-    public void onSingleTapUp(View view, int position) {
-        if (mFlowAdapter != null) {
-            final Flow item = mFlowAdapter.getItem(position);
-
-            if (item != null) {
-                NavigationHelper.navigateToCheckinScreen(this, item.getFlowId());
-            }
-        }
-    }
-
-    @Override
-    public void onLongPress(View view, int position) {}
-
-    @Override
-    public void onRefresh() {
-        if (NetworkUtil.isDeviceConnectedToInternet(this)) {
-            SyncService.requestCompleteSync();
-        } else {
-            FeedbackHelper.toast(this, getString(R.string.no_connection_to_force_update), false);
-        }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onSyncEvent(SyncEvent event) {
-        Timber.i("Sync event with %s in %s", event.getType(), event.getStatus());
-
-        if (event.getStatus() == SyncStatus.IN_PROGRESS) {
-            if (!mSwipeRefreshLayout.isRefreshing())
-                mSwipeRefreshLayout.setRefreshing(true);
-        } else if (event.getType() == SyncType.FLOWS) {
-            Timber.i("Sync completed");
-
-            if (mSwipeRefreshLayout.isRefreshing())
-                mSwipeRefreshLayout.setRefreshing(false);
-
-            loadFlowData();
         }
     }
 
