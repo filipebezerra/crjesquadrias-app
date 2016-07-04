@@ -89,12 +89,14 @@ public class FlowActivity extends BaseActivity
 
             if (mWork == null) {
                 throw new IllegalArgumentException(
-                        "You need to set a valid workId as long type");
+                        "You need to set a valid br.com.libertsolutions.crs.app.work.Work "
+                                + "instance as android.os.Parcelable");
             }
         } else {
             Toast.makeText(getApplicationContext(), "Developer, you need to use the method "
                     + "NavigationHelper.navigateToFlowScreen() passing the "
-                    + "Work ID in the second parameter", Toast.LENGTH_LONG).show();
+                    + "br.com.libertsolutions.crs.app.work.Work instance as android.os.Parcelable "
+                    + "in the second parameter", Toast.LENGTH_LONG).show();
             finish();
         }
     }
@@ -121,7 +123,7 @@ public class FlowActivity extends BaseActivity
             final Flow item = mFlowAdapter.getItem(position);
 
             if (item != null) {
-                NavigationHelper.navigateToCheckinScreen(this, item.getFlowId());
+                NavigationHelper.navigateToCheckinScreen(this, item);
             }
         }
     }

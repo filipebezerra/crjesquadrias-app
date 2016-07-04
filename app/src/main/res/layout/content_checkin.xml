@@ -24,7 +24,6 @@
             android:clipToPadding="false"
             app:layoutManager="LinearLayoutManager"
             tools:listitem="@layout/item_checkin"
-            tools:visibility="gone"
             />
     </android.support.v4.widget.SwipeRefreshLayout>
 
@@ -37,7 +36,6 @@
         android:orientation="vertical"
         android:padding="16dp"
         android:visibility="gone"
-        tools:visibility="visible"
         >
 
         <ImageView

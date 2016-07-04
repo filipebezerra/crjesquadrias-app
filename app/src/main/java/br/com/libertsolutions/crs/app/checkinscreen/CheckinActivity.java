@@ -1,6 +1,8 @@
 package br.com.libertsolutions.crs.app.checkinscreen;
 
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,12 +12,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
 import br.com.libertsolutions.crs.app.checkin.Checkin;
 import br.com.libertsolutions.crs.app.checkin.CheckinDataService;
 import br.com.libertsolutions.crs.app.checkin.CheckinRealmDataService;
+import br.com.libertsolutions.crs.app.flow.Flow;
 import br.com.libertsolutions.crs.app.sync.SyncService;
 import br.com.libertsolutions.crs.app.sync.event.EventBusManager;
 import br.com.libertsolutions.crs.app.sync.event.SyncEvent;
@@ -43,9 +47,9 @@ public class CheckinActivity extends BaseActivity
         implements CheckinAdapter.CheckinCallback, SwipeRefreshLayout.OnRefreshListener,
         SearchView.OnQueryTextListener {
 
-    public static final String EXTRA_FLOW_ID = "flowId";
+    public static final String EXTRA_FLOW = "flow";
 
-    private Long mFlowId;
+    private Flow mFlow;
 
     private CheckinAdapter mCheckinAdapter;
 
@@ -55,6 +59,9 @@ public class CheckinActivity extends BaseActivity
 
     private MenuItem mSearchMenuItem;
 
+    @BindView(R.id.collapsing_toolbar) CollapsingToolbarLayout mCollapsingToolbarLayout;
+    @BindView(R.id.flow_name) TextView mFlowNameTitleView;
+    @BindView(R.id.checkins_finished) TextView mCheckinsFinishedView;
     @BindView(R.id.list) RecyclerView mCheckinsView;
     @BindView(R.id.swipe_container) SwipeRefreshLayout mSwipeRefreshLayout;
     @BindView(R.id.empty_view) LinearLayout mEmptyStateView;
@@ -78,19 +85,36 @@ public class CheckinActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         validateExtraFlowId();
+        initTitleAppBar();
         setupRecyclerView();
         setupSwipeRefreshLayout();
     }
 
     private void validateExtraFlowId() {
-        if (getIntent().hasExtra(EXTRA_FLOW_ID)) {
-            mFlowId = getIntent().getLongExtra(EXTRA_FLOW_ID, 0);
+        if (getIntent().hasExtra(EXTRA_FLOW)) {
+            mFlow = getIntent().getParcelableExtra(EXTRA_FLOW);
+
+            if (mFlow == null) {
+                throw new IllegalArgumentException(
+                        "You need to set a valid br.com.libertsolutions.crs.app.flow.Flow "
+                                + "instance as android.os.Parcelable");
+            }
         } else {
             Toast.makeText(getApplicationContext(), "Developer, you need to use the method "
                     + "NavigationHelper.navigateToCheckinScreen() passing the "
-                    + "Flow ID in the second parameter", Toast.LENGTH_LONG).show();
+                    + "br.com.libertsolutions.crs.app.flow.Flow instance as android.os.Parcelable "
+                    + "in the second parameter", Toast.LENGTH_LONG).show();
             finish();
         }
+    }
+
+    private void initTitleAppBar() {
+        setTitle(getString(R.string.title_activity_checkin));
+
+        mCollapsingToolbarLayout.setExpandedTitleColor(
+                ContextCompat.getColor(this, android.R.color.transparent));
+
+        mFlowNameTitleView.setText(mFlow.getStep().getName());
     }
 
     private void setupRecyclerView() {
@@ -142,7 +166,7 @@ public class CheckinActivity extends BaseActivity
     }
 
     private void loadCheckinData() {
-        mCheckinDataSubscription = getCheckinDataService().list(mFlowId)
+        mCheckinDataSubscription = getCheckinDataService().list(mFlow.getFlowId())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         this::showCheckinData,
@@ -198,18 +222,18 @@ public class CheckinActivity extends BaseActivity
     private void updateSubtitle() {
         if (!hasCheckinData()) {
             showEmptyView(true);
-            setSubtitle(null);
         } else {
             final int finishedCount = mCheckinAdapter.getFinishedCheckinsCount();
             if (finishedCount == 0) {
-                setSubtitle(getString(R.string.no_checkin_finished));
+                mCheckinsFinishedView.setText(getString(R.string.no_checkin_finished));
             } else {
                 final int itemCount = mCheckinAdapter.getItemCount();
 
                 if (itemCount == finishedCount) {
-                    setSubtitle(getString(R.string.checkins_all_finished));
+                    mCheckinsFinishedView.setText(getString(R.string.checkins_all_finished));
                 } else {
-                    setSubtitle(getString(R.string.checkins_finished, finishedCount));
+                    mCheckinsFinishedView.setText(getString(R.string.checkins_finished,
+                            finishedCount));
                 }
             }
         }

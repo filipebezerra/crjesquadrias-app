@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.IntentCompat;
 import br.com.libertsolutions.crs.app.application.RequestCodes;
 import br.com.libertsolutions.crs.app.checkinscreen.CheckinActivity;
+import br.com.libertsolutions.crs.app.flow.Flow;
 import br.com.libertsolutions.crs.app.flowscreen.FlowActivity;
 import br.com.libertsolutions.crs.app.loginscreen.LoginActivity;
 import br.com.libertsolutions.crs.app.mainscreen.MainActivity;
@@ -17,10 +18,8 @@ import br.com.libertsolutions.crs.app.settingscreen.SettingsActivityCompat;
 import br.com.libertsolutions.crs.app.work.Work;
 
 /**
- * .
- *
  * @author Filipe Bezerra
- * @version 0.1.0, 27/03/2016
+ * @version 0.2.0
  * @since 0.1.0
  */
 public class NavigationHelper {
@@ -53,8 +52,8 @@ public class NavigationHelper {
                 .putExtra(FlowActivity.EXTRA_WORK, work));
     }
 
-    public static void navigateToCheckinScreen(@NonNull Context context, @NonNull Long flowId) {
+    public static void navigateToCheckinScreen(@NonNull Context context, @NonNull Flow flow) {
         context.startActivity(new Intent(context, CheckinActivity.class)
-                .putExtra(CheckinActivity.EXTRA_FLOW_ID, flowId));
+                .putExtra(CheckinActivity.EXTRA_FLOW, flow));
     }
 }
