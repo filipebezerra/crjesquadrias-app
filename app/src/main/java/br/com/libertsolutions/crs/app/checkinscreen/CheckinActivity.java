@@ -8,6 +8,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
@@ -55,6 +57,7 @@ public class CheckinActivity extends BaseActivity
 
     @BindView(R.id.list) RecyclerView mCheckinsView;
     @BindView(R.id.swipe_container) SwipeRefreshLayout mSwipeRefreshLayout;
+    @BindView(R.id.empty_view) LinearLayout mEmptyStateView;
 
     @Override
     protected int provideLayoutResource() {
@@ -149,9 +152,13 @@ public class CheckinActivity extends BaseActivity
     }
 
     private void showCheckinData(List<Checkin> list) {
-        mCheckinsView.setAdapter(
-                mCheckinAdapter = new CheckinAdapter(CheckinActivity.this, list));
-        mCheckinAdapter.setCheckinCallback(CheckinActivity.this);
+        if (!list.isEmpty()) {
+            mCheckinsView.setAdapter(
+                    mCheckinAdapter = new CheckinAdapter(CheckinActivity.this, list));
+            mCheckinAdapter.setCheckinCallback(CheckinActivity.this);
+            showEmptyView(false);
+        }
+
         updateSubtitle();
         collapseSearchView();
     }
@@ -190,7 +197,7 @@ public class CheckinActivity extends BaseActivity
 
     private void updateSubtitle() {
         if (!hasCheckinData()) {
-            //TODO showEmptyState
+            showEmptyView(true);
             setSubtitle(null);
         } else {
             final int finishedCount = mCheckinAdapter.getFinishedCheckinsCount();
@@ -207,6 +214,11 @@ public class CheckinActivity extends BaseActivity
             }
         }
         supportInvalidateOptionsMenu();
+    }
+
+    private void showEmptyView(boolean visible) {
+        mCheckinsView.setVisibility(visible ? View.GONE : View.VISIBLE);
+        mEmptyStateView.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     private void setAllToBeSynced(List<Checkin> checkins) {

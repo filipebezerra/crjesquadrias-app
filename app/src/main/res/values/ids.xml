@@ -27,4 +27,8 @@
     <item name="product_line" type="id" />
     <item name="product_processing_caption" type="id" />
     <item name="product_processing" type="id" />
+    <item name="empty_view" type="id" />
+    <item name="empty_image" type="id" />
+    <item name="empty_title" type="id" />
+    <item name="empty_tagline" type="id" />
 </resources>

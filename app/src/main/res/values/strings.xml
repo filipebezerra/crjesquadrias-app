@@ -70,7 +70,9 @@
     <string name="checkins_all_finished">Todos check-ins concluídos</string>
     <string name="title_dialog_error_retrieving_data">Falha ao tentar recuperar dados no banco de dados</string>
     <string name="title_no_data">Nenhuma obra</string>
+    <string name="title_no_checkins">Nenhum check-in</string>
     <string name="tagline_no_data">Não há dados disponíveis ou nenhuma obra está em execução</string>
+    <string name="tagline_no_checkins">Esta etapa da obra não tem checklist</string>
     <string name="title_no_connection">Sem conexão</string>
     <string name="tagline_no_connection">Não há conexão com a internet e não há obras importadas</string>
     <string name="title_importing_data">Importação em andamento…</string>

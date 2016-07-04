@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.MenuRes;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -84,7 +83,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
-    public void setSubtitle(@NonNull CharSequence subtitle) {
+    public void setSubtitle(@Nullable CharSequence subtitle) {
         final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setSubtitle(subtitle);

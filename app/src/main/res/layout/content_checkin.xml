@@ -24,7 +24,49 @@
             android:clipToPadding="false"
             app:layoutManager="LinearLayoutManager"
             tools:listitem="@layout/item_checkin"
+            tools:visibility="gone"
             />
     </android.support.v4.widget.SwipeRefreshLayout>
+
+    <LinearLayout
+        android:id="@id/empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        >
+
+        <ImageView
+            android:id="@id/empty_image"
+            android:layout_width="144dp"
+            android:layout_height="144dp"
+            app:srcCompat="@drawable/ic_checkins"
+            />
+
+        <TextView
+            android:id="@id/empty_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="@string/title_no_checkins"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            />
+
+        <TextView
+            android:id="@id/empty_tagline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="@string/tagline_no_checkins"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            />
+
+    </LinearLayout>
 
 </FrameLayout>
