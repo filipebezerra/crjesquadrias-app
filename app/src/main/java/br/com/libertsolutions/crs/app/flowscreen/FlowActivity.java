@@ -30,7 +30,6 @@ import br.com.libertsolutions.crs.app.utils.network.NetworkUtil;
 import br.com.libertsolutions.crs.app.work.Work;
 import butterknife.BindView;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.crashlytics.android.Crashlytics;
 import java.util.List;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -204,7 +203,7 @@ public class FlowActivity extends BaseActivity
     }
 
     private void showError(@StringRes int titleRes, Throwable e) {
-        Crashlytics.logException(e);
+        Timber.e(e, getString(titleRes));
 
         new MaterialDialog.Builder(FlowActivity.this)
                 .title(titleRes)
