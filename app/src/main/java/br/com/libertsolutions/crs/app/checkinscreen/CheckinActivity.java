@@ -189,7 +189,10 @@ public class CheckinActivity extends BaseActivity
     }
 
     private void updateSubtitle() {
-        if (mCheckinAdapter != null) {
+        if (!hasCheckinData()) {
+            //TODO showEmptyState
+            setSubtitle(null);
+        } else {
             final int finishedCount = mCheckinAdapter.getFinishedCheckinsCount();
             if (finishedCount == 0) {
                 setSubtitle(getString(R.string.no_checkin_finished));
@@ -278,7 +281,14 @@ public class CheckinActivity extends BaseActivity
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        return mCheckinAdapter != null && mCheckinAdapter.getItemCount() != 0;
+        final boolean menusEnabled = hasCheckinData();
+        menu.findItem(R.id.menu_search).setVisible(menusEnabled);
+        menu.findItem(R.id.action_check_all).setVisible(menusEnabled);
+        return true;
+    }
+
+    private boolean hasCheckinData() {
+        return mCheckinAdapter != null && mCheckinAdapter.getItemCount() > 0;
     }
 
     @Override
