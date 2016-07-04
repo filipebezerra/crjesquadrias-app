@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -148,25 +149,10 @@ public class MainActivity extends BaseActivity implements OnClickListener,
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        EventBusManager.register(this);
-        loadViewData();
-    }
-
-    private void loadViewData() {
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
         showUserLoggedInfo();
-
-        final boolean isInitialDataImported = ConfigHelper.isInitialDataImported(this);
-
-        if (isInitialDataImported) {
-            loadWorkData();
-            requestCompleteSync();
-        } else if (NetworkUtil.isDeviceConnectedToInternet(this)) {
-            startImportingData();
-        } else {
-            showNoDataAndNetworkState();
-        }
+        loadViewData();
     }
 
     private void showUserLoggedInfo() {
@@ -178,6 +164,19 @@ public class MainActivity extends BaseActivity implements OnClickListener,
             FeedbackHelper
                     .snackbar(mRootView, String.format("Logado como %s.",
                             LoginHelper.formatCpf(mUserLogged.getName())), false);
+        }
+    }
+
+    private void loadViewData() {
+        final boolean isInitialDataImported = ConfigHelper.isInitialDataImported(this);
+
+        if (isInitialDataImported) {
+            loadWorkData();
+            requestCompleteSync();
+        } else if (NetworkUtil.isDeviceConnectedToInternet(this)) {
+            startImportingData();
+        } else {
+            showNoDataAndNetworkState();
         }
     }
 
@@ -418,6 +417,12 @@ public class MainActivity extends BaseActivity implements OnClickListener,
     private void showEmptyView(boolean visible) {
         mWorksView.setVisibility(visible ? View.GONE : View.VISIBLE);
         mEmptyStateView.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBusManager.register(this);
     }
 
     @Override
