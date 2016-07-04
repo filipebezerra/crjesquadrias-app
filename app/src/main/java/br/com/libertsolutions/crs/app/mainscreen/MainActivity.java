@@ -5,7 +5,6 @@ import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
-import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -94,19 +93,7 @@ public class MainActivity extends BaseActivity implements OnClickListener,
         setupActionBar();
         setupRecyclerView();
         setupSwipeRefreshLayout();
-    }
-
-    private void setupSwipeRefreshLayout() {
-        mSwipeRefreshLayout.setOnRefreshListener(this);
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
-        mSwipeRefreshLayout.setProgressBackgroundColorSchemeResource(android.R.color.white);
-    }
-
-    @Override
-    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
         mCompositeSubscription = new CompositeSubscription();
-        loadViewData();
     }
 
     private void setupActionBar() {
@@ -131,6 +118,33 @@ public class MainActivity extends BaseActivity implements OnClickListener,
         mWorksView.addOnItemTouchListener(new OnTouchListener(this, mWorksView, this));
     }
 
+    @Override
+    public void onSingleTapUp(View view, int position) {
+        if (mWorkAdapter != null) {
+            final Work item = mWorkAdapter.getItem(position);
+
+            if (item != null) {
+                NavigationHelper.navigateToFlowScreen(this, item);
+            }
+        }
+    }
+
+    @Override
+    public void onLongPress(View view, int position) {}
+
+    private void setupSwipeRefreshLayout() {
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
+        mSwipeRefreshLayout.setProgressBackgroundColorSchemeResource(android.R.color.white);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBusManager.register(this);
+        loadViewData();
+    }
+
     private void loadViewData() {
         showUserLoggedInfo();
 
@@ -138,7 +152,6 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 
         if (isInitialDataImported) {
             loadWorkData();
-            Timber.i("Loading view data, requesting complete sync");
             requestCompleteSync();
         } else if (NetworkUtil.isDeviceConnectedToInternet(this)) {
             startImportingData();
@@ -147,9 +160,20 @@ public class MainActivity extends BaseActivity implements OnClickListener,
         }
     }
 
+    private void showUserLoggedInfo() {
+        if (mUserLogged == null) {
+            mUserLogged = LoginHelper.getUserLogged(this);
+        }
+
+        if (mUserLogged != null) {
+            FeedbackHelper
+                    .snackbar(mRootView, String.format("Logado como %s.",
+                            LoginHelper.formatCpf(mUserLogged.getName())), false);
+        }
+    }
+
     private void requestCompleteSync() {
         SyncService.requestCompleteSync();
-        Timber.i("Complete sync requested");
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -168,27 +192,6 @@ public class MainActivity extends BaseActivity implements OnClickListener,
         }
     }
 
-    private void showEmptyState(@DrawableRes int image, @StringRes int title,
-            @StringRes int tagline) {
-        ButterKnife.<ImageView>findById(mEmptyStateView, R.id.empty_image)
-                .setImageResource(image);
-        ButterKnife.<TextView>findById(mEmptyStateView, R.id.empty_title)
-                .setText(title);
-        ButterKnife.<TextView>findById(mEmptyStateView, R.id.empty_tagline)
-                .setText(tagline);
-        showEmptyView(true);
-    }
-
-    private void showEmptyView(boolean visible) {
-        mWorksView.setVisibility(visible ? View.GONE : View.VISIBLE);
-        mEmptyStateView.setVisibility(visible ? View.VISIBLE : View.GONE);
-    }
-
-    private void showNoDataAndNetworkState() {
-        showEmptyState(R.drawable.ic_no_connection, R.string.title_no_connection,
-                R.string.tagline_no_connection);
-    }
-
     private void startImportingData() {
         showImportingDataState();
         requestWorkData();
@@ -198,167 +201,6 @@ public class MainActivity extends BaseActivity implements OnClickListener,
         showEmptyState(R.drawable.ic_import_state, R.string.title_importing_data,
                 R.string.tagline_importing_data);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-    }
-
-    private void showUserLoggedInfo() {
-        if (mUserLogged == null) {
-            mUserLogged = LoginHelper.getUserLogged(this);
-        }
-
-        if (mUserLogged != null) {
-            FeedbackHelper
-                    .snackbar(mRootView, String.format("Logado como %s.",
-                            LoginHelper.formatCpf(mUserLogged.getName())), false);
-        }
-    }
-
-    private WorkDataService getWorkDataService() {
-        if (mWorkDataService == null) {
-            mWorkDataService = new WorkRealmDataService(this);
-        }
-        return mWorkDataService;
-    }
-
-    private void loadWorkData() {
-        final Subscription subscription = getWorkDataService()
-                .list()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .doOnError(
-                        e -> showError(R.string.title_dialog_error_loading_data_from_local, e))
-                .doOnNext(
-                        this::showWorkData)
-                .subscribe();
-        mCompositeSubscription.add(subscription);
-    }
-
-    private void showError(@StringRes int titleRes, Throwable e) {
-        Timber.e(e, getString(titleRes));
-
-        new MaterialDialog.Builder(MainActivity.this)
-                .title(titleRes)
-                .content(e.getMessage())
-                .positiveText(R.string.text_dialog_button_ok)
-                .show();
-    }
-
-    private void showWorkData(List<Work> list) {
-        if (!list.isEmpty()) {
-            mWorksView.setAdapter(mWorkAdapter = new MainWorkAdapter(MainActivity.this, list));
-            showEmptyView(false);
-        } else {
-            showEmptyDataState();
-        }
-        updateSubtitle();
-    }
-
-    private void showEmptyDataState() {
-        showEmptyState(R.drawable.ic_no_works, R.string.title_no_data,
-                R.string.tagline_no_data);
-        // TODO: enable BroadcastReceiver to network events
-    }
-
-    private void updateSubtitle() {
-        final int count = mWorkAdapter != null ? mWorkAdapter.getRunningWorksCount() : 0;
-        if (count == 0) {
-            setSubtitle(getString(R.string.no_work_running));
-        } else {
-            setSubtitle(getString(R.string.works_running,
-                    count));
-        }
-        supportInvalidateOptionsMenu();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        EventBusManager.register(this);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        EventBusManager.unregister(this);
-        mCompositeSubscription.clear();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        setupSearchView(menu);
-        return true;
-    }
-
-    private void setupSearchView(Menu menu) {
-        SearchView searchView = (SearchView) MenuItemCompat
-                .getActionView(menu.findItem(R.id.menu_search));
-        searchView.setQueryHint(getString(R.string.work_search_query_hint));
-        searchView.setOnQueryTextListener(this);
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        return mWorkAdapter != null && mWorkAdapter.getItemCount() != 0;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_logout:
-                LoginHelper.logoutUser(this);
-                finish();
-                return true;
-
-            case R.id.action_settings:
-                NavigationHelper.navigateToSettingsScreen(this);
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        changeListLayout(newConfig);
-    }
-
-    private void changeListLayout(Configuration configuration) {
-        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mWorksView.setLayoutManager(new GridLayoutManager(this, 2));
-        } else {
-            mWorksView.setLayoutManager(new LinearLayoutManager(this));
-        }
-    }
-
-    @Override
-    public void onSingleTapUp(View view, int position) {
-        if (mWorkAdapter != null) {
-            final Work item = mWorkAdapter.getItem(position);
-
-            if (item != null) {
-                NavigationHelper.navigateToFlowScreen(this, item);
-            }
-        }
-    }
-
-    @Override
-    public void onLongPress(View view, int position) {}
-
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        if (mWorkAdapter != null) {
-            mWorkAdapter.getFilter().filter(newText);
-            return true;
-        } else {
-            return false;
-        }
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -491,6 +333,84 @@ public class MainActivity extends BaseActivity implements OnClickListener,
         mCompositeSubscription.add(subscription);
     }
 
+    private void showError(@StringRes int titleRes, Throwable e) {
+        Timber.e(e, getString(titleRes));
+
+        new MaterialDialog.Builder(MainActivity.this)
+                .title(titleRes)
+                .content(e.getMessage())
+                .positiveText(R.string.text_dialog_button_ok)
+                .show();
+    }
+
+    private void loadWorkData() {
+        final Subscription subscription = getWorkDataService()
+                .list()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .doOnError(
+                        e -> showError(R.string.title_dialog_error_loading_data_from_local, e))
+                .doOnNext(
+                        this::showWorkData)
+                .subscribe();
+        mCompositeSubscription.add(subscription);
+    }
+
+    private WorkDataService getWorkDataService() {
+        if (mWorkDataService == null) {
+            mWorkDataService = new WorkRealmDataService(this);
+        }
+        return mWorkDataService;
+    }
+
+    private void showWorkData(List<Work> list) {
+        if (!list.isEmpty()) {
+            mWorksView.setAdapter(mWorkAdapter = new MainWorkAdapter(MainActivity.this, list));
+            showEmptyView(false);
+        } else {
+            showEmptyDataState();
+        }
+        updateSubtitle();
+    }
+
+    private void showEmptyDataState() {
+        showEmptyState(R.drawable.ic_no_works, R.string.title_no_data,
+                R.string.tagline_no_data);
+        // TODO: enable BroadcastReceiver to network events
+    }
+
+    private void updateSubtitle() {
+        final int count = mWorkAdapter != null ? mWorkAdapter.getRunningWorksCount() : 0;
+        if (count == 0) {
+            setSubtitle(getString(R.string.no_work_running));
+        } else {
+            setSubtitle(getString(R.string.works_running,
+                    count));
+        }
+        supportInvalidateOptionsMenu();
+    }
+
+    private void showNoDataAndNetworkState() {
+        showEmptyState(R.drawable.ic_no_connection, R.string.title_no_connection,
+                R.string.tagline_no_connection);
+    }
+
+    private void showEmptyState(@DrawableRes int image, @StringRes int title,
+            @StringRes int tagline) {
+        ButterKnife.<ImageView>findById(mEmptyStateView, R.id.empty_image)
+                .setImageResource(image);
+        ButterKnife.<TextView>findById(mEmptyStateView, R.id.empty_title)
+                .setText(title);
+        ButterKnife.<TextView>findById(mEmptyStateView, R.id.empty_tagline)
+                .setText(tagline);
+        showEmptyView(true);
+    }
+
+    private void showEmptyView(boolean visible) {
+        mWorksView.setVisibility(visible ? View.GONE : View.VISIBLE);
+        mEmptyStateView.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
     @Override
     public void onRefresh() {
         if (NetworkUtil.isDeviceConnectedToInternet(this)) {
@@ -498,5 +418,77 @@ public class MainActivity extends BaseActivity implements OnClickListener,
         } else {
             FeedbackHelper.toast(this, getString(R.string.no_connection_to_force_update), false);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        setupSearchView(menu);
+        return true;
+    }
+
+    private void setupSearchView(Menu menu) {
+        SearchView searchView = (SearchView) MenuItemCompat
+                .getActionView(menu.findItem(R.id.menu_search));
+        searchView.setQueryHint(getString(R.string.work_search_query_hint));
+        searchView.setOnQueryTextListener(this);
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        if (mWorkAdapter != null) {
+            mWorkAdapter.getFilter().filter(newText);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        return mWorkAdapter != null && mWorkAdapter.getItemCount() != 0;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_logout:
+                LoginHelper.logoutUser(this);
+                finish();
+                return true;
+
+            case R.id.action_settings:
+                NavigationHelper.navigateToSettingsScreen(this);
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        changeListLayout(newConfig);
+    }
+
+    private void changeListLayout(Configuration configuration) {
+        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mWorksView.setLayoutManager(new GridLayoutManager(this, 2));
+        } else {
+            mWorksView.setLayoutManager(new LinearLayoutManager(this));
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBusManager.unregister(this);
+        mCompositeSubscription.clear();
     }
 }
