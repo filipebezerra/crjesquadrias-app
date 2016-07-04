@@ -15,8 +15,6 @@ import android.widget.ToggleButton;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.checkin.Checkin;
 import br.com.libertsolutions.crs.app.checkin.CheckinComparator;
-import br.com.libertsolutions.crs.app.checkin.Item;
-import br.com.libertsolutions.crs.app.checkin.OrderGlass;
 import br.com.libertsolutions.crs.app.checkin.Product;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -205,19 +203,20 @@ public class CheckinAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                         }
                     }
 
+                    int width, height;
                     if (checkin.getOrderGlass() != null) {
-                        OrderGlass orderGlass = checkin.getOrderGlass();
-
-                        if (String.valueOf(orderGlass.getHeight()).startsWith(filterText)
-                                || String.valueOf(orderGlass.getWidth()).startsWith(filterText)) {
-                            newList.add(checkin);
-                        }
+                        width = (int) checkin.getOrderGlass().getWidth();
+                        height = (int) checkin.getOrderGlass().getHeight();
                     } else {
-                        Item item = checkin.getItem();
-                        if (String.valueOf(item.getHeight()).startsWith(filterText)
-                                || String.valueOf(item.getWidth()).startsWith(filterText)) {
-                            newList.add(checkin);
-                        }
+                        width = (int) checkin.getItem().getWidth();
+                        height = (int) checkin.getItem().getHeight();
+                    }
+
+                    final String measure = width + "x" + height;
+                    if (String.valueOf(width).startsWith(filterText)
+                            || String.valueOf(height).startsWith(filterText)
+                            || measure.startsWith(filterText)) {
+                        newList.add(checkin);
                     }
                 }
 
