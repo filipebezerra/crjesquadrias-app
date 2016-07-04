@@ -139,6 +139,15 @@ public class MainActivity extends BaseActivity implements OnClickListener,
     }
 
     @Override
+    public void onRefresh() {
+        if (NetworkUtil.isDeviceConnectedToInternet(this)) {
+            requestCompleteSync();
+        } else {
+            FeedbackHelper.toast(this, getString(R.string.no_connection_to_force_update), false);
+        }
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
         EventBusManager.register(this);
@@ -409,15 +418,6 @@ public class MainActivity extends BaseActivity implements OnClickListener,
     private void showEmptyView(boolean visible) {
         mWorksView.setVisibility(visible ? View.GONE : View.VISIBLE);
         mEmptyStateView.setVisibility(visible ? View.VISIBLE : View.GONE);
-    }
-
-    @Override
-    public void onRefresh() {
-        if (NetworkUtil.isDeviceConnectedToInternet(this)) {
-            requestCompleteSync();
-        } else {
-            FeedbackHelper.toast(this, getString(R.string.no_connection_to_force_update), false);
-        }
     }
 
     @Override
