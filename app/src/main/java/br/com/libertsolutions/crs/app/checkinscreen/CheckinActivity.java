@@ -23,7 +23,6 @@ import br.com.libertsolutions.crs.app.utils.feedback.FeedbackHelper;
 import br.com.libertsolutions.crs.app.utils.network.NetworkUtil;
 import butterknife.BindView;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.crashlytics.android.Crashlytics;
 import java.util.List;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -57,16 +56,6 @@ public class CheckinActivity extends BaseActivity
     @BindView(R.id.list) RecyclerView mCheckinsView;
     @BindView(R.id.swipe_container) SwipeRefreshLayout mSwipeRefreshLayout;
 
-    private void showError(int titleRes, Throwable e) {
-        Crashlytics.logException(e);
-
-        new MaterialDialog.Builder(this)
-                .title(titleRes)
-                .content(e.getMessage())
-                .positiveText(R.string.text_dialog_button_ok)
-                .show();
-    }
-
     @Override
     protected int provideLayoutResource() {
         return R.layout.activity_checkin;
@@ -88,7 +77,6 @@ public class CheckinActivity extends BaseActivity
         validateExtraFlowId();
         setupRecyclerView();
         setupSwipeRefreshLayout();
-        loadCheckinData();
     }
 
     private void validateExtraFlowId() {
@@ -111,143 +99,6 @@ public class CheckinActivity extends BaseActivity
         mSwipeRefreshLayout.setOnRefreshListener(this);
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
         mSwipeRefreshLayout.setProgressBackgroundColorSchemeResource(android.R.color.white);
-    }
-
-    private void loadCheckinData() {
-        mCheckinDataSubscription = getCheckinDataService().list(mFlowId)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        this::showCheckinData,
-
-                        e -> showError(R.string.title_dialog_error_loading_data_from_local, e)
-                );
-    }
-
-    private void showCheckinData(List<Checkin> list) {
-        mCheckinsView.setAdapter(
-                mCheckinAdapter = new CheckinAdapter(CheckinActivity.this, list));
-        mCheckinAdapter.setCheckinCallback(CheckinActivity.this);
-        updateSubtitle();
-        collapseSearchView();
-    }
-
-    private void collapseSearchView() {
-        if (mSearchMenuItem != null && mSearchMenuItem.isActionViewExpanded()) {
-            mSearchMenuItem.collapseActionView();
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        boolean hasOptionsMenu = super.onCreateOptionsMenu(menu);
-        setupSearchView(menu);
-        return hasOptionsMenu;
-    }
-
-    private void setupSearchView(Menu menu) {
-        mSearchMenuItem = menu.findItem(R.id.menu_search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(mSearchMenuItem);
-        searchView.setQueryHint(getString(R.string.checkin_search_query_hint));
-        searchView.setOnQueryTextListener(this);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        EventBusManager.register(this);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        EventBusManager.unregister(this);
-        if (mCheckinDataSubscription != null && mCheckinDataSubscription.isUnsubscribed()) {
-            mCheckinDataSubscription.unsubscribe();
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_check_all) {
-            mCheckinAdapter.checkAllDone();
-            return true;
-        } else {
-            return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
-    public void onCheckinDone(Checkin checkin) {
-        updateSubtitle();
-        setToBeSynced(checkin);
-    }
-
-    private void setToBeSynced(Checkin checkin) {
-        if (checkin == null) {
-            return;
-        }
-
-        getCheckinDataService().updateSyncState(checkin, true)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        ignored -> {},
-
-                        e -> showError(R.string.title_dialog_error_saving_data, e)
-                );
-    }
-
-    @Override
-    public void onCheckinsAllDone(List<Checkin> checkinsUpdated) {
-        updateSubtitle();
-        setAllToBeSynced(checkinsUpdated);
-    }
-
-    private void setAllToBeSynced(List<Checkin> checkins) {
-        if (checkins == null || checkins.isEmpty()) {
-            return;
-        }
-
-        getCheckinDataService().updateSyncState(checkins, true)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        ignored -> {},
-
-                        e -> showError(R.string.title_dialog_error_saving_data, e)
-                );
-    }
-
-    @Override
-    public void onCheckinsAlreadyDone() {
-        FeedbackHelper.snackbar(mRootView, getString(R.string.checkins_already_done), true);
-    }
-
-    @Override
-    public void onStatusCannotChange() {
-        FeedbackHelper.snackbar(mRootView, getString(R.string.checkins_status_cannot_change), true);
-    }
-
-    private void updateSubtitle() {
-        if (mCheckinAdapter != null) {
-            final int finishedCount = mCheckinAdapter.getFinishedCheckinsCount();
-            if (finishedCount == 0) {
-                setSubtitle(getString(R.string.no_checkin_finished));
-            } else {
-                final int itemCount = mCheckinAdapter.getItemCount();
-
-                if (itemCount == finishedCount) {
-                    setSubtitle(getString(R.string.checkins_all_finished));
-                } else {
-                    setSubtitle(getString(R.string.checkins_finished, finishedCount));
-                }
-            }
-        }
-    }
-
-    private CheckinDataService getCheckinDataService() {
-        if (mCheckinDataService == null) {
-            mCheckinDataService = new CheckinRealmDataService(this);
-        }
-        return mCheckinDataService;
     }
 
     @Override
@@ -281,6 +132,136 @@ public class CheckinActivity extends BaseActivity
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        EventBusManager.register(this);
+        loadCheckinData();
+    }
+
+    private void loadCheckinData() {
+        mCheckinDataSubscription = getCheckinDataService().list(mFlowId)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        this::showCheckinData,
+
+                        e -> showError(R.string.title_dialog_error_loading_data_from_local, e)
+                );
+    }
+
+    private void showCheckinData(List<Checkin> list) {
+        mCheckinsView.setAdapter(
+                mCheckinAdapter = new CheckinAdapter(CheckinActivity.this, list));
+        mCheckinAdapter.setCheckinCallback(CheckinActivity.this);
+        updateSubtitle();
+        collapseSearchView();
+    }
+
+    private void collapseSearchView() {
+        if (mSearchMenuItem != null && mSearchMenuItem.isActionViewExpanded()) {
+            mSearchMenuItem.collapseActionView();
+        }
+    }
+
+    @Override
+    public void onCheckinDone(Checkin checkin) {
+        updateSubtitle();
+        setToBeSynced(checkin);
+    }
+
+    private void setToBeSynced(Checkin checkin) {
+        if (checkin == null) {
+            return;
+        }
+
+        getCheckinDataService().updateSyncState(checkin, true)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        ignored -> {},
+
+                        e -> showError(R.string.title_dialog_error_saving_data, e)
+                );
+    }
+
+    @Override
+    public void onCheckinsAllDone(List<Checkin> checkinsUpdated) {
+        updateSubtitle();
+        setAllToBeSynced(checkinsUpdated);
+    }
+
+    private void updateSubtitle() {
+        if (mCheckinAdapter != null) {
+            final int finishedCount = mCheckinAdapter.getFinishedCheckinsCount();
+            if (finishedCount == 0) {
+                setSubtitle(getString(R.string.no_checkin_finished));
+            } else {
+                final int itemCount = mCheckinAdapter.getItemCount();
+
+                if (itemCount == finishedCount) {
+                    setSubtitle(getString(R.string.checkins_all_finished));
+                } else {
+                    setSubtitle(getString(R.string.checkins_finished, finishedCount));
+                }
+            }
+        }
+        supportInvalidateOptionsMenu();
+    }
+
+    private void setAllToBeSynced(List<Checkin> checkins) {
+        if (checkins == null || checkins.isEmpty()) {
+            return;
+        }
+
+        getCheckinDataService().updateSyncState(checkins, true)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        ignored -> {},
+
+                        e -> showError(R.string.title_dialog_error_saving_data, e)
+                );
+    }
+
+    private CheckinDataService getCheckinDataService() {
+        if (mCheckinDataService == null) {
+            mCheckinDataService = new CheckinRealmDataService(this);
+        }
+        return mCheckinDataService;
+    }
+
+    private void showError(int titleRes, Throwable e) {
+        Timber.e(e, getString(titleRes));
+
+        new MaterialDialog.Builder(this)
+                .title(titleRes)
+                .content(e.getMessage())
+                .positiveText(R.string.text_dialog_button_ok)
+                .show();
+    }
+
+    @Override
+    public void onCheckinsAlreadyDone() {
+        FeedbackHelper.snackbar(mRootView, getString(R.string.checkins_already_done), true);
+    }
+
+    @Override
+    public void onStatusCannotChange() {
+        FeedbackHelper.snackbar(mRootView, getString(R.string.checkins_status_cannot_change), true);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        boolean hasOptionsMenu = super.onCreateOptionsMenu(menu);
+        setupSearchView(menu);
+        return hasOptionsMenu;
+    }
+
+    private void setupSearchView(Menu menu) {
+        mSearchMenuItem = menu.findItem(R.id.menu_search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(mSearchMenuItem);
+        searchView.setQueryHint(getString(R.string.checkin_search_query_hint));
+        searchView.setOnQueryTextListener(this);
+    }
+
+    @Override
     public boolean onQueryTextSubmit(String query) {
         return false;
     }
@@ -292,6 +273,30 @@ public class CheckinActivity extends BaseActivity
             return true;
         } else {
             return false;
+        }
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        return mCheckinAdapter != null && mCheckinAdapter.getItemCount() != 0;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_check_all) {
+            mCheckinAdapter.checkAllDone();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBusManager.unregister(this);
+        if (mCheckinDataSubscription != null && mCheckinDataSubscription.isUnsubscribed()) {
+            mCheckinDataSubscription.unsubscribe();
         }
     }
 }
