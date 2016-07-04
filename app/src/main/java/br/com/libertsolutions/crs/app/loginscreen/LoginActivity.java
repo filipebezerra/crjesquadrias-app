@@ -15,22 +15,22 @@ import br.com.libertsolutions.crs.app.login.LoginBody;
 import br.com.libertsolutions.crs.app.login.LoginHelper;
 import br.com.libertsolutions.crs.app.login.User;
 import br.com.libertsolutions.crs.app.login.UserService;
+import br.com.libertsolutions.crs.app.settings.SettingsHelper;
 import br.com.libertsolutions.crs.app.utils.feedback.FeedbackHelper;
 import br.com.libertsolutions.crs.app.utils.form.FormUtil;
 import br.com.libertsolutions.crs.app.utils.keyboard.KeyboardUtil;
 import br.com.libertsolutions.crs.app.utils.navigation.NavigationHelper;
 import br.com.libertsolutions.crs.app.utils.network.NetworkUtil;
 import br.com.libertsolutions.crs.app.utils.webservice.ServiceGenerator;
-import br.com.libertsolutions.crs.app.settings.SettingsHelper;
 import butterknife.BindView;
 import butterknife.OnEditorAction;
 import butterknife.OnFocusChange;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.crashlytics.android.Crashlytics;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
+import timber.log.Timber;
 
 /**
  * Tela de login, nesta usuários do sistema deverão logar para ter acesso aos dados obtidos do
@@ -50,6 +50,57 @@ public class LoginActivity extends BaseActivity {
     @BindView(R.id.cpf_helper) TextInputLayout mCpfHelper;
     @BindView(R.id.password) TextInputEditText mPasswordView;
     @BindView(R.id.password_helper) TextInputLayout mPasswordHelper;
+
+    @Override
+    protected int provideLayoutResource() {
+        return R.layout.activity_login;
+    }
+
+    @Override
+    protected int provideUpIndicatorResource() {
+        return R.drawable.ic_clear_24dp;
+    }
+
+    @Override
+    protected int provideMenuResource() {
+        return R.menu.menu_login;
+    }
+
+    @Override
+    protected void onCreate(Bundle inState) {
+        super.onCreate(inState);
+        if (LoginHelper.isUserLogged(this)) {
+            NavigationHelper.navigateToMainScreen(this);
+            finish();
+        } else if (!SettingsHelper.isSettingsApplied(this)) {
+            NavigationHelper.navigateToSettingsScreen(this);
+        }
+    }
+
+    @OnEditorAction(R.id.password)
+    boolean onPasswordEditorAction(int actionId) {
+        if (actionId == getResources().getInteger(R.integer.entrar)) {
+            doLogin();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+
+            case R.id.action_done:
+                doLogin();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     private void doLogin() {
         if (!mFormUtil.enableOrRemoveErrorInView(mCpfHelper,
@@ -137,7 +188,7 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void showAuthenticationError(Throwable e) {
-        Crashlytics.logException(e);
+        Timber.e(e, "Authentication error");
 
         new MaterialDialog.Builder(LoginActivity.this)
                 .title(R.string.title_dialog_sign_in_failed)
@@ -180,54 +231,6 @@ public class LoginActivity extends BaseActivity {
                 });
     }
 
-    @Override
-    protected int provideLayoutResource() {
-        return R.layout.activity_login;
-    }
-
-    @Override
-    protected int provideUpIndicatorResource() {
-        return R.drawable.ic_clear_24dp;
-    }
-
-    @Override
-    protected int provideMenuResource() {
-        return R.menu.menu_login;
-    }
-
-    @Override
-    protected void onCreate(Bundle inState) {
-        super.onCreate(inState);
-        if (LoginHelper.isUserLogged(this)) {
-            NavigationHelper.navigateToMainScreen(this);
-            finish();
-        } else if (!SettingsHelper.isSettingsApplied(this)) {
-            NavigationHelper.navigateToSettingsScreen(this);
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        unsubscribeAuthentication();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-
-            case R.id.action_done:
-                doLogin();
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
     @OnFocusChange(R.id.cpf)
     void onCpfViewFocusChange(boolean focused) {
         if (focused) {
@@ -247,12 +250,9 @@ public class LoginActivity extends BaseActivity {
         }
     }
 
-    @OnEditorAction(R.id.password)
-    boolean onPasswordEditorAction(int actionId) {
-        if (actionId == getResources().getInteger(R.integer.entrar)) {
-            doLogin();
-            return true;
-        }
-        return false;
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unsubscribeAuthentication();
     }
 }
