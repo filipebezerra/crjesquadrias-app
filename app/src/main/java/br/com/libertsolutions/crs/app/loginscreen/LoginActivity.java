@@ -23,6 +23,7 @@ import br.com.libertsolutions.crs.app.utils.navigation.NavigationHelper;
 import br.com.libertsolutions.crs.app.utils.network.NetworkUtil;
 import br.com.libertsolutions.crs.app.utils.webservice.ServiceGenerator;
 import butterknife.BindView;
+import butterknife.OnClick;
 import butterknife.OnEditorAction;
 import butterknife.OnFocusChange;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -37,7 +38,6 @@ import timber.log.Timber;
  * servidor.
  *
  * @author Filipe Bezerra
- * @version 0.1.0
  * @since 0.1.0
  */
 public class LoginActivity extends BaseActivity {
@@ -62,11 +62,6 @@ public class LoginActivity extends BaseActivity {
     }
 
     @Override
-    protected int provideMenuResource() {
-        return R.menu.menu_login;
-    }
-
-    @Override
     protected void onCreate(Bundle inState) {
         super.onCreate(inState);
         if (LoginHelper.isUserLogged(this)) {
@@ -86,15 +81,16 @@ public class LoginActivity extends BaseActivity {
         return false;
     }
 
+    @OnClick(R.id.button_login)
+    void onButtonLoginClick() {
+        doLogin();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
-                return true;
-
-            case R.id.action_done:
-                doLogin();
                 return true;
 
             default:
