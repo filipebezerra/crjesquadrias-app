@@ -13,4 +13,6 @@
     <color name="statusPending">#a90329</color>
     <color name="statusStarted">#3276b1</color>
     <color name="statusFinished">#739e73</color>
+
+    <color name="window_background">#def1e5</color>
 </resources>

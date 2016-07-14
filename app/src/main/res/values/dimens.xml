@@ -4,4 +4,5 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="item_offset">8dp</dimen>
+    <dimen name="recycler_view_spacing">8dp</dimen>
 </resources>

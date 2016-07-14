@@ -4,7 +4,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:windowBackground">@color/white</item>
+        <item name="android:windowBackground">@color/window_background</item>
         <item name="selectableItemBackground">@drawable/selector_item_background</item>
     </style>
 
@@ -22,4 +22,24 @@
     <style name="Crs.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="Widget.Crs" parent="android:Widget" />
+
+    <style name="Widget.Crs.RecyclerView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:clipToPadding">false</item>
+        <item name="android:fitsSystemWindows">true</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:paddingLeft">@dimen/recycler_view_spacing</item>
+        <item name="android:paddingRight">@dimen/recycler_view_spacing</item>
+        <item name="android:paddingTop">@dimen/recycler_view_spacing</item>
+        <item name="android:scrollbars">vertical</item>
+    </style>
+
+    <style name="Widget.Crs.CardView" parent="CardView.Light">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">2dp</item>
+        <item name="contentPadding">16dp</item>
+        <item name="cardUseCompatPadding">true</item>
+    </style>
 </resources>

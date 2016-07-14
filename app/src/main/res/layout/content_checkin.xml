@@ -16,19 +16,11 @@
         >
 
         <android.support.v7.widget.RecyclerView
+            style="@style/Widget.Crs.RecyclerView"
             android:id="@id/list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:fitsSystemWindows="true"
-            android:gravity="center_horizontal"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp"
-            android:paddingTop="8dp"
-            android:scrollbars="vertical"
-            app:layoutManager="LinearLayoutManager"
             tools:listitem="@layout/item_checkin"
             />
+
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <LinearLayout
