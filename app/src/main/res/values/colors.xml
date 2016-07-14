@@ -15,4 +15,6 @@
     <color name="statusFinished">#739e73</color>
 
     <color name="window_background">#def1e5</color>
+    <color name="color_accent_pressed">#6a3f825e</color>
+    <color name="color_accent_focused">#963f825e</color>
 </resources>

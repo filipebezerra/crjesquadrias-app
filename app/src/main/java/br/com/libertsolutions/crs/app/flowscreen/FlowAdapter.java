@@ -2,6 +2,7 @@ package br.com.libertsolutions.crs.app.flowscreen;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,10 +23,13 @@ import java.util.List;
 public class FlowAdapter extends RecyclerView.Adapter<FlowAdapter.ViewHolder> {
     @NonNull private final List<Flow> mFlows;
     @NonNull private Context mContext;
+    @NonNull private View.OnClickListener mCardViewListener;
 
-    public FlowAdapter(@NonNull Context context, @NonNull List<Flow> flowList) {
+    public FlowAdapter(@NonNull Context context, @NonNull List<Flow> flowList,
+            @NonNull View.OnClickListener cardViewListener) {
         mContext = context;
         mFlows = flowList;
+        mCardViewListener = cardViewListener;
     }
 
     @Override
@@ -54,6 +58,10 @@ public class FlowAdapter extends RecyclerView.Adapter<FlowAdapter.ViewHolder> {
                 holder.stepStatus.setBackgroundResource(R.drawable.circle_status_finished);
                 break;
         }
+
+        holder.flow = flow;
+        holder.cardView.setTag(holder);
+        holder.cardView.setOnClickListener(mCardViewListener);
     }
 
     @Override
@@ -79,17 +87,11 @@ public class FlowAdapter extends RecyclerView.Adapter<FlowAdapter.ViewHolder> {
         return count;
     }
 
-    public void swapData(List<Flow> flowList) {
-        if (flowList != null) {
-            mFlows.clear();
-            mFlows.addAll(flowList);
-            notifyDataSetChanged();
-        }
-    }
-
     class ViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.card_view) CardView cardView;
         @BindView(R.id.flow_status) View stepStatus;
         @BindView(R.id.flow_name) TextView stepName;
+        Flow flow;
 
         public ViewHolder(View itemView) {
             super(itemView);

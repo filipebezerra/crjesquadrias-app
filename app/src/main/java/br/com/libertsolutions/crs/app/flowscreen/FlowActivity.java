@@ -14,8 +14,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
-import br.com.libertsolutions.crs.app.android.recyclerview.OnClickListener;
-import br.com.libertsolutions.crs.app.android.recyclerview.OnTouchListener;
 import br.com.libertsolutions.crs.app.flow.Flow;
 import br.com.libertsolutions.crs.app.flow.FlowDataService;
 import br.com.libertsolutions.crs.app.flow.FlowRealmDataService;
@@ -44,7 +42,7 @@ import timber.log.Timber;
  * @since 0.1.0
  */
 public class FlowActivity extends BaseActivity
-        implements OnClickListener, SwipeRefreshLayout.OnRefreshListener {
+        implements SwipeRefreshLayout.OnRefreshListener {
 
     public static final String EXTRA_WORK = "work";
 
@@ -113,22 +111,7 @@ public class FlowActivity extends BaseActivity
     private void setupRecyclerView() {
         changeListLayout(getResources().getConfiguration());
         mWorkStepsView.setHasFixedSize(true);
-        mWorkStepsView.addOnItemTouchListener(new OnTouchListener(this, mWorkStepsView, this));
     }
-
-    @Override
-    public void onSingleTapUp(View view, int position) {
-        if (mFlowAdapter != null) {
-            final Flow item = mFlowAdapter.getItem(position);
-
-            if (item != null) {
-                NavigationHelper.navigateToCheckinScreen(this, item);
-            }
-        }
-    }
-
-    @Override
-    public void onLongPress(View view, int position) {}
 
     private void setupSwipeRefreshLayout() {
         mSwipeRefreshLayout.setOnRefreshListener(this);
@@ -151,12 +134,14 @@ public class FlowActivity extends BaseActivity
 
         if (event.getStatus() == SyncStatus.IN_PROGRESS) {
             Timber.i("Sync in progress");
-            if (!mSwipeRefreshLayout.isRefreshing())
+            if (!mSwipeRefreshLayout.isRefreshing()) {
                 mSwipeRefreshLayout.setRefreshing(true);
+            }
         } else {
             Timber.i("Sync completed");
-            if (mSwipeRefreshLayout.isRefreshing())
+            if (mSwipeRefreshLayout.isRefreshing()) {
                 mSwipeRefreshLayout.setRefreshing(false);
+            }
 
             loadFlowData();
         }
@@ -184,12 +169,15 @@ public class FlowActivity extends BaseActivity
     }
 
     private void showFlowData(List<Flow> list) {
-        if (mFlowAdapter == null) {
-            mWorkStepsView.setAdapter(mFlowAdapter = new FlowAdapter(FlowActivity.this, list));
-        } else {
-            mFlowAdapter.swapData(list);
-        }
+        mFlowAdapter = new FlowAdapter(FlowActivity.this, list, this::handleListItemClick);
+        mWorkStepsView.setAdapter(mFlowAdapter);
         updateTitleAppBar();
+    }
+
+    public void handleListItemClick(View view) {
+        final FlowAdapter.ViewHolder viewHolder = (FlowAdapter.ViewHolder) view.getTag();
+        final Flow flow = viewHolder.flow;
+        NavigationHelper.navigateToCheckinScreen(this, flow);
     }
 
     private void updateTitleAppBar() {

@@ -16,13 +16,8 @@
         >
 
         <android.support.v7.widget.RecyclerView
+            style="@style/Widget.Crs.RecyclerView"
             android:id="@id/list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scrollbars="vertical"
-            android:scrollbarStyle="outsideOverlay"
-            android:clipToPadding="false"
-            app:layoutManager="LinearLayoutManager"
             tools:listitem="@layout/item_flow"
             />
     </android.support.v4.widget.SwipeRefreshLayout>
