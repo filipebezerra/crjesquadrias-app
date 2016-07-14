@@ -1,10 +1,12 @@
 package br.com.libertsolutions.crs.app.checkinscreen;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -117,7 +119,7 @@ public class CheckinActivity extends BaseActivity
     }
 
     private void setupRecyclerView() {
-        mCheckinsView.setLayoutManager(new LinearLayoutManager(this));
+        changeListLayout(getResources().getConfiguration());
         mCheckinsView.setHasFixedSize(true);
     }
 
@@ -329,6 +331,20 @@ public class CheckinActivity extends BaseActivity
             return true;
         } else {
             return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        changeListLayout(newConfig);
+    }
+
+    private void changeListLayout(Configuration configuration) {
+        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mCheckinsView.setLayoutManager(new GridLayoutManager(this, 2));
+        } else {
+            mCheckinsView.setLayoutManager(new LinearLayoutManager(this));
         }
     }
 
