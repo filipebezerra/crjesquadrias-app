@@ -18,10 +18,14 @@
         <android.support.v7.widget.RecyclerView
             android:id="@id/list"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scrollbars="vertical"
-            android:scrollbarStyle="outsideOverlay"
+            android:layout_height="match_parent"
             android:clipToPadding="false"
+            android:fitsSystemWindows="true"
+            android:gravity="center_horizontal"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="8dp"
+            android:scrollbars="vertical"
             app:layoutManager="LinearLayoutManager"
             tools:listitem="@layout/item_checkin"
             />
