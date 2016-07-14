@@ -2,7 +2,6 @@ package br.com.libertsolutions.crs.app.application;
 
 import android.app.Application;
 import br.com.libertsolutions.crs.app.BuildConfig;
-import br.com.libertsolutions.crs.app.sync.SyncService;
 import br.com.libertsolutions.crs.app.utils.logging.CrashReportingTree;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
@@ -12,10 +11,7 @@ import io.realm.RealmConfiguration;
 import timber.log.Timber;
 
 /**
- * .
- *
  * @author Filipe Bezerra
- * @version 0.1.0, 02/06/2016
  * @since 0.1.0
  */
 public class App extends Application {
@@ -25,7 +21,6 @@ public class App extends Application {
         initLoggingWithTimber();
         initCrashReportingWithFabric();
         initDataStorageWithRealm();
-        SyncService.start(this);
     }
 
     private void initLoggingWithTimber() {

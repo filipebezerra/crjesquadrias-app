@@ -5,7 +5,6 @@ import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
-import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -37,7 +36,6 @@ import br.com.libertsolutions.crs.app.sync.SyncService;
 import br.com.libertsolutions.crs.app.sync.event.EventBusManager;
 import br.com.libertsolutions.crs.app.sync.event.SyncEvent;
 import br.com.libertsolutions.crs.app.sync.event.SyncStatus;
-import br.com.libertsolutions.crs.app.sync.event.SyncType;
 import br.com.libertsolutions.crs.app.utils.drawable.DrawableHelper;
 import br.com.libertsolutions.crs.app.utils.feedback.FeedbackHelper;
 import br.com.libertsolutions.crs.app.utils.navigation.NavigationHelper;
@@ -65,7 +63,6 @@ import timber.log.Timber;
  * Activity da interface de usuário da lista de {@link Work}s.
  *
  * @author Filipe Bezerra
- * @since 0.2.0
  * @since 0.1.0
  */
 public class MainActivity extends BaseActivity implements OnClickListener,
@@ -90,11 +87,14 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 
     @Override
     protected void onCreate(Bundle inState) {
+        SyncService.start(this);
         super.onCreate(inState);
         setupActionBar();
         setupRecyclerView();
         setupSwipeRefreshLayout();
         mCompositeSubscription = new CompositeSubscription();
+        showUserLoggedInfo();
+        loadViewData();
     }
 
     private void setupActionBar() {
@@ -148,13 +148,6 @@ public class MainActivity extends BaseActivity implements OnClickListener,
         }
     }
 
-    @Override
-    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        showUserLoggedInfo();
-        loadViewData();
-    }
-
     private void showUserLoggedInfo() {
         if (mUserLogged == null) {
             mUserLogged = LoginHelper.getUserLogged(this);
@@ -189,14 +182,15 @@ public class MainActivity extends BaseActivity implements OnClickListener,
         Timber.i("Sync event with %s in %s", event.getType(), event.getStatus());
 
         if (event.getStatus() == SyncStatus.IN_PROGRESS) {
-            if (!mSwipeRefreshLayout.isRefreshing()) mSwipeRefreshLayout.setRefreshing(true);
+            Timber.i("Sync in progress");
+            if (!mSwipeRefreshLayout.isRefreshing())
+                mSwipeRefreshLayout.setRefreshing(true);
         } else {
-            if (mSwipeRefreshLayout.isRefreshing()) mSwipeRefreshLayout.setRefreshing(false);
+            Timber.i("Sync completed");
+            if (mSwipeRefreshLayout.isRefreshing())
+                mSwipeRefreshLayout.setRefreshing(false);
 
-            if (event.getType() == SyncType.WORKS) {
-                Timber.i("Sync completed");
-                loadWorkData();
-            }
+            loadWorkData();
         }
     }
 

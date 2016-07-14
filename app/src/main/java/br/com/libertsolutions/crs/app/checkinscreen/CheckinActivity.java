@@ -24,7 +24,6 @@ import br.com.libertsolutions.crs.app.sync.SyncService;
 import br.com.libertsolutions.crs.app.sync.event.EventBusManager;
 import br.com.libertsolutions.crs.app.sync.event.SyncEvent;
 import br.com.libertsolutions.crs.app.sync.event.SyncStatus;
-import br.com.libertsolutions.crs.app.sync.event.SyncType;
 import br.com.libertsolutions.crs.app.utils.feedback.FeedbackHelper;
 import br.com.libertsolutions.crs.app.utils.network.NetworkUtil;
 import butterknife.BindView;
@@ -142,19 +141,15 @@ public class CheckinActivity extends BaseActivity
         Timber.i("Sync event with %s in %s", event.getType(), event.getStatus());
 
         if (event.getStatus() == SyncStatus.IN_PROGRESS) {
-            if (!mSwipeRefreshLayout.isRefreshing()) {
+            Timber.i("Sync in progress");
+            if (!mSwipeRefreshLayout.isRefreshing())
                 mSwipeRefreshLayout.setRefreshing(true);
-            }
         } else {
             Timber.i("Sync completed");
-
-            if (mSwipeRefreshLayout.isRefreshing()) {
+            if (mSwipeRefreshLayout.isRefreshing())
                 mSwipeRefreshLayout.setRefreshing(false);
-            }
 
-            if (event.getType() == SyncType.CHECKINS) {
-                loadCheckinData();
-            }
+            loadCheckinData();
         }
     }
 
