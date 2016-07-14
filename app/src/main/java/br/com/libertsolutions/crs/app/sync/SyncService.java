@@ -5,17 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
-
-import org.greenrobot.eventbus.Subscribe;
-
 import br.com.libertsolutions.crs.app.sync.event.EventBusManager;
-import br.com.libertsolutions.crs.app.sync.event.SyncEvent;
 import br.com.libertsolutions.crs.app.sync.event.SyncRequestEvent;
-import br.com.libertsolutions.crs.app.sync.event.SyncType;
+import org.greenrobot.eventbus.Subscribe;
 import timber.log.Timber;
 
-import static br.com.libertsolutions.crs.app.sync.event.SyncStatus.COMPLETED;
-import static br.com.libertsolutions.crs.app.sync.event.SyncType.CHECKINS;
 import static br.com.libertsolutions.crs.app.sync.event.SyncType.COMPLETE_SYNC;
 
 /**
@@ -29,13 +23,8 @@ import static br.com.libertsolutions.crs.app.sync.event.SyncType.COMPLETE_SYNC;
  */
 public class SyncService extends Service {
 
-    public static final String SYNC_TAG = "Sync";
-
+    public static final String SYNC_TAG = "SyncingCRSapp";
     private SyncManager mSyncManager;
-
-    private boolean mIsCompleteSyncRequested = false;
-
-    private final Object mWaitMonitor = new Object();
 
     static {
         Timber.tag(SYNC_TAG);
@@ -63,26 +52,7 @@ public class SyncService extends Service {
     @Subscribe
     public void onSyncRequestEvent(SyncRequestEvent event) {
         Timber.i("Sync request event with %s", event.getSyncType());
-        if (event.getSyncType() == COMPLETE_SYNC) {
-            mIsCompleteSyncRequested = true;
-            mSyncManager.dispatchSync(CHECKINS);
-        } else {
-            mSyncManager.dispatchSync(event.getSyncType());
-        }
-    }
-
-    @Subscribe
-    public void onSyncEvent(SyncEvent event) {
-        synchronized (mWaitMonitor) {
-            Timber.i("Sync event with %s in %s", event.getType(), event.getStatus());
-            if (mIsCompleteSyncRequested
-                    && event.getType() == CHECKINS && event.getStatus() == COMPLETED) {
-                Timber.i("Checkin sync completed. Dispatching other syncs");
-                mSyncManager.dispatchSync(SyncType.WORKS);
-                mSyncManager.dispatchSync(SyncType.FLOWS);
-                mIsCompleteSyncRequested = false;
-            }
-        }
+        mSyncManager.dispatchSync(event.getSyncType());
     }
 
     public static void start(@NonNull Context context) {

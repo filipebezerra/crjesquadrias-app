@@ -70,10 +70,18 @@ abstract class AbstractSync {
             case WORKS:
                 ConfigHelper.setLastWorksSyncDate(mContext, config.getDataAtual());
                 break;
+
             case FLOWS:
                 ConfigHelper.setLastFlowsSyncDate(mContext, config.getDataAtual());
                 break;
+
             case CHECKINS:
+                ConfigHelper.setLastCheckinsSyncDate(mContext, config.getDataAtual());
+                break;
+
+            case COMPLETE_SYNC:
+                ConfigHelper.setLastWorksSyncDate(mContext, config.getDataAtual());
+                ConfigHelper.setLastFlowsSyncDate(mContext, config.getDataAtual());
                 ConfigHelper.setLastCheckinsSyncDate(mContext, config.getDataAtual());
                 break;
         }

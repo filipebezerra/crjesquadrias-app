@@ -10,8 +10,7 @@ import java.util.Map;
  * Classe para gerenciador os {@link SyncType} e sua execução.
  *
  * @author Filipe Bezerra
- * @version #, 06/06/2016
- * @since #
+ * @since 0.1.1
  */
 class SyncManager {
     private Map<SyncType, AbstractSync> mSyncMap;
@@ -21,6 +20,7 @@ class SyncManager {
         mSyncMap.put(SyncType.WORKS, new WorksSync(context));
         mSyncMap.put(SyncType.FLOWS, new FlowsSync(context));
         mSyncMap.put(SyncType.CHECKINS, new CheckinsSync(context));
+        mSyncMap.put(SyncType.COMPLETE_SYNC, new CompleteSync(context));
     }
 
     void dispatchSync(@NonNull SyncType syncType) {
