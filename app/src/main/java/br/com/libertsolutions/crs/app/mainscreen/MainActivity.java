@@ -19,8 +19,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
-import br.com.libertsolutions.crs.app.android.recyclerview.OnClickListener;
-import br.com.libertsolutions.crs.app.android.recyclerview.OnTouchListener;
 import br.com.libertsolutions.crs.app.checkin.Checkin;
 import br.com.libertsolutions.crs.app.checkin.CheckinRealmDataService;
 import br.com.libertsolutions.crs.app.checkin.CheckinService;
@@ -63,8 +61,8 @@ import timber.log.Timber;
  * @author Filipe Bezerra
  * @since 0.1.0
  */
-public class MainActivity extends BaseActivity implements OnClickListener,
-        SearchView.OnQueryTextListener, SwipeRefreshLayout.OnRefreshListener {
+public class MainActivity extends BaseActivity
+        implements SearchView.OnQueryTextListener, SwipeRefreshLayout.OnRefreshListener {
 
     private MainWorkAdapter mWorkAdapter;
 
@@ -108,22 +106,7 @@ public class MainActivity extends BaseActivity implements OnClickListener,
     private void setupRecyclerView() {
         changeListLayout(getResources().getConfiguration());
         mWorksView.setHasFixedSize(true);
-        mWorksView.addOnItemTouchListener(new OnTouchListener(this, mWorksView, this));
     }
-
-    @Override
-    public void onSingleTapUp(View view, int position) {
-        if (mWorkAdapter != null) {
-            final Work item = mWorkAdapter.getItem(position);
-
-            if (item != null) {
-                NavigationHelper.navigateToFlowScreen(this, item);
-            }
-        }
-    }
-
-    @Override
-    public void onLongPress(View view, int position) {}
 
     private void setupSwipeRefreshLayout() {
         mSwipeRefreshLayout.setOnRefreshListener(this);
@@ -175,12 +158,14 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 
         if (event.getStatus() == SyncStatus.IN_PROGRESS) {
             Timber.i("Sync in progress");
-            if (!mSwipeRefreshLayout.isRefreshing())
+            if (!mSwipeRefreshLayout.isRefreshing()) {
                 mSwipeRefreshLayout.setRefreshing(true);
+            }
         } else {
             Timber.i("Sync completed");
-            if (mSwipeRefreshLayout.isRefreshing())
+            if (mSwipeRefreshLayout.isRefreshing()) {
                 mSwipeRefreshLayout.setRefreshing(false);
+            }
 
             loadWorkData();
         }
@@ -359,12 +344,19 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 
     private void showWorkData(List<Work> list) {
         if (!list.isEmpty()) {
-            mWorksView.setAdapter(mWorkAdapter = new MainWorkAdapter(MainActivity.this, list));
+            mWorkAdapter = new MainWorkAdapter(MainActivity.this, list, this::handleListItemClick);
+            mWorksView.setAdapter(mWorkAdapter);
             showEmptyView(false);
         } else {
             showEmptyDataState();
         }
         updateSubtitle();
+    }
+
+    public void handleListItemClick(View view) {
+        final MainWorkAdapter.ViewHolder viewHolder = (MainWorkAdapter.ViewHolder) view.getTag();
+        final Work work = viewHolder.work;
+        NavigationHelper.navigateToFlowScreen(this, work);
     }
 
     private void showEmptyDataState() {

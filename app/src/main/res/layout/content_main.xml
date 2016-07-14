@@ -16,15 +16,9 @@
         >
 
         <android.support.v7.widget.RecyclerView
+            style="@style/Widget.Crs.RecyclerView"
             android:id="@id/list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:scrollbarStyle="outsideOverlay"
-            android:scrollbars="vertical"
-            app:layoutManager="LinearLayoutManager"
             tools:listitem="@layout/item_work"
-            tools:visibility="gone"
             />
     </android.support.v4.widget.SwipeRefreshLayout>
 
@@ -37,7 +31,6 @@
         android:orientation="vertical"
         android:padding="16dp"
         android:visibility="gone"
-        tools:visibility="visible"
         >
 
         <ImageView

@@ -2,6 +2,7 @@ package br.com.libertsolutions.crs.app.mainscreen;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -29,16 +30,16 @@ public class MainWorkAdapter extends RecyclerView.Adapter<MainWorkAdapter.ViewHo
     implements Filterable {
 
     @NonNull private List<Work> mWorks;
-
     @NonNull private Context mContext;
-
     private List<Work> mOriginalWorks;
-
     private WorkFilter mWorkFilter;
+    @NonNull private View.OnClickListener mCardViewListener;
 
-    public MainWorkAdapter(@NonNull Context context, @NonNull List<Work> workList) {
+    public MainWorkAdapter(@NonNull Context context, @NonNull List<Work> workList,
+            @NonNull View.OnClickListener cardViewListener) {
         mContext = context;
         mWorks = workList;
+        mCardViewListener = cardViewListener;
     }
 
     @Override
@@ -73,6 +74,10 @@ public class MainWorkAdapter extends RecyclerView.Adapter<MainWorkAdapter.ViewHo
                 holder.workStatus.setBackgroundResource(R.drawable.circle_status_started);
                 break;
         }
+
+        holder.work = work;
+        holder.cardView.setTag(holder);
+        holder.cardView.setOnClickListener(mCardViewListener);
     }
 
     @Override
@@ -107,10 +112,12 @@ public class MainWorkAdapter extends RecyclerView.Adapter<MainWorkAdapter.ViewHo
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.card_view) CardView cardView;
         @BindView(R.id.workStatus) View workStatus;
         @BindView(R.id.workCode) TextView workCode;
         @BindView(R.id.customerName) TextView customerName;
         @BindView(R.id.workDate) TextView workDate;
+        Work work;
 
         public ViewHolder(View itemView) {
             super(itemView);
