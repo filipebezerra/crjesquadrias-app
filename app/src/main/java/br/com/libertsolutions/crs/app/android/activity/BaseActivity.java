@@ -1,6 +1,5 @@
 package br.com.libertsolutions.crs.app.android.activity;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.LayoutRes;
@@ -10,10 +9,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.ViewGroup;
 import br.com.libertsolutions.crs.app.R;
-import br.com.libertsolutions.crs.app.utils.drawable.DrawableHelper;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -27,7 +24,6 @@ import butterknife.ButterKnife;
 public abstract class BaseActivity extends AppCompatActivity {
     protected static final int NO_UP_INDICATOR = -1;
     protected static final int NO_MENU = -1;
-    protected static final long INVALID_EXTRA_ID = -1;
 
     @BindView(R.id.root_view) protected ViewGroup mRootView;
     @Nullable @BindView(R.id.toolbar) protected Toolbar mToolbarAsActionBar;
@@ -45,19 +41,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (provideMenuResource() != NO_MENU) {
             getMenuInflater().inflate(provideMenuResource(), menu);
 
-            for (int i = 0; i <= menu.size() - 1; i++) {
-                final MenuItem menuItem = menu.getItem(i);
-                final Drawable icon = menuItem.getIcon();
-
-                if (icon != null) {
-                    DrawableHelper.withContext(this)
-                            .withDrawable(icon)
-                            .withColor(R.color.white)
-                            .tint()
-                            .applyTo(menuItem);
-                }
-            }
-
             return true;
         } else {
             return super.onCreateOptionsMenu(menu);
@@ -73,12 +56,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             if (actionBar != null
                     && provideUpIndicatorResource() != NO_UP_INDICATOR) {
                 actionBar.setDisplayHomeAsUpEnabled(true);
-                actionBar.setHomeAsUpIndicator(
-                        DrawableHelper.withContext(this)
-                                .withDrawable(provideUpIndicatorResource())
-                                .withColor(R.color.white)
-                                .tint()
-                                .get());
+                actionBar.setHomeAsUpIndicator(provideUpIndicatorResource());
             }
         }
     }

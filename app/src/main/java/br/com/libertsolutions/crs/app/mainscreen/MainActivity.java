@@ -2,7 +2,6 @@ package br.com.libertsolutions.crs.app.mainscreen;
 
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.StringRes;
@@ -36,7 +35,6 @@ import br.com.libertsolutions.crs.app.sync.SyncService;
 import br.com.libertsolutions.crs.app.sync.event.EventBusManager;
 import br.com.libertsolutions.crs.app.sync.event.SyncEvent;
 import br.com.libertsolutions.crs.app.sync.event.SyncStatus;
-import br.com.libertsolutions.crs.app.utils.drawable.DrawableHelper;
 import br.com.libertsolutions.crs.app.utils.feedback.FeedbackHelper;
 import br.com.libertsolutions.crs.app.utils.navigation.NavigationHelper;
 import br.com.libertsolutions.crs.app.utils.network.NetworkUtil;
@@ -103,13 +101,7 @@ public class MainActivity extends BaseActivity implements OnClickListener,
         }
 
         if (mToolbarAsActionBar != null) {
-            final Drawable navigationIcon = DrawableHelper.withContext(this)
-                    .withColor(R.color.white)
-                    .withDrawable(R.drawable.ic_worker)
-                    .tint()
-                    .get();
-
-            mToolbarAsActionBar.setNavigationIcon(navigationIcon);
+            mToolbarAsActionBar.setNavigationIcon(R.drawable.ic_worker);
         }
     }
 
