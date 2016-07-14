@@ -209,7 +209,7 @@ public class FlowActivity extends BaseActivity
 
     private void changeListLayout(Configuration configuration) {
         if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mWorkStepsView.setLayoutManager(new GridLayoutManager(this, 3));
+            mWorkStepsView.setLayoutManager(new GridLayoutManager(this, 2));
         } else {
             mWorkStepsView.setLayoutManager(new LinearLayoutManager(this));
         }
