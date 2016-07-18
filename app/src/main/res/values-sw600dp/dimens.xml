@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="login_appbar_height">256dp</dimen>
+    <dimen name="checkin_appbar_height">208dp</dimen>
+    <dimen name="flow_appbar_height">240dp</dimen>
+</resources>

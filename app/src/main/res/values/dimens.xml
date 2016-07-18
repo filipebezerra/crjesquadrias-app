@@ -5,4 +5,7 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="item_offset">8dp</dimen>
     <dimen name="recycler_view_spacing">8dp</dimen>
+    <dimen name="login_appbar_height">128dp</dimen>
+    <dimen name="checkin_appbar_height">160dp</dimen>
+    <dimen name="flow_appbar_height">192dp</dimen>
 </resources>

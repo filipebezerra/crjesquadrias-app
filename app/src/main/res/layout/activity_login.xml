@@ -13,7 +13,7 @@
     <android.support.design.widget.AppBarLayout
         android:id="@id/appbar"
         android:layout_width="match_parent"
-        android:layout_height="192dp"
+        android:layout_height="@dimen/login_appbar_height"
         android:theme="@style/Crs.AppBarOverlay"
         android:fitsSystemWindows="true"
         >
