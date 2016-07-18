@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="?attr/colorPrimary"
     android:fitsSystemWindows="true"
-    tools:context=".loginscreen.LoginActivity"
+    tools:context=".presentation.login.LoginActivity"
     >
 
     <android.support.design.widget.AppBarLayout

@@ -7,7 +7,7 @@
     android:id="@id/root_view"
     android:padding="64dp"
     android:background="@drawable/bg_launch_screen"
-    tools:context=".launchscreen.LaunchScreenActivity"
+    tools:context=".presentation.launch.LaunchScreenActivity"
     >
 
     <ImageView
