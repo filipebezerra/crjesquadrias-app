@@ -121,6 +121,7 @@ public class FlowActivity extends BaseActivity
         if (NetworkUtils.isDeviceConnectedToInternet(this)) {
             SyncService.requestCompleteSync();
         } else {
+            stopRefreshingProgress();
             FeedbackHelper.toast(this, getString(R.string.no_connection_to_force_update), false);
         }
     }
@@ -136,11 +137,14 @@ public class FlowActivity extends BaseActivity
             }
         } else {
             Timber.i("Sync completed");
-            if (mSwipeRefreshLayout.isRefreshing()) {
-                mSwipeRefreshLayout.setRefreshing(false);
-            }
-
+            stopRefreshingProgress();
             loadFlowData();
+        }
+    }
+
+    private void stopRefreshingProgress() {
+        if (mSwipeRefreshLayout.isRefreshing()) {
+            mSwipeRefreshLayout.setRefreshing(false);
         }
     }
 

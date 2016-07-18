@@ -131,6 +131,7 @@ public class CheckinActivity extends BaseActivity
         if (NetworkUtils.isDeviceConnectedToInternet(this)) {
             SyncService.requestCompleteSync();
         } else {
+            stopRefreshingProgress();
             FeedbackHelper.toast(this, getString(R.string.no_connection_to_force_update), false);
         }
     }
@@ -145,10 +146,14 @@ public class CheckinActivity extends BaseActivity
                 mSwipeRefreshLayout.setRefreshing(true);
         } else {
             Timber.i("Sync completed");
-            if (mSwipeRefreshLayout.isRefreshing())
-                mSwipeRefreshLayout.setRefreshing(false);
-
+            stopRefreshingProgress();
             loadCheckinData();
+        }
+    }
+
+    private void stopRefreshingProgress() {
+        if (mSwipeRefreshLayout.isRefreshing()) {
+            mSwipeRefreshLayout.setRefreshing(false);
         }
     }
 

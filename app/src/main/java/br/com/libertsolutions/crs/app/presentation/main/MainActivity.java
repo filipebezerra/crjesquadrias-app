@@ -114,11 +114,7 @@ public class MainActivity extends BaseActivity
 
     @Override
     public void onRefresh() {
-        if (NetworkUtils.isDeviceConnectedToInternet(this)) {
-            requestCompleteSync();
-        } else {
-            FeedbackHelper.toast(this, getString(R.string.no_connection_to_force_update), false);
-        }
+        requestCompleteSync();
     }
 
     private void showUserLoggedInfo() {
@@ -147,7 +143,12 @@ public class MainActivity extends BaseActivity
     }
 
     private void requestCompleteSync() {
-        SyncService.requestCompleteSync();
+        if (NetworkUtils.isDeviceConnectedToInternet(this)) {
+            SyncService.requestCompleteSync();
+        } else {
+            stopRefreshingProgress();
+            FeedbackHelper.toast(this, getString(R.string.no_connection_to_force_update), false);
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -161,11 +162,14 @@ public class MainActivity extends BaseActivity
             }
         } else {
             Timber.i("Sync completed");
-            if (mSwipeRefreshLayout.isRefreshing()) {
-                mSwipeRefreshLayout.setRefreshing(false);
-            }
-
+            stopRefreshingProgress();
             loadWorkData();
+        }
+    }
+
+    private void stopRefreshingProgress() {
+        if (mSwipeRefreshLayout.isRefreshing()) {
+            mSwipeRefreshLayout.setRefreshing(false);
         }
     }
 
