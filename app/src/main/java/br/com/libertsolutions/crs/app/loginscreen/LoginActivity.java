@@ -8,7 +8,6 @@ import android.support.design.widget.TextInputLayout;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.android.activity.BaseActivity;
 import br.com.libertsolutions.crs.app.login.LoginBody;
@@ -45,7 +44,6 @@ public class LoginActivity extends BaseActivity {
 
     private Subscription mSubscription;
 
-    @BindView(R.id.root_view) FrameLayout mRootView;
     @BindView(R.id.cpf) TextInputEditText mCpfView;
     @BindView(R.id.cpf_helper) TextInputLayout mCpfHelper;
     @BindView(R.id.password) TextInputEditText mPasswordView;

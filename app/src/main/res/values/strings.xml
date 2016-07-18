@@ -89,4 +89,5 @@
     <string name="product_processing_caption">Tratamento</string>
     <string name="checkin_done">Já está feito</string>
     <string name="checkin_not_done">Marcar como feito</string>
+    <string name="welcome_title">Bem-vindo</string>
 </resources>
