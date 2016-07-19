@@ -19,7 +19,15 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            shrinkResources false
+            minifyEnabled true
+            proguardFile  'proguard-crashlytics-2.pro'
+            proguardFile  'proguard-eventbus-3.pro'
+            proguardFile  'proguard-gson.pro'
+            proguardFile  'proguard-rx-java.pro'
+            proguardFile  'proguard-square-okhttp3.pro'
+            proguardFile  'proguard-square-retrofit2.pro'
+            proguardFile  'proguard-retrolambda.pro'
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
