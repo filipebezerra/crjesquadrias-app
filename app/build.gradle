@@ -13,21 +13,22 @@ android {
         applicationId "br.com.libertsolutions.crs.app"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 23020
-        versionName "0.2.0"
+        versionCode 23100
+        versionName "1.0.0"
         vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
         release {
             shrinkResources false
             minifyEnabled true
-            proguardFile  'proguard-crashlytics-2.pro'
-            proguardFile  'proguard-eventbus-3.pro'
-            proguardFile  'proguard-gson.pro'
-            proguardFile  'proguard-rx-java.pro'
-            proguardFile  'proguard-square-okhttp3.pro'
-            proguardFile  'proguard-square-retrofit2.pro'
-            proguardFile  'proguard-retrolambda.pro'
+            proguardFile 'proguard-crashlytics-2.pro'
+            proguardFile 'proguard-eventbus-3.pro'
+            proguardFile 'proguard-gson.pro'
+            proguardFile 'proguard-retrolambda.pro'
+            proguardFile 'proguard-rx-java.pro'
+            proguardFile 'proguard-square-okhttp3.pro'
+            proguardFile 'proguard-square-okio.pro'
+            proguardFile 'proguard-square-retrofit2.pro'
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -56,12 +57,8 @@ dependencies {
     apt "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
 
     // Third material components library
-    compile("com.github.afollestad.material-dialogs:core:${materialDialogsVersion}") {
-        transitive = true
-    }
-    compile("com.github.afollestad.material-dialogs:commons:${materialDialogsVersion}") {
-        transitive = true
-    }
+    compile "com.afollestad.material-dialogs:core:${materialDialogsVersion}"
+    compile "com.afollestad.material-dialogs:commons:${materialDialogsVersion}"
 
     // Http libraries
     compile ("com.squareup.retrofit2:retrofit:${retrofitVersion}") {

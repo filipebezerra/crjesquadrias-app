@@ -29,9 +29,9 @@ task clean(type: Delete) {
 
 ext {
     supportLibraryVersion = '23.4.0'
-    materialDialogsVersion = '0.8.5.7@aar'
+    materialDialogsVersion = '0.8.5.8@aar'
     retrofitVersion = '2.1.0'
-    okHttpVersion = '3.3.1'
+    okHttpVersion = '3.4.1'
     parcelablepleaseVersion = '1.0.2'
-    butterKnifeVersion = '8.1.0'
+    butterKnifeVersion = '8.2.1'
 }
