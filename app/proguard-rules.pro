@@ -13,9 +13,6 @@
 -keep public class * extends android.preference.Preference
 -keep public class * extends android.support.v4.app.Fragment
 -keep public class * extends android.support.v4.app.DialogFragment
--keep public class * extends com.actionbarsherlock.app.SherlockListFragment
--keep public class * extends com.actionbarsherlock.app.SherlockFragment
--keep public class * extends com.actionbarsherlock.app.SherlockFragmentActivity
 -keep public class * extends android.app.Fragment
 -keep public class com.android.vending.licensing.ILicensingService
 
@@ -60,5 +57,5 @@
 -dontwarn android.support.**
 -dontwarn com.google.ads.**
 
-# Keep Realm Model classes
+# Keep my own classes
 -keep class br.com.libertsolutions.crs.app.** { *; }
