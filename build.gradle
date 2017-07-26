@@ -30,8 +30,8 @@ task clean(type: Delete) {
 ext {
     supportLibraryVersion = '24.1.1'
     materialDialogsVersion = '0.8.6.2'
-    retrofitVersion = '2.1.0'
-    okHttpVersion = '3.4.1'
+    retrofitVersion = '2.3.0'
+    okHttpVersion = '3.8.0'
     parcelablepleaseVersion = '1.0.2'
     butterKnifeVersion = '8.2.1'
 }

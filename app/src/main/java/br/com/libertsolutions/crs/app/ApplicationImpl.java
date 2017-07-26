@@ -4,10 +4,12 @@ import android.app.Application;
 import br.com.libertsolutions.crs.app.presentation.util.CrashReportingTree;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
+import com.squareup.leakcanary.LeakCanary;
 import io.fabric.sdk.android.Fabric;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import timber.log.Timber;
+import timber.log.Timber.DebugTree;
 
 /**
  * @author Filipe Bezerra
@@ -17,14 +19,24 @@ public class ApplicationImpl extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        initMemoryLeakDetector();
         initLoggingWithTimber();
         initCrashReportingWithFabric();
         initDataStorageWithRealm();
     }
 
+    private void initMemoryLeakDetector() {
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            // This process is dedicated to LeakCanary for heap analysis.
+            // You should not init your app in this process.
+            return;
+        }
+        LeakCanary.install(this);
+    }
+
     private void initLoggingWithTimber() {
         if (BuildConfig.DEBUG) {
-            Timber.plant(new Timber.DebugTree());
+            Timber.plant(new DebugTree());
         } else {
             Timber.plant(new CrashReportingTree());
         }
