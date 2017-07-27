@@ -4,8 +4,8 @@ import com.google.gson.annotations.SerializedName;
 
 /**
  * @author Filipe Bezerra
- * @since 0.1.0
+ * @since 1.0.1
  */
-public class Config {
-    @SerializedName("dataAtual") public String currentDate;
+public abstract class BaseResponse {
+    @SerializedName("TotalPaginas") public int totalPaginas;
 }

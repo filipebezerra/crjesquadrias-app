@@ -1,22 +1,30 @@
 package br.com.libertsolutions.crs.app.data.sync;
 
 import android.content.Context;
-
-import java.util.concurrent.TimeUnit;
-
-import br.com.libertsolutions.crs.app.domain.pojo.Checkin;
 import br.com.libertsolutions.crs.app.data.checkin.CheckinDataService;
 import br.com.libertsolutions.crs.app.data.checkin.CheckinRealmDataService;
 import br.com.libertsolutions.crs.app.data.checkin.CheckinService;
-import br.com.libertsolutions.crs.app.data.config.ConfigDataHelper;
-import br.com.libertsolutions.crs.app.data.login.LoginDataHelper;
 import br.com.libertsolutions.crs.app.data.sync.event.SyncEvent;
-import br.com.libertsolutions.crs.app.data.sync.event.SyncStatus;
 import br.com.libertsolutions.crs.app.data.sync.event.SyncType;
-import br.com.libertsolutions.crs.app.data.util.RxUtil;
-import br.com.libertsolutions.crs.app.data.util.ServiceGenerator;
-import rx.schedulers.Schedulers;
+import br.com.libertsolutions.crs.app.domain.pojo.Checkin;
+import br.com.libertsolutions.crs.app.domain.pojo.Checkins;
+import rx.Subscription;
 import timber.log.Timber;
+
+import static br.com.libertsolutions.crs.app.data.config.ConfigDataHelper.isInitialDataImported;
+import static br.com.libertsolutions.crs.app.data.login.LoginDataHelper.getUserLogged;
+import static br.com.libertsolutions.crs.app.data.sync.SyncService.SYNC_TAG;
+import static br.com.libertsolutions.crs.app.data.sync.event.SyncStatus.COMPLETED;
+import static br.com.libertsolutions.crs.app.data.sync.event.SyncStatus.IN_PROGRESS;
+import static br.com.libertsolutions.crs.app.data.sync.event.SyncType.CHECKINS;
+import static br.com.libertsolutions.crs.app.data.util.Constants.PAGE_START;
+import static br.com.libertsolutions.crs.app.data.util.RxUtil.exponentialBackoff;
+import static br.com.libertsolutions.crs.app.data.util.RxUtil.timeoutException;
+import static br.com.libertsolutions.crs.app.data.util.ServiceGenerator.createService;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static rx.schedulers.Schedulers.io;
+import static timber.log.Timber.e;
+import static timber.log.Timber.tag;
 
 /**
  * Classe para execução de sincronização das atualizações nos {@link Checkin}s.
@@ -33,82 +41,82 @@ import timber.log.Timber;
  */
 class CheckinsSync extends AbstractSync {
 
-    private final CheckinDataService mCheckinDataService;
+    private final CheckinDataService checkinDataService;
 
-    private final CheckinService mCheckinService;
+    private final CheckinService checkinService;
+
+    private int currentPageCheckins = PAGE_START;
 
     static {
-        Timber.tag(SyncService.SYNC_TAG);
+        tag(SYNC_TAG);
     }
 
-    public CheckinsSync(Context context) {
+    CheckinsSync(Context context) {
         super(context);
-        mCheckinDataService = new CheckinRealmDataService(context);
-        mCheckinService = ServiceGenerator.createService(CheckinService.class, context);
+        checkinDataService = new CheckinRealmDataService(context);
+        checkinService = createService(CheckinService.class, context);
     }
 
     @Override
     protected SyncType getSyncType() {
-        return SyncType.CHECKINS;
+        return CHECKINS;
     }
 
     @Override
     protected void doSync() {
-        if (!ConfigDataHelper.isInitialDataImported(mContext)) return;
+        if (!isInitialDataImported(applicationContext))
+            return;
 
-        SyncEvent.send(getSyncType(), SyncStatus.IN_PROGRESS);
+        SyncEvent.send(getSyncType(), IN_PROGRESS);
         postUpdates();
     }
 
     private void postUpdates() {
         Timber.i("Posting checkin updates");
         //noinspection ConstantConditions
-        final String userCpf = LoginDataHelper.getUserLogged(mContext).getCpf();
-        mCheckinDataService
+        final String userCpf = getUserLogged(applicationContext).getCpf();
+        checkinDataService
                 .listPendingSynchronization()
-                .observeOn(Schedulers.io())
-                .retryWhen(
-                        RxUtil.timeoutException())
-                .retryWhen(
-                        RxUtil.exponentialBackoff(3, 5, TimeUnit.SECONDS))
-                .filter(
-                        checkinsUpdated -> checkinsUpdated != null && !checkinsUpdated.isEmpty())
-                .flatMap(
-                        checkinsUpdated -> mCheckinService.patch(userCpf, checkinsUpdated))
-                .flatMap(
-                        mCheckinDataService::saveAll)
-                .subscribe(
-                        checkinsSent -> {},
-
-                        error -> Timber.e(error, "Erro enviando atualizações nos check-ins"),
-
-                        this::getUpdates
-                );
+                .observeOn(io())
+                .retryWhen(timeoutException())
+                .retryWhen(exponentialBackoff(3, 5, SECONDS))
+                .filter(checkins -> checkins != null && !checkins.isEmpty())
+                .flatMap(checkins -> checkinService.patch(userCpf, checkins))
+                .flatMap(checkinDataService::saveAll)
+                .doOnError(e -> e(e, "Erro enviando atualizações nos check-ins"))
+                .doOnCompleted(this::getUpdates)
+                .subscribe();
     }
 
     private void getUpdates() {
-        final String lastSyncDate = ConfigDataHelper.getLastCheckinsSyncDate(mContext);
-        Timber.i("Getting checkin updates since %s", lastSyncDate);
-        mCheckinService
-                .getAllWithUpdates(lastSyncDate)
-                .observeOn(Schedulers.io())
-                .retryWhen(
-                        RxUtil.timeoutException())
-                .retryWhen(
-                        RxUtil.exponentialBackoff(3, 5, TimeUnit.SECONDS))
-                .filter(
-                        checkinsUpdated -> checkinsUpdated != null && !checkinsUpdated.isEmpty())
-                .flatMap(
-                        mCheckinDataService::saveAll)
-                .subscribe(
-                        checkinsReceived -> {},
+        Timber.i("Getting checkin updates since %s", getLastSyncDate());
+        final Subscription subscription = checkinService
+                .getAllWithUpdates(getLastSyncDate(), currentPageCheckins)
+                .retryWhen(timeoutException())
+                .retryWhen(exponentialBackoff(3, 5, SECONDS))
+                .filter(checkins ->
+                        checkins != null && (checkins.list != null && !checkins.list.isEmpty()))
+                .subscribe(this::saveUpdates, e -> e(e, "Erro obtendo atualizações nos check-ins"));
+        compositeSubscription.add(subscription);
+    }
 
-                        error -> Timber.e(error, "Erro obtendo atualizações nos check-ins"),
-
+    private void saveUpdates(Checkins checkins) {
+        final Subscription subscription = checkinDataService
+                .saveAll(checkins.list)
+                .doOnError(e -> e(e, "Erro persistindo atualizações nos check-ins"))
+                .doOnCompleted(
                         () -> {
-                            syncDone();
-                            SyncEvent.send(getSyncType(), SyncStatus.COMPLETED);
-                        }
-                );
+                            if (currentPageCheckins == checkins.totalPaginas) {
+                                syncDone();
+                                SyncEvent.send(getSyncType(), COMPLETED);
+                                compositeSubscription.clear();
+                            } else {
+                                currentPageCheckins++;
+                                getUpdates();
+                            }
+                        })
+                .subscribeOn(io())
+                .subscribe();
+        compositeSubscription.add(subscription);
     }
 }

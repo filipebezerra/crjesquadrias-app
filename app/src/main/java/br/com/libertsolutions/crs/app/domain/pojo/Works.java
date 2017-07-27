@@ -1,11 +1,11 @@
 package br.com.libertsolutions.crs.app.domain.pojo;
 
 import com.google.gson.annotations.SerializedName;
+import java.util.List;
 
 /**
  * @author Filipe Bezerra
- * @since 0.1.0
  */
-public class Config {
-    @SerializedName("dataAtual") public String currentDate;
+public class Works extends BaseResponse {
+    @SerializedName("Obra") public List<Work> list;
 }

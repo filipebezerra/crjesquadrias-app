@@ -1,16 +1,17 @@
 package br.com.libertsolutions.crs.app.presentation.main;
 
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.StringRes;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.SearchView.OnQueryTextListener;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,61 +19,74 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import br.com.libertsolutions.crs.app.R;
-import br.com.libertsolutions.crs.app.presentation.activity.BaseActivity;
-import br.com.libertsolutions.crs.app.domain.pojo.Checkin;
 import br.com.libertsolutions.crs.app.data.checkin.CheckinRealmDataService;
 import br.com.libertsolutions.crs.app.data.checkin.CheckinService;
 import br.com.libertsolutions.crs.app.data.config.ConfigDataHelper;
 import br.com.libertsolutions.crs.app.data.config.ConfigService;
-import br.com.libertsolutions.crs.app.domain.pojo.Flow;
 import br.com.libertsolutions.crs.app.data.flow.FlowRealmDataService;
 import br.com.libertsolutions.crs.app.data.flow.FlowService;
 import br.com.libertsolutions.crs.app.data.login.LoginDataHelper;
-import br.com.libertsolutions.crs.app.domain.pojo.User;
 import br.com.libertsolutions.crs.app.data.sync.SyncService;
 import br.com.libertsolutions.crs.app.data.sync.event.EventBusManager;
 import br.com.libertsolutions.crs.app.data.sync.event.SyncEvent;
 import br.com.libertsolutions.crs.app.data.sync.event.SyncStatus;
-import br.com.libertsolutions.crs.app.presentation.util.FeedbackHelper;
-import br.com.libertsolutions.crs.app.presentation.util.NavigationHelper;
-import br.com.libertsolutions.crs.app.presentation.util.NetworkUtils;
-import br.com.libertsolutions.crs.app.data.util.RxUtil;
-import br.com.libertsolutions.crs.app.data.util.ServiceGenerator;
-import br.com.libertsolutions.crs.app.domain.pojo.Work;
 import br.com.libertsolutions.crs.app.data.work.WorkDataService;
 import br.com.libertsolutions.crs.app.data.work.WorkRealmDataService;
 import br.com.libertsolutions.crs.app.data.work.WorkService;
+import br.com.libertsolutions.crs.app.domain.pojo.Checkins;
+import br.com.libertsolutions.crs.app.domain.pojo.Flows;
+import br.com.libertsolutions.crs.app.domain.pojo.User;
+import br.com.libertsolutions.crs.app.domain.pojo.Work;
+import br.com.libertsolutions.crs.app.domain.pojo.Works;
+import br.com.libertsolutions.crs.app.presentation.activity.BaseActivity;
+import br.com.libertsolutions.crs.app.presentation.util.FeedbackHelper;
+import br.com.libertsolutions.crs.app.presentation.util.NavigationHelper;
+import br.com.libertsolutions.crs.app.presentation.util.NetworkUtils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.afollestad.materialdialogs.MaterialDialog;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 import timber.log.Timber;
+
+import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
+import static br.com.libertsolutions.crs.app.data.config.ConfigDataHelper.setCheckinDataAsImported;
+import static br.com.libertsolutions.crs.app.data.config.ConfigDataHelper.setDataImportationAsLastSyncDate;
+import static br.com.libertsolutions.crs.app.data.config.ConfigDataHelper.setFlowDataAsImported;
+import static br.com.libertsolutions.crs.app.data.config.ConfigDataHelper.setWorkDataAsImported;
+import static br.com.libertsolutions.crs.app.data.util.Constants.PAGE_START;
+import static br.com.libertsolutions.crs.app.data.util.RxUtil.exponentialBackoff;
+import static br.com.libertsolutions.crs.app.data.util.RxUtil.timeoutException;
+import static br.com.libertsolutions.crs.app.data.util.ServiceGenerator.createService;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.greenrobot.eventbus.ThreadMode.MAIN;
+import static rx.android.schedulers.AndroidSchedulers.mainThread;
+import static rx.schedulers.Schedulers.io;
 
 /**
  * @author Filipe Bezerra
  * @since 0.1.0
  */
-public class MainActivity extends BaseActivity
-        implements SearchView.OnQueryTextListener, SwipeRefreshLayout.OnRefreshListener {
+public class MainActivity extends BaseActivity implements OnQueryTextListener, OnRefreshListener {
 
-    private MainWorkAdapter mWorkAdapter;
+    private MainWorkAdapter workAdapter;
 
-    private WorkDataService mWorkDataService;
+    private WorkDataService workDataService;
 
-    private CompositeSubscription mCompositeSubscription;
+    private CompositeSubscription compositeSubscription;
 
     private User mUserLogged;
 
-    @BindView(R.id.list) RecyclerView mWorksView;
-    @BindView(R.id.empty_state) LinearLayout mEmptyStateView;
-    @BindView(R.id.swipe_container) SwipeRefreshLayout mSwipeRefreshLayout;
+    private int currentPageWorks = PAGE_START;
+    private int currentPageFlows = PAGE_START;
+    private int currentPageCheckins = PAGE_START;
+
+    @BindView(R.id.list) RecyclerView recyclerViewWorks;
+    @BindView(R.id.empty_state) LinearLayout viewEmptyState;
+    @BindView(R.id.swipe_container) SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected int provideLayoutResource() {
@@ -86,7 +100,7 @@ public class MainActivity extends BaseActivity
         setupActionBar();
         setupRecyclerView();
         setupSwipeRefreshLayout();
-        mCompositeSubscription = new CompositeSubscription();
+        compositeSubscription = new CompositeSubscription();
         showUserLoggedInfo();
         loadViewData();
     }
@@ -103,13 +117,13 @@ public class MainActivity extends BaseActivity
 
     private void setupRecyclerView() {
         changeListLayout(getResources().getConfiguration());
-        mWorksView.setHasFixedSize(true);
+        recyclerViewWorks.setHasFixedSize(true);
     }
 
     private void setupSwipeRefreshLayout() {
-        mSwipeRefreshLayout.setOnRefreshListener(this);
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
-        mSwipeRefreshLayout.setProgressBackgroundColorSchemeResource(android.R.color.white);
+        swipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
+        swipeRefreshLayout.setProgressBackgroundColorSchemeResource(android.R.color.white);
     }
 
     @Override
@@ -151,14 +165,14 @@ public class MainActivity extends BaseActivity
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe(threadMode = MAIN)
     public void onSyncEvent(SyncEvent event) {
         Timber.i("Sync event with %s in %s", event.getType(), event.getStatus());
 
         if (event.getStatus() == SyncStatus.IN_PROGRESS) {
             Timber.i("Sync in progress");
-            if (!mSwipeRefreshLayout.isRefreshing()) {
-                mSwipeRefreshLayout.setRefreshing(true);
+            if (!swipeRefreshLayout.isRefreshing()) {
+                swipeRefreshLayout.setRefreshing(true);
             }
         } else {
             Timber.i("Sync completed");
@@ -168,8 +182,8 @@ public class MainActivity extends BaseActivity
     }
 
     private void stopRefreshingProgress() {
-        if (mSwipeRefreshLayout.isRefreshing()) {
-            mSwipeRefreshLayout.setRefreshing(false);
+        if (swipeRefreshLayout.isRefreshing()) {
+            swipeRefreshLayout.setRefreshing(false);
         }
     }
 
@@ -181,137 +195,124 @@ public class MainActivity extends BaseActivity
     private void showImportingDataState() {
         showEmptyState(R.drawable.ic_import_state, R.string.title_importing_data,
                 R.string.tagline_importing_data);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setRequestedOrientation(SCREEN_ORIENTATION_PORTRAIT);
     }
 
     @SuppressWarnings("ConstantConditions")
     private void requestWorkData() {
-        final Subscription subscription = ServiceGenerator
-                .createService(WorkService.class, this)
-                .getAll()
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(
-                        e -> showError(R.string.error_importing_data, e))
-                .retryWhen(
-                        RxUtil.timeoutException())
-                .retryWhen(
-                        RxUtil.exponentialBackoff(3, 5, TimeUnit.SECONDS))
-                .doOnNext(
-                        this::saveWorkData)
-                .subscribe();
-        mCompositeSubscription.add(subscription);
+        final Subscription subscription = createService(WorkService.class, this)
+                .getAll(currentPageWorks)
+                .retryWhen(timeoutException())
+                .retryWhen(exponentialBackoff(3, 5, SECONDS))
+                .observeOn(mainThread())
+                .subscribe(this::saveWorkData, e -> showError(R.string.error_importing_data, e));
+        compositeSubscription.add(subscription);
     }
 
     @SuppressWarnings("ConstantConditions")
-    private void saveWorkData(List<Work> works) {
-        if (works.isEmpty()) {
+    private void saveWorkData(Works works) {
+        if (works == null || (works.list == null || works.list.isEmpty())) {
             showEmptyView(true);
             return;
         }
 
         final Subscription subscription = getWorkDataService()
-                .saveAll(works)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .doOnError(
-                        e -> showError(R.string.title_dialog_error_saving_data, e))
-                .doOnNext(
-                        l -> ConfigDataHelper.setWorkDataAsImported(MainActivity.this))
+                .saveAll(works.list)
+                .observeOn(mainThread())
+                .subscribeOn(io())
+                .doOnError(e -> showError(R.string.title_dialog_error_saving_data, e))
                 .doOnCompleted(
-                        this::requestFlowData)
+                        () -> {
+                            if (currentPageWorks == works.totalPaginas) {
+                                setWorkDataAsImported(MainActivity.this);
+                                requestFlowData();
+                            } else {
+                                currentPageWorks++;
+                                requestWorkData();
+                            }
+                        })
                 .subscribe();
-        mCompositeSubscription.add(subscription);
+        compositeSubscription.add(subscription);
     }
 
     @SuppressWarnings("ConstantConditions")
     private void requestFlowData() {
-        final Subscription subscription = ServiceGenerator
-                .createService(FlowService.class, this)
-                .getAll()
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(
-                        e -> showError(R.string.error_importing_data, e))
-                .retryWhen(
-                        RxUtil.timeoutException())
-                .retryWhen(
-                        RxUtil.exponentialBackoff(3, 5, TimeUnit.SECONDS))
-                .doOnNext(
-                        this::saveFlowData)
-                .subscribe();
-        mCompositeSubscription.add(subscription);
+        final Subscription subscription = createService(FlowService.class, this)
+                .getAll(currentPageFlows)
+                .retryWhen(timeoutException())
+                .retryWhen(exponentialBackoff(3, 5, SECONDS))
+                .observeOn(mainThread())
+                .subscribe(this::saveFlowData, e -> showError(R.string.error_importing_data, e));
+        compositeSubscription.add(subscription);
     }
 
-    private void saveFlowData(List<Flow> flows) {
+    private void saveFlowData(Flows flows) {
         final Subscription subscription = new FlowRealmDataService(this)
-                .saveAll(flows)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .doOnError(
-                        e -> showError(R.string.title_dialog_error_saving_data, e))
-                .doOnNext(
-                        d -> ConfigDataHelper.setFlowDataAsImported(MainActivity.this))
+                .saveAll(flows.list)
+                .observeOn(mainThread())
+                .subscribeOn(io())
+                .doOnError(e -> showError(R.string.title_dialog_error_saving_data, e))
                 .doOnCompleted(
-                        this::requestCheckinData)
+                        () -> {
+                            if (currentPageFlows == flows.totalPaginas) {
+                                setFlowDataAsImported(MainActivity.this);
+                                requestCheckinData();
+                            } else {
+                                currentPageFlows++;
+                                requestFlowData();
+                            }
+                        })
                 .subscribe();
-        mCompositeSubscription.add(subscription);
+        compositeSubscription.add(subscription);
     }
 
     @SuppressWarnings("ConstantConditions")
     private void requestCheckinData() {
-        final Subscription subscription = ServiceGenerator
-                .createService(CheckinService.class, this)
-                .getAll()
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(
-                        e -> showError(R.string.error_importing_data, e))
-                .retryWhen(
-                        RxUtil.timeoutException())
-                .retryWhen(
-                        RxUtil.exponentialBackoff(3, 5, TimeUnit.SECONDS))
-                .doOnNext(
-                        this::saveCheckinData)
-                .subscribe();
-        mCompositeSubscription.add(subscription);
+        final Subscription subscription = createService(CheckinService.class, this)
+                .getAll(currentPageCheckins)
+                .retryWhen(timeoutException())
+                .retryWhen(exponentialBackoff(3, 5, SECONDS))
+                .observeOn(mainThread())
+                .subscribe(this::saveCheckinData, e -> showError(R.string.error_importing_data, e));
+        compositeSubscription.add(subscription);
     }
 
-    private void saveCheckinData(List<Checkin> checkins) {
+    private void saveCheckinData(Checkins checkins) {
         final Subscription subscription = new CheckinRealmDataService(this)
-                .saveAll(checkins)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .doOnError(
-                        e -> showError(R.string.title_dialog_error_saving_data, e))
-                .doOnNext(
-                        d -> ConfigDataHelper.setCheckinDataAsImported(MainActivity.this))
+                .saveAll(checkins.list)
+                .observeOn(mainThread())
+                .subscribeOn(io())
+                .doOnError(e -> showError(R.string.title_dialog_error_saving_data, e))
                 .doOnCompleted(
-                        this::finishImportingData)
+                        () -> {
+                            if (currentPageCheckins == checkins.totalPaginas) {
+                                setCheckinDataAsImported(MainActivity.this);
+                                finishImportingData();
+                            } else {
+                                currentPageCheckins++;
+                                requestCheckinData();
+                            }
+                        })
                 .subscribe();
-        mCompositeSubscription.add(subscription);
+        compositeSubscription.add(subscription);
     }
 
     @SuppressWarnings("ConstantConditions")
     private void finishImportingData() {
-        final Subscription subscription = ServiceGenerator
-                .createService(ConfigService.class, this)
+        final Subscription subscription = createService(ConfigService.class, this)
                 .get()
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(
-                        e -> showError(R.string.error_importing_data, e))
-                .retryWhen(
-                        RxUtil.timeoutException())
-                .retryWhen(
-                        RxUtil.exponentialBackoff(3, 5, TimeUnit.SECONDS))
-                .doOnNext(
-                        c -> ConfigDataHelper.setDataImportationAsLastSyncDate(
-                                MainActivity.this, c.getDataAtual()))
-                .doOnCompleted(
+                .retryWhen(timeoutException())
+                .retryWhen(exponentialBackoff(3, 5, SECONDS))
+                .observeOn(mainThread())
+                .subscribe(
+                        c -> setDataImportationAsLastSyncDate(MainActivity.this, c.currentDate),
+                        e -> showError(R.string.error_importing_data, e),
                         () -> {
-                            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+                            setRequestedOrientation(SCREEN_ORIENTATION_UNSPECIFIED);
                             loadWorkData();
                         }
-                )
-                .subscribe();
-        mCompositeSubscription.add(subscription);
+                );
+        compositeSubscription.add(subscription);
     }
 
     private void showError(@StringRes int titleRes, Throwable e) {
@@ -327,27 +328,26 @@ public class MainActivity extends BaseActivity
     private void loadWorkData() {
         final Subscription subscription = getWorkDataService()
                 .list()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .doOnError(
-                        e -> showError(R.string.title_dialog_error_loading_data_from_local, e))
-                .doOnNext(
-                        this::showWorkData)
-                .subscribe();
-        mCompositeSubscription.add(subscription);
+                .observeOn(mainThread())
+                .subscribeOn(io())
+                .subscribe(
+                        this::showWorkData,
+                        e -> showError(R.string.title_dialog_error_loading_data_from_local, e)
+                );
+        compositeSubscription.add(subscription);
     }
 
     private WorkDataService getWorkDataService() {
-        if (mWorkDataService == null) {
-            mWorkDataService = new WorkRealmDataService(this);
+        if (workDataService == null) {
+            workDataService = new WorkRealmDataService(this);
         }
-        return mWorkDataService;
+        return workDataService;
     }
 
     private void showWorkData(List<Work> list) {
         if (!list.isEmpty()) {
-            mWorkAdapter = new MainWorkAdapter(MainActivity.this, list, this::handleListItemClick);
-            mWorksView.setAdapter(mWorkAdapter);
+            workAdapter = new MainWorkAdapter(this, list, this::handleListItemClick);
+            recyclerViewWorks.setAdapter(workAdapter);
             showEmptyView(false);
         } else {
             showEmptyDataState();
@@ -368,7 +368,7 @@ public class MainActivity extends BaseActivity
     }
 
     private void updateSubtitle() {
-        final int count = mWorkAdapter != null ? mWorkAdapter.getRunningWorksCount() : 0;
+        final int count = workAdapter != null ? workAdapter.getRunningWorksCount() : 0;
         if (count == 0) {
             setSubtitle(getString(R.string.no_work_running));
         } else {
@@ -385,18 +385,18 @@ public class MainActivity extends BaseActivity
 
     private void showEmptyState(@DrawableRes int image, @StringRes int title,
             @StringRes int tagline) {
-        ButterKnife.<ImageView>findById(mEmptyStateView, R.id.empty_image)
+        ButterKnife.<ImageView>findById(viewEmptyState, R.id.empty_image)
                 .setImageResource(image);
-        ButterKnife.<TextView>findById(mEmptyStateView, R.id.empty_title)
+        ButterKnife.<TextView>findById(viewEmptyState, R.id.empty_title)
                 .setText(title);
-        ButterKnife.<TextView>findById(mEmptyStateView, R.id.empty_tagline)
+        ButterKnife.<TextView>findById(viewEmptyState, R.id.empty_tagline)
                 .setText(tagline);
         showEmptyView(true);
     }
 
     private void showEmptyView(boolean visible) {
-        mWorksView.setVisibility(visible ? View.GONE : View.VISIBLE);
-        mEmptyStateView.setVisibility(visible ? View.VISIBLE : View.GONE);
+        recyclerViewWorks.setVisibility(visible ? View.GONE : View.VISIBLE);
+        viewEmptyState.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -426,8 +426,8 @@ public class MainActivity extends BaseActivity
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        if (mWorkAdapter != null) {
-            mWorkAdapter.getFilter().filter(newText);
+        if (workAdapter != null) {
+            workAdapter.getFilter().filter(newText);
             return true;
         } else {
             return false;
@@ -436,7 +436,7 @@ public class MainActivity extends BaseActivity
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        return mWorkAdapter != null && mWorkAdapter.getItemCount() != 0;
+        return workAdapter != null && workAdapter.getItemCount() != 0;
     }
 
     @Override
@@ -464,9 +464,9 @@ public class MainActivity extends BaseActivity
 
     private void changeListLayout(Configuration configuration) {
         if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mWorksView.setLayoutManager(new GridLayoutManager(this, 2));
+            recyclerViewWorks.setLayoutManager(new GridLayoutManager(this, 2));
         } else {
-            mWorksView.setLayoutManager(new LinearLayoutManager(this));
+            recyclerViewWorks.setLayoutManager(new LinearLayoutManager(this));
         }
     }
 
@@ -474,6 +474,6 @@ public class MainActivity extends BaseActivity
     protected void onStop() {
         super.onStop();
         EventBusManager.unregister(this);
-        mCompositeSubscription.clear();
+        compositeSubscription.clear();
     }
 }

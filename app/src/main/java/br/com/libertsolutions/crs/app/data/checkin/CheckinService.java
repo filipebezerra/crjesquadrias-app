@@ -1,6 +1,7 @@
 package br.com.libertsolutions.crs.app.data.checkin;
 
 import br.com.libertsolutions.crs.app.domain.pojo.Checkin;
+import br.com.libertsolutions.crs.app.domain.pojo.Checkins;
 import java.util.List;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -15,14 +16,11 @@ import rx.Observable;
  */
 public interface CheckinService {
     @GET("CheckinApi/Get")
-    Observable<List<Checkin>> getAll();
+    Observable<Checkins> getAll(@Query("page") int page);
 
     @GET("CheckinApi/Get")
-    Observable<List<Checkin>> getByFlowId(@Query("id_obra") long workId,
-            @Query("id_etapa") long stepId);
-
-    @GET("CheckinApi/Get")
-    Observable<List<Checkin>> getAllWithUpdates(@Query("ultimaAtualizacao") String lastUpdate);
+    Observable<Checkins> getAllWithUpdates(
+            @Query("ultimaAtualizacao") String lastUpdate, @Query("page") int page);
 
     @POST("CheckinApi/Post")
     Observable<Checkin> post(@Query("cpf") String cpf, @Body Checkin checkin);

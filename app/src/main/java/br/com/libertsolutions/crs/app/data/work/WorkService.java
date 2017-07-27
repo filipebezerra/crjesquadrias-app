@@ -1,7 +1,6 @@
 package br.com.libertsolutions.crs.app.data.work;
 
-import br.com.libertsolutions.crs.app.domain.pojo.Work;
-import java.util.List;
+import br.com.libertsolutions.crs.app.domain.pojo.Works;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 import rx.Observable;
@@ -12,8 +11,9 @@ import rx.Observable;
  */
 public interface WorkService {
     @GET("ObraApi/Get")
-    Observable<List<Work>> getAll();
+    Observable<Works> getAll(@Query("page") int page);
 
     @GET("ObraApi/Get")
-    Observable<List<Work>> getAllWithUpdates(@Query("ultimaAtualizacao") String lastUpdate);
+    Observable<Works> getAllWithUpdates(
+            @Query("ultimaAtualizacao") String lastUpdate, @Query("page") int page);
 }

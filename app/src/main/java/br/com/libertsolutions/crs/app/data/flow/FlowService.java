@@ -1,7 +1,6 @@
 package br.com.libertsolutions.crs.app.data.flow;
 
-import br.com.libertsolutions.crs.app.domain.pojo.Flow;
-import java.util.List;
+import br.com.libertsolutions.crs.app.domain.pojo.Flows;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 import rx.Observable;
@@ -12,11 +11,9 @@ import rx.Observable;
  */
 public interface FlowService {
     @GET("FluxoApi/Get")
-    Observable<List<Flow>> getAll();
+    Observable<Flows> getAll(@Query("page") int page);
 
     @GET("FluxoApi/Get")
-    Observable<List<Flow>> getByWorkId(@Query("id_obra") long workId);
-
-    @GET("FluxoApi/Get")
-    Observable<List<Flow>> getAllWithUpdates(@Query("ultimaAtualizacao") String lastUpdate);
+    Observable<Flows> getAllWithUpdates(
+            @Query("ultimaAtualizacao") String lastUpdate, @Query("page") int page);
 }

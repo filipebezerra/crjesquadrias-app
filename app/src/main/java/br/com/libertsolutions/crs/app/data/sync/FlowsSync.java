@@ -1,21 +1,29 @@
 package br.com.libertsolutions.crs.app.data.sync;
 
 import android.content.Context;
-
-import java.util.concurrent.TimeUnit;
-
-import br.com.libertsolutions.crs.app.data.config.ConfigDataHelper;
-import br.com.libertsolutions.crs.app.domain.pojo.Flow;
 import br.com.libertsolutions.crs.app.data.flow.FlowDataService;
 import br.com.libertsolutions.crs.app.data.flow.FlowRealmDataService;
 import br.com.libertsolutions.crs.app.data.flow.FlowService;
 import br.com.libertsolutions.crs.app.data.sync.event.SyncEvent;
-import br.com.libertsolutions.crs.app.data.sync.event.SyncStatus;
 import br.com.libertsolutions.crs.app.data.sync.event.SyncType;
-import br.com.libertsolutions.crs.app.data.util.RxUtil;
-import br.com.libertsolutions.crs.app.data.util.ServiceGenerator;
-import rx.schedulers.Schedulers;
+import br.com.libertsolutions.crs.app.domain.pojo.Flow;
+import br.com.libertsolutions.crs.app.domain.pojo.Flows;
+import rx.Subscription;
 import timber.log.Timber;
+
+import static br.com.libertsolutions.crs.app.data.config.ConfigDataHelper.isInitialDataImported;
+import static br.com.libertsolutions.crs.app.data.sync.SyncService.SYNC_TAG;
+import static br.com.libertsolutions.crs.app.data.sync.event.SyncStatus.COMPLETED;
+import static br.com.libertsolutions.crs.app.data.sync.event.SyncStatus.IN_PROGRESS;
+import static br.com.libertsolutions.crs.app.data.sync.event.SyncType.FLOWS;
+import static br.com.libertsolutions.crs.app.data.util.Constants.PAGE_START;
+import static br.com.libertsolutions.crs.app.data.util.RxUtil.exponentialBackoff;
+import static br.com.libertsolutions.crs.app.data.util.RxUtil.timeoutException;
+import static br.com.libertsolutions.crs.app.data.util.ServiceGenerator.createService;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static rx.schedulers.Schedulers.io;
+import static timber.log.Timber.e;
+import static timber.log.Timber.tag;
 
 /**
  * Classe para execução de sincronização das atualizações nos {@link Flow}s ou fluxos.
@@ -29,53 +37,64 @@ import timber.log.Timber;
  */
 class FlowsSync extends AbstractSync {
 
-    private final FlowDataService mFlowDataService;
+    private final FlowDataService flowDataService;
 
-    private final FlowService mFlowService;
+    private final FlowService flowService;
+
+    private int currentPageFlows = PAGE_START;
 
     static {
-        Timber.tag(SyncService.SYNC_TAG);
+        tag(SYNC_TAG);
     }
 
-    public FlowsSync(Context context) {
+    FlowsSync(Context context) {
         super(context);
-        mFlowDataService = new FlowRealmDataService(context);
-        mFlowService = ServiceGenerator.createService(FlowService.class, context);
+        flowDataService = new FlowRealmDataService(context);
+        flowService = createService(FlowService.class, context);
     }
 
     @Override
     protected SyncType getSyncType() {
-        return SyncType.FLOWS;
+        return FLOWS;
     }
 
     @Override
     protected void doSync() {
-        if (!ConfigDataHelper.isInitialDataImported(mContext)) return;
+        if (!isInitialDataImported(applicationContext))
+            return;
 
-        SyncEvent.send(getSyncType(), SyncStatus.IN_PROGRESS);
+        SyncEvent.send(getSyncType(), IN_PROGRESS);
+        getUpdates();
+    }
 
-        final String lastSyncDate = ConfigDataHelper.getLastFlowsSyncDate(mContext);
-        Timber.i("Getting flow updates since %s", lastSyncDate);
-        mFlowService
-                .getAllWithUpdates(lastSyncDate)
-                .observeOn(Schedulers.io())
-                .retryWhen(
-                        RxUtil.timeoutException())
-                .retryWhen(
-                        RxUtil.exponentialBackoff(3, 5, TimeUnit.SECONDS))
-                .filter(
-                        flowsUpdate -> flowsUpdate != null && !flowsUpdate.isEmpty())
-                .flatMap(
-                        mFlowDataService::saveAll)
-                .subscribe(
-                        flowsReceived -> {},
+    private void getUpdates() {
+        Timber.i("Getting flow updates since %s", getLastSyncDate());
+        Subscription subscription = flowService
+                .getAllWithUpdates(getLastSyncDate(), currentPageFlows)
+                .retryWhen(timeoutException())
+                .retryWhen(exponentialBackoff(3, 5, SECONDS))
+                .filter(flows -> flows != null && (flows.list != null && !flows.list.isEmpty()))
+                .subscribe(this::saveUpdates, e -> e(e, "Erro obtendo atualizações nos fluxos"));
+        compositeSubscription.add(subscription);
+    }
 
-                        e -> Timber.e(e, "Erro obtendo atualizações nos fluxos"),
-
+    private void saveUpdates(Flows flows) {
+        final Subscription subscription = flowDataService
+                .saveAll(flows.list)
+                .doOnError(e -> e(e, "Erro persistindo atualizações nos fluxos"))
+                .doOnCompleted(
                         () -> {
-                            syncDone();
-                            SyncEvent.send(getSyncType(), SyncStatus.COMPLETED);
-                        }
-                );
+                            if (currentPageFlows == flows.totalPaginas) {
+                                syncDone();
+                                SyncEvent.send(getSyncType(), COMPLETED);
+                                compositeSubscription.clear();
+                            } else {
+                                currentPageFlows++;
+                                getUpdates();
+                            }
+                        })
+                .subscribeOn(io())
+                .subscribe();
+        compositeSubscription.add(subscription);
     }
 }
