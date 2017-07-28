@@ -34,6 +34,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".presentation.login.LoginActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
@@ -41,6 +42,7 @@
             android:theme="@style/Crs.NoActionBar"
             android:windowSoftInputMode="stateVisible|adjustResize"
             />
+
         <activity
             android:name=".presentation.main.MainActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
@@ -49,18 +51,21 @@
             android:theme="@style/Crs.NoActionBar"
             android:windowSoftInputMode="stateHidden"
             />
+
         <activity
             android:name=".presentation.settings.SettingsActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             android:label="@string/title_activity_settings"
             android:theme="@style/Crs.NoActionBar"
             />
+
         <activity
             android:name=".presentation.settings.SettingsActivityCompat"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
             android:label="@string/title_activity_settings"
             android:theme="@style/Crs.NoActionBar"
             />
+
         <activity
             android:name=".presentation.flow.FlowActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"
@@ -73,6 +78,7 @@
                 android:value=".presentation.main.MainActivity"
                 />
         </activity>
+
         <activity
             android:name=".presentation.checkin.CheckinActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout"

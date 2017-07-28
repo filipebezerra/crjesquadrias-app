@@ -1,4 +1,3 @@
-## Retrolambda specific rules ##
-
-# as per official recommendation: https://github.com/evant/gradle-retrolambda#proguard
+## Retrolambda
 -dontwarn java.lang.invoke.*
+-dontwarn **$$Lambda$*

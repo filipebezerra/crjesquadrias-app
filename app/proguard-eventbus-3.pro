@@ -1,5 +1,4 @@
-## New rules for EventBus 3.0.x ##
-# http://greenrobot.org/eventbus/documentation/proguard/
+## EventBus 3
 -keepattributes *Annotation*
 -keepclassmembers class ** {
     @org.greenrobot.eventbus.Subscribe <methods>;

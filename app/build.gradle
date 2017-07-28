@@ -1,9 +1,8 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.getkeepsafe.dexcount'
 apply plugin: 'io.fabric'
-apply plugin: 'com.neenbedankt.android-apt'
-apply plugin: 'realm-android'
 apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'realm-android'
+apply plugin: 'com.getkeepsafe.dexcount'
 
 //noinspection GroovyAssignabilityCheck
 if (project.hasProperty("CRSEsquadriasRelease.signing")
@@ -23,19 +22,24 @@ android {
         versionName "1.0.1"
         vectorDrawables.useSupportLibrary = true
         setProperty("archivesBaseName", "CRS-$versionName")
+        buildConfigField "long", "SCHEMA_VERSION", "2L"
     }
     buildTypes {
         release {
             shrinkResources false
             minifyEnabled true
-            proguardFile 'proguard-crashlytics-2.pro'
+            proguardFile 'proguard-butterknife.pro'
+            proguardFile 'proguard-crashlytics.pro'
             proguardFile 'proguard-eventbus-3.pro'
             proguardFile 'proguard-gson.pro'
             proguardFile 'proguard-retrolambda.pro'
             proguardFile 'proguard-rx-java.pro'
-            proguardFile 'proguard-square-okhttp3.pro'
-            proguardFile 'proguard-square-okio.pro'
-            proguardFile 'proguard-square-retrofit2.pro'
+            proguardFile 'proguard-okhttp3.pro'
+            proguardFile 'proguard-okio.pro'
+            proguardFile 'proguard-retrofit2.pro'
+            proguardFile 'proguard-support-design.pro'
+            proguardFile 'proguard-support-v7-appcompat.pro'
+            proguardFile 'proguard-support-v7-cardview.pro'
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -45,6 +49,16 @@ android {
     }
 }
 
+ext {
+    support = '25.3.1'
+    materialDialogs = '0.9.4.5'
+    retrofit = '2.3.0'
+    okhttp = '3.8.1'
+    parcelableplease = '1.0.2'
+    butterknife = '8.7.0'
+    leakcanary = '1.5.1'
+}
+
 repositories {
     maven { url 'https://maven.fabric.io/public' }
 }
@@ -52,52 +66,61 @@ repositories {
 dependencies {
     testCompile 'junit:junit:4.12'
 
-    // Support library
-    compile "com.android.support:appcompat-v7:${supportLibraryVersion}"
-    compile "com.android.support:design:${supportLibraryVersion}"
-    compile "com.android.support:recyclerview-v7:${supportLibraryVersion}"
-    compile "com.android.support:cardview-v7:${supportLibraryVersion}"
+    // Support
+    compile "com.android.support:appcompat-v7:${support}"
+    compile "com.android.support:design:${support}"
+    compile "com.android.support:recyclerview-v7:${support}"
+    compile "com.android.support:cardview-v7:${support}"
 
-    // View injection library
-    compile "com.jakewharton:butterknife:${butterKnifeVersion}"
-    apt "com.jakewharton:butterknife-compiler:${butterKnifeVersion}"
+    // View Injection
+    compile "com.jakewharton:butterknife:${butterknife}"
+    annotationProcessor "com.jakewharton:butterknife-compiler:${butterknife}"
 
-    // Third material components library
-    compile "com.afollestad.material-dialogs:core:${materialDialogsVersion}"
-    compile "com.afollestad.material-dialogs:commons:${materialDialogsVersion}"
+    // Third MD Components
+    compile "com.afollestad.material-dialogs:core:${materialDialogs}"
+    compile "com.afollestad.material-dialogs:commons:${materialDialogs}"
 
-    // Http libraries
-    compile ("com.squareup.retrofit2:retrofit:${retrofitVersion}") {
+    // Http
+    compile ("com.squareup.retrofit2:retrofit:${retrofit}") {
         exclude module: 'okhttp'
     }
-    compile "com.squareup.retrofit2:adapter-rxjava:${retrofitVersion}"
-    compile "com.squareup.retrofit2:converter-gson:${retrofitVersion}"
-    compile "com.squareup.okhttp3:okhttp:${okHttpVersion}"
-    compile "com.squareup.okhttp3:logging-interceptor:${okHttpVersion}"
+    compile "com.squareup.retrofit2:adapter-rxjava:${retrofit}"
+    compile "com.squareup.retrofit2:converter-gson:${retrofit}"
+    compile "com.squareup.okhttp3:okhttp:${okhttp}"
+    compile "com.squareup.okhttp3:logging-interceptor:${okhttp}"
+
+    // Reactive Extensions
     compile 'io.reactivex:rxandroid:1.2.1'
+    compile 'io.reactivex:rxjava:1.3.0'
 
-    // Parcelable auto generator library
-    compile "com.hannesdorfmann.parcelableplease:annotation:${parcelablepleaseVersion}"
-    apt "com.hannesdorfmann.parcelableplease:processor:${parcelablepleaseVersion}"
+    // Parcelable auto generator
+    compile "com.hannesdorfmann.parcelableplease:annotation:${parcelableplease}"
+    annotationProcessor "com.hannesdorfmann.parcelableplease:processor:${parcelableplease}"
 
-    // Crash reporting library
-    compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
+    // Crash Reporting
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') {
         transitive = true;
     }
 
-    // Logging library
-    compile 'com.jakewharton.timber:timber:4.1.2'
+    // Logging
+    compile 'com.jakewharton.timber:timber:4.5.1'
 
-    // Event bus library
+    // Event Bus
     compile 'org.greenrobot:eventbus:3.0.0'
 
-    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.1'
-    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
-    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
+    // Memory Leak Analyzer
+    debugCompile "com.squareup.leakcanary:leakcanary-android:${leakcanary}"
+    releaseCompile "com.squareup.leakcanary:leakcanary-android-no-op:${leakcanary}"
 }
 
 retrolambda {
-    jdk System.getenv("JAVA_HOME")
-    oldJdk System.getenv("JAVA7_HOME")
     javaVersion JavaVersion.VERSION_1_7
+}
+
+dexcount {
+    format = "list"
+    includeFieldCount = true
+    includeTotalMethodCount = true
+    orderByMethodCount = true
+    maxMethodCount = 65536
 }

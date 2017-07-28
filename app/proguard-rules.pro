@@ -57,5 +57,5 @@
 -dontwarn android.support.**
 -dontwarn com.google.ads.**
 
-# Keep my own classes
+# Internal classes must be kept
 -keep class br.com.libertsolutions.crs.app.** { *; }

@@ -1,4 +1,4 @@
-# OkHttp 3
+## OkHttp 3
 -keepattributes Signature
 -keepattributes *Annotation*
 -keep class okhttp3.** { *; }
