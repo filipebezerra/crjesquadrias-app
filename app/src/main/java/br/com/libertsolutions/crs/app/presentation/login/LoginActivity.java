@@ -1,50 +1,56 @@
 package br.com.libertsolutions.crs.app.presentation.login;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
-import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import br.com.libertsolutions.crs.app.R;
-import br.com.libertsolutions.crs.app.presentation.activity.BaseActivity;
-import br.com.libertsolutions.crs.app.domain.pojo.LoginBody;
 import br.com.libertsolutions.crs.app.data.login.LoginDataHelper;
-import br.com.libertsolutions.crs.app.domain.pojo.User;
 import br.com.libertsolutions.crs.app.data.login.UserService;
-import br.com.libertsolutions.crs.app.data.settings.SettingsDataHelper;
-import br.com.libertsolutions.crs.app.presentation.util.FeedbackHelper;
+import br.com.libertsolutions.crs.app.domain.pojo.User;
+import br.com.libertsolutions.crs.app.presentation.activity.BaseActivity;
 import br.com.libertsolutions.crs.app.presentation.util.FormUtils;
 import br.com.libertsolutions.crs.app.presentation.util.KeyboardUtils;
-import br.com.libertsolutions.crs.app.presentation.util.NavigationHelper;
-import br.com.libertsolutions.crs.app.presentation.util.NetworkUtils;
-import br.com.libertsolutions.crs.app.data.util.ServiceGenerator;
 import butterknife.BindView;
 import butterknife.OnClick;
 import butterknife.OnEditorAction;
 import butterknife.OnFocusChange;
 import com.afollestad.materialdialogs.MaterialDialog;
+import rx.Subscriber;
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 import timber.log.Timber;
+
+import static android.text.TextUtils.isEmpty;
+import static br.com.libertsolutions.crs.app.data.login.LoginDataHelper.isUserLogged;
+import static br.com.libertsolutions.crs.app.data.login.LoginDataHelper.isValidUser;
+import static br.com.libertsolutions.crs.app.data.login.LoginDataHelper.loginUser;
+import static br.com.libertsolutions.crs.app.data.settings.SettingsDataHelper.isSettingsApplied;
+import static br.com.libertsolutions.crs.app.data.util.ServiceGenerator.createService;
+import static br.com.libertsolutions.crs.app.domain.pojo.LoginBody.newLoginBody;
+import static br.com.libertsolutions.crs.app.presentation.util.FeedbackHelper.snackbar;
+import static br.com.libertsolutions.crs.app.presentation.util.NavigationHelper.navigateToMainScreen;
+import static br.com.libertsolutions.crs.app.presentation.util.NavigationHelper.navigateToSettingsScreen;
+import static br.com.libertsolutions.crs.app.presentation.util.NetworkUtils.isDeviceConnectedToInternet;
+import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
 /**
  * @author Filipe Bezerra
  * @since 0.1.0
  */
 public class LoginActivity extends BaseActivity {
-    private FormUtils mFormUtils = new FormUtils();
 
-    private Subscription mSubscription;
+    private FormUtils formUtils = new FormUtils();
 
-    @BindView(R.id.cpf) TextInputEditText mCpfView;
-    @BindView(R.id.cpf_helper) TextInputLayout mCpfHelper;
-    @BindView(R.id.password) TextInputEditText mPasswordView;
-    @BindView(R.id.password_helper) TextInputLayout mPasswordHelper;
+    private Subscription subscription;
+
+    private UserService userService;
+
+    @BindView(R.id.cpf) TextInputEditText inputLayoutCpf;
+    @BindView(R.id.cpf_helper) TextInputLayout inputLayoutCpfHelper;
+    @BindView(R.id.password) TextInputEditText inputLayoutPassword;
+    @BindView(R.id.password_helper) TextInputLayout inputLayoutPasswordHelper;
 
     @Override
     protected int provideLayoutResource() {
@@ -59,16 +65,15 @@ public class LoginActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle inState) {
         super.onCreate(inState);
-        if (LoginDataHelper.isUserLogged(this)) {
-            NavigationHelper.navigateToMainScreen(this);
+        if (isUserLogged(this)) {
+            navigateToMainScreen(this);
             finish();
-        } else if (!SettingsDataHelper.isSettingsApplied(this)) {
-            NavigationHelper.navigateToSettingsScreen(this);
+        } else if (!isSettingsApplied(this)) {
+            navigateToSettingsScreen(this);
         }
     }
 
-    @OnEditorAction(R.id.password)
-    boolean onPasswordEditorAction(int actionId) {
+    @OnEditorAction(R.id.password) boolean onPasswordEditorAction(int actionId) {
         if (actionId == getResources().getInteger(R.integer.entrar)) {
             doLogin();
             return true;
@@ -76,13 +81,11 @@ public class LoginActivity extends BaseActivity {
         return false;
     }
 
-    @OnClick(R.id.button_login)
-    void onButtonLoginClick() {
+    @OnClick(R.id.button_login) void onButtonLoginClick() {
         doLogin();
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
@@ -94,83 +97,87 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void doLogin() {
-        if (!mFormUtils.enableOrRemoveErrorInView(mCpfHelper,
-                getString(R.string.hint_cpf_required), mCpfView)) {
-            mFormUtils.enableOrRemoveErrorInView(mCpfHelper,
+        if (!formUtils.enableOrRemoveErrorInView(inputLayoutCpfHelper,
+                getString(R.string.hint_cpf_required), inputLayoutCpf)) {
+            formUtils.enableOrRemoveErrorInView(inputLayoutCpfHelper,
                     getString(R.string.hint_cpf_invalid),
-                    mCpfView.getTag() != null || mCpfView.getText().length() == 11);
+                    inputLayoutCpf.getTag() != null || inputLayoutCpf.getText().length() == 11);
         }
 
-        mFormUtils.enableOrRemoveErrorInView(mPasswordHelper,
-                getString(R.string.hint_password_required), mPasswordView);
+        formUtils.enableOrRemoveErrorInView(inputLayoutPasswordHelper,
+                getString(R.string.hint_password_required), inputLayoutPassword);
 
-        if (!mFormUtils.hasErrors()) {
-            final String cpf = mCpfView.getTag().toString();
-            final String password = mPasswordView.getText().toString();
-
-            if (NetworkUtils.isDeviceConnectedToInternet(this)) {
-                final UserService service = ServiceGenerator.createService(UserService.class, this);
-
-                if (service != null) {
-                    final MaterialDialog progressDialog = new MaterialDialog
-                            .Builder(LoginActivity.this)
-                            .title(R.string.title_dialog_signing_in)
-                            .content(R.string.msg_dialog_signing_in)
-                            .progress(true, 0)
-                            .cancelable(true)
-                            .cancelListener(new DialogInterface.OnCancelListener() {
-                                @Override
-                                public void onCancel(DialogInterface dialog) {
-                                    unsubscribeAuthentication();
-                                }
-                            })
-                            .canceledOnTouchOutside(false)
-                            .show();
-
-                    mSubscription = service.authenticateUser(LoginBody.of(cpf, password))
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribeOn(Schedulers.io())
-                            .subscribe(
-                                    new Action1<User>() {
-                                        @Override
-                                        public void call(User user) {
-                                            progressDialog.dismiss();
-                                            validateUser(user);
-                                        }
-                                    },
-
-                                    new Action1<Throwable>() {
-                                        @Override
-                                        public void call(Throwable e) {
-                                            progressDialog.dismiss();
-                                            showAuthenticationError(e);
-                                        }
-                                    }
-                            );
-                } else {
-                    validateAppSettings();
-                }
-            } else {
-                showNetworkError();
-            }
-        } else {
+        if (formUtils.hasErrors()) {
             showFormError();
+            return;
         }
+
+        if (!isDeviceConnectedToInternet(this)) {
+            showNetworkError();
+            return;
+        }
+
+        if (userService() == null) {
+            validateAppSettings();
+            return;
+        }
+
+        final MaterialDialog progressDialog = new MaterialDialog
+                .Builder(this)
+                .title(R.string.title_dialog_signing_in)
+                .content(R.string.msg_dialog_signing_in)
+                .progress(true, 0)
+                .cancelable(true)
+                .cancelListener(dialog -> unsubscribeAuthentication())
+                .canceledOnTouchOutside(false)
+                .build();
+
+        final String cpf = inputLayoutCpf.getTag().toString();
+        final String password = inputLayoutPassword.getText().toString();
+
+        subscription = userService().authenticateUser(newLoginBody(cpf, password))
+                .observeOn(mainThread())
+                .subscribe(
+                        new Subscriber<User>() {
+                            @Override public void onStart() {
+                                progressDialog.show();
+                            }
+
+                            @Override public void onError(final Throwable e) {
+                                progressDialog.dismiss();
+                                showAuthenticationError(e);
+                            }
+
+                            @Override public void onNext(final User user) {
+                                progressDialog.dismiss();
+                                validateUser(user);
+                            }
+
+                            @Override public void onCompleted() {}
+                        }
+                );
+    }
+
+    private UserService userService() {
+        if (userService == null) {
+            userService = createService(UserService.class, this);
+        }
+        return userService;
     }
 
     private void unsubscribeAuthentication() {
-        if (mSubscription != null && !mSubscription.isUnsubscribed()) {
-            mSubscription.unsubscribe();
+        if (subscription != null && !subscription.isUnsubscribed()) {
+            subscription.unsubscribe();
         }
     }
 
     private void validateUser(User user) {
-        if (LoginDataHelper.isValidUser(user)) {
-            LoginDataHelper.loginUser(LoginActivity.this, user);
-            NavigationHelper.navigateToMainScreen(LoginActivity.this);
+        if (isValidUser(user)) {
+            loginUser(this, user);
+            navigateToMainScreen(this);
             finish();
         } else {
-            new MaterialDialog.Builder(LoginActivity.this)
+            new MaterialDialog.Builder(this)
                     .title(R.string.title_dialog_invalid_credentials)
                     .content(R.string.msg_dialog_invalid_credentials)
                     .positiveText(R.string.text_dialog_button_ok)
@@ -189,26 +196,24 @@ public class LoginActivity extends BaseActivity {
     }
 
     private void validateAppSettings() {
-        if (!SettingsDataHelper.isSettingsApplied(this)) {
-            FeedbackHelper.snackbar(mRootView, getString(R.string.msg_settings_not_applied), true,
+        if (!isSettingsApplied(this)) {
+            snackbar(mRootView, getString(R.string.msg_settings_not_applied), true,
                     new Snackbar.Callback() {
                         @Override
                         public void onDismissed(Snackbar snackbar, int event) {
-                            NavigationHelper.navigateToSettingsScreen(LoginActivity.this);
+                            navigateToSettingsScreen(LoginActivity.this);
                         }
                     });
         }
     }
 
     private void showNetworkError() {
-        FeedbackHelper
-                .snackbar(mRootView, getString(R.string.msg_unable_to_sign_in_no_network),
-                        true);
+        snackbar(mRootView, getString(R.string.msg_unable_to_sign_in_no_network), true);
     }
 
     private void showFormError() {
         final View currentFocus = getCurrentFocus();
-        FeedbackHelper.snackbar(mRootView, getString(R.string.msg_fix_errors_to_sign_in),
+        snackbar(mRootView, getString(R.string.msg_fix_errors_to_sign_in),
                 true, new Snackbar.Callback() {
                     @Override
                     public void onDismissed(Snackbar snackbar, int event) {
@@ -222,28 +227,26 @@ public class LoginActivity extends BaseActivity {
                 });
     }
 
-    @OnFocusChange(R.id.cpf)
-    void onCpfViewFocusChange(boolean focused) {
+    @OnFocusChange(R.id.cpf) void onCpfViewFocusChange(boolean focused) {
         if (focused) {
-            final Object cpf = mCpfView.getTag();
+            final Object cpf = inputLayoutCpf.getTag();
 
             if (cpf != null) {
-                mCpfView.setText(cpf.toString());
-                mCpfView.selectAll();
+                inputLayoutCpf.setText(cpf.toString());
+                inputLayoutCpf.selectAll();
             }
         } else {
-            if (!TextUtils.isEmpty(mCpfView.getText())
-                    && mCpfView.getText().toString().length() == 11) {
-                final String cpf = mCpfView.getText().toString();
-                mCpfView.setText(LoginDataHelper.formatCpf(cpf));
-                mCpfView.setTag(cpf);
+            if (!isEmpty(inputLayoutCpf.getText())
+                    && inputLayoutCpf.getText().toString().length() == 11) {
+                final String cpf = inputLayoutCpf.getText().toString();
+                inputLayoutCpf.setText(LoginDataHelper.formatCpf(cpf));
+                inputLayoutCpf.setTag(cpf);
             }
         }
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
+    @Override protected void onStop() {
         unsubscribeAuthentication();
+        super.onStop();
     }
 }
