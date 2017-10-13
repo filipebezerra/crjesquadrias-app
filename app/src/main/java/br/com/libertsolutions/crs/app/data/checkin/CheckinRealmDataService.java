@@ -1,6 +1,6 @@
 package br.com.libertsolutions.crs.app.data.checkin;
 
-import android.content.Context;
+import br.com.libertsolutions.crs.app.data.util.RealmObservable;
 import br.com.libertsolutions.crs.app.domain.entity.CheckinEntity;
 import br.com.libertsolutions.crs.app.domain.entity.ItemEntity;
 import br.com.libertsolutions.crs.app.domain.entity.OrderGlassEntity;
@@ -9,14 +9,10 @@ import br.com.libertsolutions.crs.app.domain.pojo.Checkin;
 import br.com.libertsolutions.crs.app.domain.pojo.Item;
 import br.com.libertsolutions.crs.app.domain.pojo.OrderGlass;
 import br.com.libertsolutions.crs.app.domain.pojo.Product;
-import br.com.libertsolutions.crs.app.data.util.RealmObservable;
-import io.realm.Realm;
 import io.realm.RealmList;
-import io.realm.RealmResults;
 import java.util.ArrayList;
 import java.util.List;
 import rx.Observable;
-import rx.functions.Func1;
 
 /**
  * Implementação do contrato de acesso e modificação à dados dos {@link Checkin}s.
@@ -26,11 +22,6 @@ import rx.functions.Func1;
  * @since 0.1.0
  */
 public class CheckinRealmDataService implements CheckinDataService {
-    private final Context mContext;
-
-    public CheckinRealmDataService(Context context) {
-        mContext = context;
-    }
 
     private Checkin checkinFromRealm(CheckinEntity checkinEntity) {
         if (checkinEntity == null) {
@@ -98,124 +89,140 @@ public class CheckinRealmDataService implements CheckinDataService {
 
     @Override
     public Observable<List<Checkin>> list(final long flowId) {
-        return RealmObservable.results(mContext, new Func1<Realm, RealmResults<CheckinEntity>>() {
-            @Override
-            public RealmResults<CheckinEntity> call(Realm realm) {
-                // find all
-                return realm.where(CheckinEntity.class)
-                        .equalTo(CheckinEntity.FIELD_FLOW_ID, flowId)
-                        .findAll();
+        return RealmObservable.results(realm -> {
+            // find all
+            return realm.where(CheckinEntity.class)
+                    .equalTo(CheckinEntity.FIELD_FLOW_ID, flowId)
+                    .findAll();
+        }).map(checkinEntities -> {
+            // map them to UI objects
+            final List<Checkin> checkinList = new ArrayList<>(checkinEntities.size());
+            for (CheckinEntity checkinEntity : checkinEntities) {
+                checkinList.add(checkinFromRealm(checkinEntity));
             }
-        }).map(new Func1<RealmResults<CheckinEntity>, List<Checkin>>() {
-            @Override
-            public List<Checkin> call(RealmResults<CheckinEntity> checkinEntities) {
-                // map them to UI objects
-                final List<Checkin> checkinList = new ArrayList<>(checkinEntities.size());
-                for (CheckinEntity checkinEntity : checkinEntities) {
-                    checkinList.add(checkinFromRealm(checkinEntity));
-                }
 
-                return checkinList;
-            }
+            return checkinList;
         });
     }
 
     @Override
     public Observable<List<Checkin>> saveAll(final List<Checkin> checkinList) {
-        return RealmObservable.list(mContext, new Func1<Realm, RealmList<CheckinEntity>>() {
-            @Override
-            public RealmList<CheckinEntity> call(Realm realm) {
-                List<CheckinEntity> checkinEntityList = new ArrayList<>(checkinList.size());
+        return RealmObservable.list(realm -> {
+            List<CheckinEntity> checkinEntityList = new ArrayList<>(checkinList.size());
 
-                for(Checkin checkin : checkinList) {
-                    ItemEntity itemEntity = null;
-                    OrderGlassEntity orderGlassEntity = null;
-                    ProductEntity productEntity = new ProductEntity();
+            for(Checkin checkin : checkinList) {
+                ItemEntity itemEntity = null;
+                OrderGlassEntity orderGlassEntity = null;
+                ProductEntity productEntity = new ProductEntity();
 
-                    if (checkin.getItem() != null) {
-                        productEntity.setProductId(
-                                checkin.getItem().getProduct().getProductId());
-                        productEntity.setCode(
-                                checkin.getItem().getProduct().getCode());
-                        productEntity.setDescription(
-                                checkin.getItem().getProduct().getDescription());
-                        productEntity.setWeight(
-                                checkin.getItem().getProduct().getWeight());
-                        productEntity.setTreatment(
-                                checkin.getItem().getProduct().getTreatment());
-                        productEntity.setType(checkin.getItem().getProduct().getType());
-                        productEntity.setLine(checkin.getItem().getProduct().getLine());
-                        productEntity = realm.copyToRealmOrUpdate(productEntity);
+                if (checkin.getItem() != null) {
+                    productEntity.setProductId(
+                            checkin.getItem().getProduct().getProductId());
+                    productEntity.setCode(
+                            checkin.getItem().getProduct().getCode());
+                    productEntity.setDescription(
+                            checkin.getItem().getProduct().getDescription());
+                    productEntity.setWeight(
+                            checkin.getItem().getProduct().getWeight());
+                    productEntity.setTreatment(
+                            checkin.getItem().getProduct().getTreatment());
+                    productEntity.setType(checkin.getItem().getProduct().getType());
+                    productEntity.setLine(checkin.getItem().getProduct().getLine());
+                    productEntity = realm.copyToRealmOrUpdate(productEntity);
 
-                        itemEntity = new ItemEntity();
-                        itemEntity.setItemId(checkin.getItem().getItemId());
-                        itemEntity.setQuantity(checkin.getItem().getQuantity());
-                        itemEntity.setWidth(checkin.getItem().getWidth());
-                        itemEntity.setHeight(checkin.getItem().getHeight());
-                        itemEntity.setWeight(checkin.getItem().getWeight());
-                        itemEntity.setTreatment(checkin.getItem().getTreatment());
-                        itemEntity.setProduct(productEntity);
-                        itemEntity = realm.copyToRealmOrUpdate(itemEntity);
-                    } else {
-                        productEntity.setProductId(
-                                checkin.getOrderGlass().getProduct().getProductId());
-                        productEntity.setCode(
-                                checkin.getOrderGlass().getProduct().getCode());
-                        productEntity.setDescription(
-                                checkin.getOrderGlass().getProduct().getDescription());
-                        productEntity.setWeight(
-                                checkin.getOrderGlass().getProduct().getWeight());
-                        productEntity.setTreatment(
-                                checkin.getOrderGlass().getProduct().getTreatment());
-                        productEntity.setType(checkin.getOrderGlass().getProduct().getType());
-                        productEntity.setLine(checkin.getOrderGlass().getProduct().getLine());
-                        productEntity = realm.copyToRealmOrUpdate(productEntity);
+                    itemEntity = new ItemEntity();
+                    itemEntity.setItemId(checkin.getItem().getItemId());
+                    itemEntity.setQuantity(checkin.getItem().getQuantity());
+                    itemEntity.setWidth(checkin.getItem().getWidth());
+                    itemEntity.setHeight(checkin.getItem().getHeight());
+                    itemEntity.setWeight(checkin.getItem().getWeight());
+                    itemEntity.setTreatment(checkin.getItem().getTreatment());
+                    itemEntity.setProduct(productEntity);
+                    itemEntity = realm.copyToRealmOrUpdate(itemEntity);
+                } else {
+                    productEntity.setProductId(
+                            checkin.getOrderGlass().getProduct().getProductId());
+                    productEntity.setCode(
+                            checkin.getOrderGlass().getProduct().getCode());
+                    productEntity.setDescription(
+                            checkin.getOrderGlass().getProduct().getDescription());
+                    productEntity.setWeight(
+                            checkin.getOrderGlass().getProduct().getWeight());
+                    productEntity.setTreatment(
+                            checkin.getOrderGlass().getProduct().getTreatment());
+                    productEntity.setType(checkin.getOrderGlass().getProduct().getType());
+                    productEntity.setLine(checkin.getOrderGlass().getProduct().getLine());
+                    productEntity = realm.copyToRealmOrUpdate(productEntity);
 
-                        orderGlassEntity = new OrderGlassEntity();
-                        orderGlassEntity.setOrderGlassId(checkin.getOrderGlass().getOrderGlassId());
-                        orderGlassEntity.setQuantity(checkin.getOrderGlass().getQuantity());
-                        orderGlassEntity.setNumber(checkin.getOrderGlass().getNumber());
-                        orderGlassEntity.setColor(checkin.getOrderGlass().getColor());
-                        orderGlassEntity.setWidth(checkin.getOrderGlass().getWidth());
-                        orderGlassEntity.setHeight(checkin.getOrderGlass().getHeight());
-                        orderGlassEntity.setWeight(checkin.getOrderGlass().getWeight());
-                        orderGlassEntity.setProduct(productEntity);
-                        orderGlassEntity = realm.copyToRealmOrUpdate(orderGlassEntity);
-                    }
-
-                    final CheckinEntity checkinEntity = new CheckinEntity();
-                    checkinEntity.setCheckinId(checkin.getCheckinId());
-                    checkinEntity.setFlowId(checkin.getFlowId());
-                    checkinEntity.setDate(checkin.getDate());
-                    checkinEntity.setStatus(checkin.getStatus());
-                    checkinEntity.setItem(itemEntity);
-                    checkinEntity.setOrderGlass(orderGlassEntity);
-                    checkinEntity.setLocation(checkin.getLocation());
-
-                    checkinEntityList.add(realm.copyToRealmOrUpdate(checkinEntity));
+                    orderGlassEntity = new OrderGlassEntity();
+                    orderGlassEntity.setOrderGlassId(checkin.getOrderGlass().getOrderGlassId());
+                    orderGlassEntity.setQuantity(checkin.getOrderGlass().getQuantity());
+                    orderGlassEntity.setNumber(checkin.getOrderGlass().getNumber());
+                    orderGlassEntity.setColor(checkin.getOrderGlass().getColor());
+                    orderGlassEntity.setWidth(checkin.getOrderGlass().getWidth());
+                    orderGlassEntity.setHeight(checkin.getOrderGlass().getHeight());
+                    orderGlassEntity.setWeight(checkin.getOrderGlass().getWeight());
+                    orderGlassEntity.setProduct(productEntity);
+                    orderGlassEntity = realm.copyToRealmOrUpdate(orderGlassEntity);
                 }
 
-                return new RealmList<>(checkinEntityList.toArray(
-                        new CheckinEntity[checkinEntityList.size()]));
-            }
-        }).map(new Func1<RealmList<CheckinEntity>, List<Checkin>>() {
-            @Override
-            public List<Checkin> call(RealmList<CheckinEntity> checkinEntities) {
-                List<Checkin> list = new ArrayList<>(checkinEntities.size());
-                for (CheckinEntity checkinEntity : checkinEntities) {
-                    list.add(checkinFromRealm(checkinEntity));
-                }
+                final CheckinEntity checkinEntity = new CheckinEntity();
+                checkinEntity.setCheckinId(checkin.getCheckinId());
+                checkinEntity.setFlowId(checkin.getFlowId());
+                checkinEntity.setDate(checkin.getDate());
+                checkinEntity.setStatus(checkin.getStatus());
+                checkinEntity.setItem(itemEntity);
+                checkinEntity.setOrderGlass(orderGlassEntity);
+                checkinEntity.setLocation(checkin.getLocation());
 
-                return list;
+                checkinEntityList.add(realm.copyToRealmOrUpdate(checkinEntity));
             }
+
+            return new RealmList<>(checkinEntityList.toArray(
+                    new CheckinEntity[checkinEntityList.size()]));
+        }).map(checkinEntities -> {
+            List<Checkin> list = new ArrayList<>(checkinEntities.size());
+            for (CheckinEntity checkinEntity : checkinEntities) {
+                list.add(checkinFromRealm(checkinEntity));
+            }
+
+            return list;
         });
     }
 
     @Override
     public Observable<Checkin> updateSyncState(final Checkin checkin, final boolean syncPending) {
-        return RealmObservable.object(mContext, new Func1<Realm, CheckinEntity>() {
-            @Override
-            public CheckinEntity call(Realm realm) {
+        return RealmObservable.object(realm -> {
+            CheckinEntity checkinEntity = realm.where(CheckinEntity.class)
+                    .equalTo(CheckinEntity.FIELD_CHECKIN_ID, checkin.getCheckinId())
+                    .findFirst();
+
+            if (checkinEntity != null) {
+                if (checkinEntity.getStatus() == Checkin.STATUS_PENDING
+                        && checkin.getStatus() == Checkin.STATUS_FINISHED) {
+                    checkinEntity.setStatus(checkin.getStatus());
+
+                    if (checkin.getDate() != null) {
+                        checkinEntity.setDate(checkin.getDate());
+                    }
+
+                    checkinEntity.setPendingSynchronization(syncPending);
+
+                    checkinEntity = realm.copyToRealmOrUpdate(checkinEntity);
+                }
+            }
+
+            return checkinEntity;
+        }).map(this::checkinFromRealm);
+    }
+
+    @Override
+    public Observable<List<Checkin>> updateSyncState(final List<Checkin> checkins,
+            final boolean syncPending) {
+        return RealmObservable.list(realm -> {
+            List<CheckinEntity> checkinEntityList = new ArrayList<>(checkins.size());
+
+            for(Checkin checkin : checkins) {
                 CheckinEntity checkinEntity = realm.where(CheckinEntity.class)
                         .equalTo(CheckinEntity.FIELD_CHECKIN_ID, checkin.getCheckinId())
                         .findFirst();
@@ -231,86 +238,38 @@ public class CheckinRealmDataService implements CheckinDataService {
 
                         checkinEntity.setPendingSynchronization(syncPending);
 
-                        checkinEntity = realm.copyToRealmOrUpdate(checkinEntity);
+                        checkinEntityList.add(realm.copyToRealmOrUpdate(checkinEntity));
                     }
                 }
-
-                return checkinEntity;
             }
-        }).map(new Func1<CheckinEntity, Checkin>() {
-            @Override
-            public Checkin call(CheckinEntity checkinEntity) {
-                return checkinFromRealm(checkinEntity);
+
+            return new RealmList<>(checkinEntityList.toArray(
+                    new CheckinEntity[checkinEntityList.size()]));
+        }).map(checkinEntities -> {
+            List<Checkin> list = new ArrayList<>(checkinEntities.size());
+            for (CheckinEntity checkinEntity : checkinEntities) {
+                list.add(checkinFromRealm(checkinEntity));
             }
-        });
-    }
 
-    @Override
-    public Observable<List<Checkin>> updateSyncState(final List<Checkin> checkins,
-            final boolean syncPending) {
-        return RealmObservable.list(mContext, new Func1<Realm, RealmList<CheckinEntity>>() {
-            @Override
-            public RealmList<CheckinEntity> call(Realm realm) {
-                List<CheckinEntity> checkinEntityList = new ArrayList<>(checkins.size());
-
-                for(Checkin checkin : checkins) {
-                    CheckinEntity checkinEntity = realm.where(CheckinEntity.class)
-                            .equalTo(CheckinEntity.FIELD_CHECKIN_ID, checkin.getCheckinId())
-                            .findFirst();
-
-                    if (checkinEntity != null) {
-                        if (checkinEntity.getStatus() == Checkin.STATUS_PENDING
-                                && checkin.getStatus() == Checkin.STATUS_FINISHED) {
-                            checkinEntity.setStatus(checkin.getStatus());
-
-                            if (checkin.getDate() != null) {
-                                checkinEntity.setDate(checkin.getDate());
-                            }
-
-                            checkinEntity.setPendingSynchronization(syncPending);
-
-                            checkinEntityList.add(realm.copyToRealmOrUpdate(checkinEntity));
-                        }
-                    }
-                }
-
-                return new RealmList<>(checkinEntityList.toArray(
-                        new CheckinEntity[checkinEntityList.size()]));
-            }
-        }).map(new Func1<RealmList<CheckinEntity>, List<Checkin>>() {
-            @Override
-            public List<Checkin> call(RealmList<CheckinEntity> checkinEntities) {
-                List<Checkin> list = new ArrayList<>(checkinEntities.size());
-                for (CheckinEntity checkinEntity : checkinEntities) {
-                    list.add(checkinFromRealm(checkinEntity));
-                }
-
-                return list;
-            }
+            return list;
         });
     }
 
     @Override
     public Observable<List<Checkin>> listPendingSynchronization() {
-        return RealmObservable.results(mContext, new Func1<Realm, RealmResults<CheckinEntity>>() {
-            @Override
-            public RealmResults<CheckinEntity> call(Realm realm) {
-                // find all pending synchronization
-                return realm.where(CheckinEntity.class)
-                        .equalTo(CheckinEntity.FIELD_PENDING_SYNCHRONIZATION, true)
-                        .findAll();
+        return RealmObservable.results(realm -> {
+            // find all pending synchronization
+            return realm.where(CheckinEntity.class)
+                    .equalTo(CheckinEntity.FIELD_PENDING_SYNCHRONIZATION, true)
+                    .findAll();
+        }).map(checkinEntities -> {
+            // map them to UI objects
+            final List<Checkin> checkinList = new ArrayList<>(checkinEntities.size());
+            for (CheckinEntity checkinEntity : checkinEntities) {
+                checkinList.add(checkinFromRealm(checkinEntity));
             }
-        }).map(new Func1<RealmResults<CheckinEntity>, List<Checkin>>() {
-            @Override
-            public List<Checkin> call(RealmResults<CheckinEntity> checkinEntities) {
-                // map them to UI objects
-                final List<Checkin> checkinList = new ArrayList<>(checkinEntities.size());
-                for (CheckinEntity checkinEntity : checkinEntities) {
-                    checkinList.add(checkinFromRealm(checkinEntity));
-                }
 
-                return checkinList;
-            }
+            return checkinList;
         });
     }
 }

@@ -53,7 +53,7 @@ class CheckinsSync extends AbstractSync {
 
     CheckinsSync(Context context) {
         super(context);
-        checkinDataService = new CheckinRealmDataService(context);
+        checkinDataService = new CheckinRealmDataService();
         checkinService = createService(CheckinService.class, context);
     }
 

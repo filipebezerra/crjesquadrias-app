@@ -8,7 +8,7 @@ public class LoginBody {
     String cpf;
     String senha;
 
-    public static LoginBody of(String cpf, String senha) {
+    public static LoginBody newLoginBody(String cpf, String senha) {
         return new LoginBody()
                 .setCpf(cpf)
                 .setSenha(senha);

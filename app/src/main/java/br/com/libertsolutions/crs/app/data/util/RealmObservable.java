@@ -1,12 +1,12 @@
 package br.com.libertsolutions.crs.app.data.util;
 
-import android.content.Context;
 import io.realm.Realm;
 import io.realm.RealmList;
-import io.realm.RealmObject;
+import io.realm.RealmModel;
 import io.realm.RealmResults;
 import rx.Observable;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 /**
  * Helper class that simplifies usage of these functions providing static methods with Func1<Realm,
@@ -19,63 +19,41 @@ public final class RealmObservable {
     private RealmObservable() {
     }
 
-    public static <T extends RealmObject> Observable<T> object(Context context,
-            final Func1<Realm, T> function) {
-        return Observable.create(new OnSubscribeRealm<T>(context) {
-            @Override
-            public T get(Realm realm) {
-                return function.call(realm);
-            }
-        });
+    public static <E extends RealmModel> Observable<E> object(final Func1<Realm, E> function) {
+        return Observable
+                .create(
+                        new OnSubscribeRealm<E>() {
+                            @Override
+                            public E get(Realm realm) {
+                                return function.call(realm);
+                            }
+                        })
+                .subscribeOn(Schedulers.io());
     }
 
-    public static <T extends RealmObject> Observable<T> object(Context context,
-            String fileName, final Func1<Realm, T> function) {
-        return Observable.create(new OnSubscribeRealm<T>(context, fileName) {
-            @Override
-            public T get(Realm realm) {
-                return function.call(realm);
-            }
-        });
+    public static <E extends RealmModel> Observable<RealmList<E>> list(
+            final Func1<Realm, RealmList<E>> function) {
+        return Observable
+                .create(
+                        new OnSubscribeRealm<RealmList<E>>() {
+                            @Override
+                            public RealmList<E> get(Realm realm) {
+                                return function.call(realm);
+                            }
+                        })
+                .subscribeOn(Schedulers.io());
     }
 
-    public static <T extends RealmObject> Observable<RealmList<T>> list(Context context,
-            final Func1<Realm, RealmList<T>> function) {
-        return Observable.create(new OnSubscribeRealm<RealmList<T>>(context) {
-            @Override
-            public RealmList<T> get(Realm realm) {
-                return function.call(realm);
-            }
-        });
-    }
-
-    public static <T extends RealmObject> Observable<RealmList<T>> list(Context context,
-            String fileName, final Func1<Realm, RealmList<T>> function) {
-        return Observable.create(new OnSubscribeRealm<RealmList<T>>(context, fileName) {
-            @Override
-            public RealmList<T> get(Realm realm) {
-                return function.call(realm);
-            }
-        });
-    }
-
-    public static <T extends RealmObject> Observable<RealmResults<T>> results(Context context,
-            final Func1<Realm, RealmResults<T>> function) {
-        return Observable.create(new OnSubscribeRealm<RealmResults<T>>(context) {
-            @Override
-            public RealmResults<T> get(Realm realm) {
-                return function.call(realm);
-            }
-        });
-    }
-
-    public static <T extends RealmObject> Observable<RealmResults<T>> results(Context context,
-            String fileName, final Func1<Realm, RealmResults<T>> function) {
-        return Observable.create(new OnSubscribeRealm<RealmResults<T>>(context, fileName) {
-            @Override
-            public RealmResults<T> get(Realm realm) {
-                return function.call(realm);
-            }
-        });
+    public static <E extends RealmModel> Observable<RealmResults<E>> results(
+            final Func1<Realm, RealmResults<E>> function) {
+        return Observable
+                .create(
+                        new OnSubscribeRealm<RealmResults<E>>() {
+                            @Override
+                            public RealmResults<E> get(Realm realm) {
+                                return function.call(realm);
+                            }
+                        })
+                .subscribeOn(Schedulers.io());
     }
 }

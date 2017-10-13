@@ -1,5 +1,6 @@
 package br.com.libertsolutions.crs.app.data.login;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -9,6 +10,7 @@ import android.text.TextUtils;
 import br.com.libertsolutions.crs.app.domain.pojo.User;
 import br.com.libertsolutions.crs.app.presentation.login.LoginActivity;
 import com.crashlytics.android.Crashlytics;
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Utilities methods used in {@link LoginActivity}.
@@ -32,6 +34,7 @@ public class LoginDataHelper {
         return sharedPreferences.getBoolean(KEY_IS_USER_LOGGED, false);
     }
 
+    @SuppressLint("CommitPrefEdits")
     public static void loginUser(@NonNull Context context, @NonNull User user) {
         if (isUserLogged(context))
             return;
@@ -51,9 +54,11 @@ public class LoginDataHelper {
                                 .putString(KEY_USER_CPF, user.getCpf())
                                 .putString(KEY_USER_EMAIL, user.getEmail()));
 
-        Crashlytics.setUserIdentifier(user.getCpf());
-        Crashlytics.setUserEmail(user.getEmail());
-        Crashlytics.setUserName(user.getName());
+        if (Fabric.isInitialized()) {
+            Crashlytics.setUserIdentifier(user.getCpf());
+            Crashlytics.setUserEmail(user.getEmail());
+            Crashlytics.setUserName(user.getName());
+        }
     }
 
     public static User getUserLogged(@NonNull Context context) {
@@ -69,6 +74,7 @@ public class LoginDataHelper {
                 .setEmail(sharedPreferences.getString(KEY_USER_EMAIL, null));
     }
 
+    @SuppressLint("CommitPrefEdits")
     public static void logoutUser(@NonNull Context context) {
         if (!isUserLogged(context))
             return;

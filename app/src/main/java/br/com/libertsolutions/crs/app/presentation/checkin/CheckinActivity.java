@@ -260,7 +260,7 @@ public class CheckinActivity extends BaseActivity
 
     private CheckinDataService getCheckinDataService() {
         if (mCheckinDataService == null) {
-            mCheckinDataService = new CheckinRealmDataService(this);
+            mCheckinDataService = new CheckinRealmDataService();
         }
         return mCheckinDataService;
     }

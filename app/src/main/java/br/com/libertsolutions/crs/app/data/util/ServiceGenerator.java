@@ -3,20 +3,16 @@ package br.com.libertsolutions.crs.app.data.util;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-
+import br.com.libertsolutions.crs.app.data.settings.SettingsDataHelper;
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
-import br.com.libertsolutions.crs.app.BuildConfig;
-import br.com.libertsolutions.crs.app.data.settings.SettingsDataHelper;
 import io.realm.RealmObject;
+import java.io.File;
+import java.util.concurrent.TimeUnit;
 import okhttp3.Cache;
+import okhttp3.CacheControl;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -26,7 +22,13 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-import rx.schedulers.Schedulers;
+import timber.log.Timber;
+
+import static br.com.libertsolutions.crs.app.BuildConfig.DEBUG;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static okhttp3.logging.HttpLoggingInterceptor.Level.BODY;
+import static okhttp3.logging.HttpLoggingInterceptor.Level.NONE;
+import static rx.schedulers.Schedulers.io;
 
 /**
  * Classe utilitária para configuração do {@link Retrofit} e instanciação das
@@ -38,11 +40,12 @@ import rx.schedulers.Schedulers;
 public class ServiceGenerator {
     private static final long HTTP_CACHE_SIZE = 10 * 1024 * 1024;
     private static final String HTTP_CACHE_FILE_NAME = "http";
+    private static final String CACHE_CONTROL = "Cache-Control";
 
-    private static Retrofit sRetrofit;
+    private static Retrofit retrofit;
 
-    private static String sBaseUrl;
-    private static String sAuthKey;
+    private static String baseUrl;
+    private static String authKey;
 
     public static <S> S createService(@NonNull Class<S> serviceClass, @NonNull Context context) {
         final String baseUrl = SettingsDataHelper.getServerUrl(context);
@@ -52,16 +55,19 @@ public class ServiceGenerator {
             return null;
         }
 
-        if (sRetrofit == null ||
-                (!baseUrl.equals(sBaseUrl) || !authKey.equals(sAuthKey))) {
+        if (retrofit == null ||
+                (!baseUrl.equals(ServiceGenerator.baseUrl) || !authKey.equals(
+                        ServiceGenerator.authKey))) {
 
             final OkHttpClient httpClient = new OkHttpClient
                     .Builder()
-                    .connectTimeout(30, TimeUnit.SECONDS)
-                    .readTimeout(30, TimeUnit.SECONDS)
+                    .connectTimeout(30, SECONDS)
+                    .readTimeout(30, SECONDS)
+                    .writeTimeout(30, SECONDS)
                     .cache(createCache(context))
                     .addInterceptor(createLoggingInterceptor())
                     .addInterceptor(createInterceptorWithAuthKey(authKey))
+                    .addNetworkInterceptor(createCacheInterceptor())
                     .build();
 
             final Gson gson = new GsonBuilder()
@@ -78,54 +84,66 @@ public class ServiceGenerator {
                     })
                     .create();
 
-            sRetrofit = new Retrofit.Builder()
+            retrofit = new Retrofit.Builder()
                     .baseUrl(baseUrl)
                     .addConverterFactory(GsonConverterFactory.create(gson))
-                    .addCallAdapterFactory(
-                            RxJavaCallAdapterFactory.createWithScheduler(Schedulers.io()))
+                    .addCallAdapterFactory(RxJavaCallAdapterFactory.createWithScheduler(io()))
                     .client(httpClient)
                     .build();
 
-            sAuthKey = authKey;
-            sBaseUrl = baseUrl;
+            ServiceGenerator.authKey = authKey;
+            ServiceGenerator.baseUrl = baseUrl;
         }
 
-        return sRetrofit.create(serviceClass);
+        return retrofit.create(serviceClass);
     }
 
     private static Cache createCache(@NonNull Context context) {
-        return new Cache(new File(context.getCacheDir(), HTTP_CACHE_FILE_NAME), HTTP_CACHE_SIZE);
+        Cache cache = null;
+        try {
+            cache = new Cache(
+                    new File(context.getCacheDir(), HTTP_CACHE_FILE_NAME), HTTP_CACHE_SIZE);
+        } catch (Exception e) {
+            Timber.e(e, "Could not create Cache!");
+        }
+        return cache;
     }
 
     private static Interceptor createLoggingInterceptor() {
-        HttpLoggingInterceptor.Level level;
-        if (BuildConfig.DEBUG) {
-            level = HttpLoggingInterceptor.Level.BODY;
-        } else {
-            level = HttpLoggingInterceptor.Level.NONE;
-        }
-        return new HttpLoggingInterceptor().setLevel(level);
+        return new HttpLoggingInterceptor().setLevel(DEBUG ? BODY : NONE);
     }
 
     private static Interceptor createInterceptorWithAuthKey(@NonNull final String authKey) {
-        return new Interceptor() {
-            @Override
-            public Response intercept(Interceptor.Chain chain) throws IOException {
-                Request original = chain.request();
+        return chain -> {
+            Request original = chain.request();
 
-                final HttpUrl httpUrl = original.url()
-                        .newBuilder()
-                        .addQueryParameter("key", authKey)
-                        .build();
+            final HttpUrl httpUrl = original.url()
+                    .newBuilder()
+                    .addQueryParameter("key", authKey)
+                    .build();
 
-                final Request request = original.newBuilder()
-                        .url(httpUrl)
-                        .header("Accept", "applicaton/json")
-                        .method(original.method(), original.body())
-                        .build();
+            final Request request = original.newBuilder()
+                    .url(httpUrl)
+                    .header("Accept", "applicaton/json")
+                    .method(original.method(), original.body())
+                    .build();
 
-                return chain.proceed(request);
-            }
+            return chain.proceed(request);
+        };
+    }
+
+    private static Interceptor createCacheInterceptor() {
+        return chain -> {
+            Response response = chain.proceed(chain.request());
+
+            // re-write response header to force use of cache
+            CacheControl cacheControl = new CacheControl.Builder()
+                    .maxAge(2, TimeUnit.MINUTES)
+                    .build();
+
+            return response.newBuilder()
+                    .header(CACHE_CONTROL, cacheControl.toString())
+                    .build();
         };
     }
 }

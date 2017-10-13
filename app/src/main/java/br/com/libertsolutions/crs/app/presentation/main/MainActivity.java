@@ -21,7 +21,6 @@ import android.widget.TextView;
 import br.com.libertsolutions.crs.app.R;
 import br.com.libertsolutions.crs.app.data.checkin.CheckinRealmDataService;
 import br.com.libertsolutions.crs.app.data.checkin.CheckinService;
-import br.com.libertsolutions.crs.app.data.config.ConfigDataHelper;
 import br.com.libertsolutions.crs.app.data.config.ConfigService;
 import br.com.libertsolutions.crs.app.data.flow.FlowRealmDataService;
 import br.com.libertsolutions.crs.app.data.flow.FlowService;
@@ -29,7 +28,6 @@ import br.com.libertsolutions.crs.app.data.login.LoginDataHelper;
 import br.com.libertsolutions.crs.app.data.sync.SyncService;
 import br.com.libertsolutions.crs.app.data.sync.event.EventBusManager;
 import br.com.libertsolutions.crs.app.data.sync.event.SyncEvent;
-import br.com.libertsolutions.crs.app.data.sync.event.SyncStatus;
 import br.com.libertsolutions.crs.app.data.work.WorkDataService;
 import br.com.libertsolutions.crs.app.data.work.WorkRealmDataService;
 import br.com.libertsolutions.crs.app.data.work.WorkService;
@@ -39,9 +37,7 @@ import br.com.libertsolutions.crs.app.domain.pojo.User;
 import br.com.libertsolutions.crs.app.domain.pojo.Work;
 import br.com.libertsolutions.crs.app.domain.pojo.Works;
 import br.com.libertsolutions.crs.app.presentation.activity.BaseActivity;
-import br.com.libertsolutions.crs.app.presentation.util.FeedbackHelper;
 import br.com.libertsolutions.crs.app.presentation.util.NavigationHelper;
-import br.com.libertsolutions.crs.app.presentation.util.NetworkUtils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -53,14 +49,20 @@ import timber.log.Timber;
 
 import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
 import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
+import static br.com.libertsolutions.crs.app.data.config.ConfigDataHelper.isInitialDataImported;
 import static br.com.libertsolutions.crs.app.data.config.ConfigDataHelper.setCheckinDataAsImported;
 import static br.com.libertsolutions.crs.app.data.config.ConfigDataHelper.setDataImportationAsLastSyncDate;
 import static br.com.libertsolutions.crs.app.data.config.ConfigDataHelper.setFlowDataAsImported;
 import static br.com.libertsolutions.crs.app.data.config.ConfigDataHelper.setWorkDataAsImported;
+import static br.com.libertsolutions.crs.app.data.login.LoginDataHelper.formatCpf;
+import static br.com.libertsolutions.crs.app.data.sync.event.SyncStatus.IN_PROGRESS;
 import static br.com.libertsolutions.crs.app.data.util.Constants.PAGE_START;
 import static br.com.libertsolutions.crs.app.data.util.RxUtil.exponentialBackoff;
 import static br.com.libertsolutions.crs.app.data.util.RxUtil.timeoutException;
 import static br.com.libertsolutions.crs.app.data.util.ServiceGenerator.createService;
+import static br.com.libertsolutions.crs.app.presentation.util.FeedbackHelper.snackbar;
+import static br.com.libertsolutions.crs.app.presentation.util.FeedbackHelper.toast;
+import static br.com.libertsolutions.crs.app.presentation.util.NetworkUtils.isDeviceConnectedToInternet;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.greenrobot.eventbus.ThreadMode.MAIN;
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
@@ -78,7 +80,7 @@ public class MainActivity extends BaseActivity implements OnQueryTextListener, O
 
     private CompositeSubscription compositeSubscription;
 
-    private User mUserLogged;
+    private User userLogged;
 
     private int currentPageWorks = PAGE_START;
     private int currentPageFlows = PAGE_START;
@@ -132,24 +134,21 @@ public class MainActivity extends BaseActivity implements OnQueryTextListener, O
     }
 
     private void showUserLoggedInfo() {
-        if (mUserLogged == null) {
-            mUserLogged = LoginDataHelper.getUserLogged(this);
+        if (userLogged == null) {
+            userLogged = LoginDataHelper.getUserLogged(this);
         }
 
-        if (mUserLogged != null) {
-            FeedbackHelper
-                    .snackbar(mRootView, String.format("Logado como %s.",
-                            LoginDataHelper.formatCpf(mUserLogged.getName())), false);
+        if (userLogged != null) {
+            snackbar(mRootView, String.format("Logado como %s.",
+                    formatCpf(userLogged.getName())), false);
         }
     }
 
     private void loadViewData() {
-        final boolean isInitialDataImported = ConfigDataHelper.isInitialDataImported(this);
-
-        if (isInitialDataImported) {
+        if (isInitialDataImported(this)) {
             loadWorkData();
             requestCompleteSync();
-        } else if (NetworkUtils.isDeviceConnectedToInternet(this)) {
+        } else if (isDeviceConnectedToInternet(this)) {
             startImportingData();
         } else {
             showNoDataAndNetworkState();
@@ -157,11 +156,11 @@ public class MainActivity extends BaseActivity implements OnQueryTextListener, O
     }
 
     private void requestCompleteSync() {
-        if (NetworkUtils.isDeviceConnectedToInternet(this)) {
+        if (isDeviceConnectedToInternet(this)) {
             SyncService.requestCompleteSync();
         } else {
             stopRefreshingProgress();
-            FeedbackHelper.toast(this, getString(R.string.no_connection_to_force_update), false);
+            toast(this, getString(R.string.no_connection_to_force_update), false);
         }
     }
 
@@ -169,7 +168,7 @@ public class MainActivity extends BaseActivity implements OnQueryTextListener, O
     public void onSyncEvent(SyncEvent event) {
         Timber.i("Sync event with %s in %s", event.getType(), event.getStatus());
 
-        if (event.getStatus() == SyncStatus.IN_PROGRESS) {
+        if (event.getStatus() == IN_PROGRESS) {
             Timber.i("Sync in progress");
             if (!swipeRefreshLayout.isRefreshing()) {
                 swipeRefreshLayout.setRefreshing(true);
@@ -202,6 +201,7 @@ public class MainActivity extends BaseActivity implements OnQueryTextListener, O
     private void requestWorkData() {
         final Subscription subscription = createService(WorkService.class, this)
                 .getAll(currentPageWorks)
+                .observeOn(mainThread())
                 .retryWhen(timeoutException())
                 .retryWhen(exponentialBackoff(3, 5, SECONDS))
                 .observeOn(mainThread())
@@ -218,7 +218,6 @@ public class MainActivity extends BaseActivity implements OnQueryTextListener, O
 
         final Subscription subscription = getWorkDataService()
                 .saveAll(works.list)
-                .observeOn(mainThread())
                 .subscribeOn(io())
                 .doOnError(e -> showError(R.string.title_dialog_error_saving_data, e))
                 .doOnCompleted(
@@ -227,6 +226,7 @@ public class MainActivity extends BaseActivity implements OnQueryTextListener, O
                                 setWorkDataAsImported(MainActivity.this);
                                 requestFlowData();
                             } else {
+                                loadWorkData();
                                 currentPageWorks++;
                                 requestWorkData();
                             }
@@ -247,7 +247,7 @@ public class MainActivity extends BaseActivity implements OnQueryTextListener, O
     }
 
     private void saveFlowData(Flows flows) {
-        final Subscription subscription = new FlowRealmDataService(this)
+        final Subscription subscription = new FlowRealmDataService()
                 .saveAll(flows.list)
                 .observeOn(mainThread())
                 .subscribeOn(io())
@@ -278,7 +278,7 @@ public class MainActivity extends BaseActivity implements OnQueryTextListener, O
     }
 
     private void saveCheckinData(Checkins checkins) {
-        final Subscription subscription = new CheckinRealmDataService(this)
+        final Subscription subscription = new CheckinRealmDataService()
                 .saveAll(checkins.list)
                 .observeOn(mainThread())
                 .subscribeOn(io())
@@ -339,7 +339,7 @@ public class MainActivity extends BaseActivity implements OnQueryTextListener, O
 
     private WorkDataService getWorkDataService() {
         if (workDataService == null) {
-            workDataService = new WorkRealmDataService(this);
+            workDataService = new WorkRealmDataService();
         }
         return workDataService;
     }

@@ -157,7 +157,7 @@ public class FlowActivity extends BaseActivity
 
     private void loadFlowData() {
         if (mFlowDataService == null) {
-            mFlowDataService = new FlowRealmDataService(this);
+            mFlowDataService = new FlowRealmDataService();
         }
 
         mFlowDataSubscription = mFlowDataService.list(mWork.getWorkId())

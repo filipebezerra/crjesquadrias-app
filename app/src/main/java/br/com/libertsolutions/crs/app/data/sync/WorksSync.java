@@ -49,7 +49,7 @@ class WorksSync extends AbstractSync {
 
     WorksSync(Context context) {
         super(context);
-        workDataService = new WorkRealmDataService(context);
+        workDataService = new WorkRealmDataService();
         workService = createService(WorkService.class, context);
     }
 

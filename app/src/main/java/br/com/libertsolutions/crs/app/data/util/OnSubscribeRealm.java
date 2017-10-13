@@ -1,9 +1,8 @@
 package br.com.libertsolutions.crs.app.data.util;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import io.realm.Realm;
-import io.realm.RealmConfiguration;
+import io.realm.RealmUtil;
 import io.realm.exceptions.RealmException;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +10,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
-import rx.functions.Action0;
 import rx.subscriptions.Subscriptions;
+import timber.log.Timber;
 
 /**
  * {@link Observable.OnSubscribe} for RealmObject subclass that follows Observable contract
@@ -21,50 +20,35 @@ import rx.subscriptions.Subscriptions;
  * @since 0.1.0
  */
 abstract class OnSubscribeRealm<T> implements Observable.OnSubscribe<T> {
-    private final Context mContext;
-    private final String mFileName;
-
-    private final List<Subscriber<? super T>> mSubscribers = new ArrayList<>();
-    private final AtomicBoolean mCanceled = new AtomicBoolean();
-    private final Object mLock = new Object();
-
-    public OnSubscribeRealm(Context context) {
-        this(context, null);
-    }
-
-    public OnSubscribeRealm(Context context, String fileName) {
-        mContext = context.getApplicationContext();
-        mFileName = fileName;
-    }
+    private final List<Subscriber<? super T>> subscribers = new ArrayList<>();
+    private final AtomicBoolean canceled = new AtomicBoolean();
+    private final Object lock = new Object();
 
     @Override
     public void call(final Subscriber<? super T> subscriber) {
-        synchronized (mLock) {
-            boolean canceled = mCanceled.get();
-            if (!canceled && !mSubscribers.isEmpty()) {
+        synchronized (lock) {
+            boolean canceled = this.canceled.get();
+            if (!canceled && !subscribers.isEmpty()) {
                 subscriber.add(newUnsubscribeAction(subscriber));
-                mSubscribers.add(subscriber);
+                subscribers.add(subscriber);
                 return;
             } else if (canceled) {
                 return;
             }
         }
         subscriber.add(newUnsubscribeAction(subscriber));
-        mSubscribers.add(subscriber);
+        subscribers.add(subscriber);
 
-        RealmConfiguration.Builder builder = new RealmConfiguration.Builder(mContext);
-        if (mFileName != null) {
-            builder.name(mFileName);
-        }
-        Realm realm = Realm.getInstance(builder.build());
+        Realm realm = Realm.getDefaultInstance();
+        Timber.d(RealmUtil.dumpRealmCount());
         boolean withError = false;
 
         T object = null;
         try {
-            if (!mCanceled.get()) {
+            if (!canceled.get()) {
                 realm.beginTransaction();
                 object = get(realm);
-                if (object != null && !mCanceled.get()) {
+                if (object != null && !canceled.get()) {
                     realm.commitTransaction();
                 } else {
                     realm.cancelTransaction();
@@ -79,7 +63,7 @@ abstract class OnSubscribeRealm<T> implements Observable.OnSubscribe<T> {
             sendOnError(e);
             withError = true;
         }
-        if (object != null && !mCanceled.get() && !withError) {
+        if (object != null && !canceled.get() && !withError) {
             sendOnNext(object);
         }
 
@@ -92,40 +76,37 @@ abstract class OnSubscribeRealm<T> implements Observable.OnSubscribe<T> {
         if (!withError) {
             sendOnCompleted();
         }
-        mCanceled.set(false);
+        canceled.set(false);
     }
 
     private void sendOnNext(T object) {
-        for (int i = 0; i < mSubscribers.size(); i++) {
-            Subscriber<? super T> subscriber = mSubscribers.get(i);
+        for (int i = 0; i < subscribers.size(); i++) {
+            Subscriber<? super T> subscriber = subscribers.get(i);
             subscriber.onNext(object);
         }
     }
 
     private void sendOnError(Throwable e) {
-        for (int i = 0; i < mSubscribers.size(); i++) {
-            Subscriber<? super T> subscriber = mSubscribers.get(i);
+        for (int i = 0; i < subscribers.size(); i++) {
+            Subscriber<? super T> subscriber = subscribers.get(i);
             subscriber.onError(e);
         }
     }
 
     private void sendOnCompleted() {
-        for (int i = 0; i < mSubscribers.size(); i++) {
-            Subscriber<? super T> subscriber = mSubscribers.get(i);
+        for (int i = 0; i < subscribers.size(); i++) {
+            Subscriber<? super T> subscriber = subscribers.get(i);
             subscriber.onCompleted();
         }
     }
 
     @NonNull
     private Subscription newUnsubscribeAction(final Subscriber<? super T> subscriber) {
-        return Subscriptions.create(new Action0() {
-            @Override
-            public void call() {
-                synchronized (mLock) {
-                    mSubscribers.remove(subscriber);
-                    if (mSubscribers.isEmpty()) {
-                        mCanceled.set(true);
-                    }
+        return Subscriptions.create(() -> {
+            synchronized (lock) {
+                subscribers.remove(subscriber);
+                if (subscribers.isEmpty()) {
+                    canceled.set(true);
                 }
             }
         });

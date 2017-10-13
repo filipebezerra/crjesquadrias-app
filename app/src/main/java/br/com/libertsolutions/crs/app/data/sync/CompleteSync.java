@@ -55,11 +55,11 @@ class CompleteSync extends AbstractSync {
 
     CompleteSync(Context context) {
         super(context);
-        checkinDataService = new CheckinRealmDataService(context);
+        checkinDataService = new CheckinRealmDataService();
         checkinService = createService(CheckinService.class, context);
-        workDataService = new WorkRealmDataService(context);
+        workDataService = new WorkRealmDataService();
         workService = createService(WorkService.class, context);
-        flowDataService = new FlowRealmDataService(context);
+        flowDataService = new FlowRealmDataService();
         flowService = createService(FlowService.class, context);
     }
 

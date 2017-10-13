@@ -49,7 +49,7 @@ class FlowsSync extends AbstractSync {
 
     FlowsSync(Context context) {
         super(context);
-        flowDataService = new FlowRealmDataService(context);
+        flowDataService = new FlowRealmDataService();
         flowService = createService(FlowService.class, context);
     }
 
