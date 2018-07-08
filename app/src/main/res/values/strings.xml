@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CRS</string>
+    <string name="app_name">CRJ</string>
     <string name="title_login_activity">Entrar</string>
     <string name="title_activity_main">Obras</string>
     <string name="title_activity_settings">Configurações</string>
@@ -8,7 +8,7 @@
 
     <string name="server_url_pref_key">server_url</string>
     <string name="server_url_pref_title">Endereço do Web service</string>
-    <string name="server_url_pref_default_value">http://crs.libertsolutions.com.br/api/</string>
+    <string name="server_url_pref_default_value">http://app.crjesquadrias.com.br/api/</string>
     <string name="server_url_pref_dialog_title">Confirme a URL do Web service</string>
     <string name="server_url_dialog_message">Informe o endereço completo incluindo http://</string>
     <string name="server_url_pref_desc">
