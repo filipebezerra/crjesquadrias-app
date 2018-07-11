@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#459f67</color>
-    <color name="colorPrimaryDark">#3f825e</color>
-    <color name="colorAccent">#3f825e</color>
+    <color name="colorPrimary">#32338e</color>
+    <color name="colorPrimaryDark">#000e60</color>
+    <color name="colorAccent">#000e60</color>
     <color name="white">#FFFFFF</color>
-    <color name="accent_pressed">#264e39</color>
+    <color name="accent_pressed">#232362</color>
     <color name="launchBackground">@color/colorPrimaryDark</color>
-    <color name="accentTranslucent">#803f825e</color>
+    <color name="accentTranslucent">#80000e60</color>
     <color name="blackTranslucent">#20000000</color>
     <color name="itemBackgroundColor">#def1e5</color>
 
@@ -14,7 +14,7 @@
     <color name="statusStarted">#3276b1</color>
     <color name="statusFinished">#739e73</color>
 
-    <color name="window_background">#def1e5</color>
-    <color name="color_accent_pressed">#6a3f825e</color>
-    <color name="color_accent_focused">#963f825e</color>
+    <color name="window_background">#fcfcfe</color>
+    <color name="color_accent_pressed">#6a000e60</color>
+    <color name="color_accent_focused">#96000e60</color>
 </resources>

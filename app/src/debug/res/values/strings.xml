@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="server_url_pref_default_value">http://app2.crjesquadrias.com.br /api/</string>
+    <string name="server_url_pref_default_value">http://app2.crjesquadrias.com.br/api/</string>
 </resources>
