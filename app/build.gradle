@@ -90,7 +90,7 @@ dependencies {
 
     // Reactive Extensions
     implementation 'io.reactivex:rxandroid:1.2.1'
-    implementation 'io.reactivex:rxjava:1.3.0'
+    implementation 'io.reactivex:rxjava:1.3.8'
 
     // Parcelable auto generator
     implementation "com.hannesdorfmann.parcelableplease:annotation:${parcelableplease}"
