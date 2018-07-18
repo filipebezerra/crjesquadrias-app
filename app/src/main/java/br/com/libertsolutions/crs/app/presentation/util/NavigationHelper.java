@@ -28,7 +28,7 @@ public class NavigationHelper {
     }
 
     public static void navigateToMainScreen(@NonNull Activity activity) {
-        activity.startActivity(IntentCompat
+        activity.startActivity(Intent
                 .makeMainActivity(new ComponentName(activity, MainActivity.class))
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }

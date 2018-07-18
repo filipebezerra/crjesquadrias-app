@@ -4,20 +4,20 @@ buildscript {
     repositories {
         jcenter()
         maven { url 'https://maven.fabric.io/public' }
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.android.tools.build:gradle:3.1.3'
         classpath 'io.realm:realm-gradle-plugin:3.5.0'
-        classpath 'io.fabric.tools:gradle:1.21.6'
-        classpath 'me.tatarka:gradle-retrolambda:3.7.0'
-        classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.7.3'
+        classpath 'io.fabric.tools:gradle:1.25.1'
+        classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.8.3'
     }
 }
 
 allprojects {
     repositories {
         jcenter()
-        maven { url "https://maven.google.com" }
+        google()
     }
 }
 
