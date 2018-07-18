@@ -1,6 +1,9 @@
 package br.com.libertsolutions.crs.app.data.sync;
 
 import android.content.Context;
+
+import java.util.Collections;
+
 import br.com.libertsolutions.crs.app.data.checkin.CheckinDataService;
 import br.com.libertsolutions.crs.app.data.checkin.CheckinRealmDataService;
 import br.com.libertsolutions.crs.app.data.checkin.CheckinService;
@@ -15,6 +18,7 @@ import br.com.libertsolutions.crs.app.data.work.WorkService;
 import br.com.libertsolutions.crs.app.domain.pojo.Checkins;
 import br.com.libertsolutions.crs.app.domain.pojo.Flows;
 import br.com.libertsolutions.crs.app.domain.pojo.Works;
+import rx.Observable;
 import rx.Subscription;
 import timber.log.Timber;
 
@@ -101,7 +105,6 @@ class CompleteSync extends AbstractSync {
                 .getAllWithUpdates(getLastSyncDate(), currentPageWorks)
                 .retryWhen(timeoutException())
                 .retryWhen(exponentialBackoff(3, 5, SECONDS))
-                .filter(works -> works != null && (works.list != null && !works.list.isEmpty()))
                 .subscribe(this::saveWorkUpdates, e -> e(e, "Erro obtendo atualizações nas obras"));
         compositeSubscription.add(subscription);
     }
@@ -112,7 +115,8 @@ class CompleteSync extends AbstractSync {
                 .doOnError(e -> e(e, "Erro persistindo atualizações nas obras"))
                 .doOnCompleted(
                         () -> {
-                            if (currentPageWorks == works.totalPaginas) {
+                            if (works.totalPaginas == 0 ||
+                                    currentPageWorks == works.totalPaginas) {
                                 getFlowUpdates();
                             } else {
                                 currentPageWorks++;
@@ -130,7 +134,6 @@ class CompleteSync extends AbstractSync {
                 .getAllWithUpdates(getLastSyncDate(), currentPageFlows)
                 .retryWhen(timeoutException())
                 .retryWhen(exponentialBackoff(3, 5, SECONDS))
-                .filter(flows -> flows != null && (flows.list != null && !flows.list.isEmpty()))
                 .subscribe(this::saveFlowUpdates, e -> e(e, "Erro obtendo atualizações nos fluxos"));
         compositeSubscription.add(subscription);
     }
@@ -141,7 +144,8 @@ class CompleteSync extends AbstractSync {
                 .doOnError(e -> e(e, "Erro persistindo atualizações nos fluxos"))
                 .doOnCompleted(
                         () -> {
-                            if (currentPageFlows == flows.totalPaginas) {
+                            if (flows.totalPaginas == 0 ||
+                                    currentPageFlows == flows.totalPaginas) {
                                 getCheckinUpdates();
                             } else {
                                 currentPageFlows++;
@@ -159,8 +163,6 @@ class CompleteSync extends AbstractSync {
                 .getAllWithUpdates(getLastSyncDate(), currentPageCheckins)
                 .retryWhen(timeoutException())
                 .retryWhen(exponentialBackoff(3, 5, SECONDS))
-                .filter(checkins ->
-                        checkins != null && (checkins.list != null && !checkins.list.isEmpty()))
                 .subscribe(this::saveCheckinUpdates,
                         e -> e(e, "Erro obtendo atualizações nos check-ins"));
         compositeSubscription.add(subscription);
@@ -172,7 +174,8 @@ class CompleteSync extends AbstractSync {
                 .doOnError(e -> e(e, "Erro persistindo atualizações nos check-ins"))
                 .doOnCompleted(
                         () -> {
-                            if (currentPageCheckins == checkins.totalPaginas) {
+                            if (checkins.totalPaginas == 0 ||
+                                    currentPageCheckins == checkins.totalPaginas) {
                                 syncDone();
                                 SyncEvent.send(getSyncType(), COMPLETED);
                                 compositeSubscription.clear();
